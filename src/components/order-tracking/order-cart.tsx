@@ -1,0 +1,116 @@
+import { type CartItem } from "@/types/menu-cart-type";
+import { Add, Delete, Remove } from "@mui/icons-material";
+import {
+    Box,
+    Button,
+    Divider,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    Typography,
+    useTheme,
+} from "@mui/material";
+
+interface Props {
+    cartItems: CartItem[];
+    onUpdateQuantity: (itemId: string, quantity: number) => void;
+    onRemoveItem: (itemId: string) => void;
+    onOpenPaymentDialog: () => void;
+}
+
+const OrderCart = ({
+    cartItems,
+    onUpdateQuantity,
+    onRemoveItem,
+    onOpenPaymentDialog,
+}: Props) => {
+    const theme = useTheme();
+    const subtotal = cartItems.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0,
+    );
+
+    return (
+        <Box
+            sx={{
+                p: 2,
+                border: "1px solid",
+                borderColor: "grey.300",
+                borderRadius: 2,
+            }}
+        >
+            <Typography variant="h5" gutterBottom>
+                Order Cart
+            </Typography>
+            <Divider />
+            {cartItems.length === 0 ? (
+                <Typography sx={{ my: 2 }}>Cart is empty</Typography>
+            ) : (
+                <List>
+                    {cartItems.map((item) => (
+                        <ListItem
+                            key={item.id}
+                            secondaryAction={
+                                <IconButton
+                                    edge="end"
+                                    aria-label="delete"
+                                    onClick={() => onRemoveItem(item.id)}
+                                >
+                                    <Delete />
+                                </IconButton>
+                            }
+                        >
+                            <ListItemText
+                                primary={item.name}
+                                secondary={`₦${(item.price * item.quantity).toFixed(2)}`}
+                            />
+                            <IconButton
+                                onClick={() =>
+                                    onUpdateQuantity(item.id, item.quantity - 1)
+                                }
+                            >
+                                <Remove />
+                            </IconButton>
+                            <Typography sx={{ mx: 1 }}>
+                                {item.quantity}
+                            </Typography>
+                            <IconButton
+                                onClick={() =>
+                                    onUpdateQuantity(item.id, item.quantity + 1)
+                                }
+                            >
+                                <Add />
+                            </IconButton>
+                        </ListItem>
+                    ))}
+                </List>
+            )}
+            <Divider />
+            <Box sx={{ mt: 2 }}>
+                <Typography variant="h5">
+                    Subtotal: ₦{subtotal.toFixed(2)}
+                </Typography>
+                <Typography
+                    variant="h3"
+                    color={theme.palette.success.main}
+                    mt={1}
+                >
+                    Total: ₦{subtotal.toFixed(2)}
+                </Typography>
+            </Box>
+            <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 2 }}
+                disabled={cartItems.length === 0}
+                onClick={onOpenPaymentDialog}
+            >
+                Place Order
+            </Button>
+        </Box>
+    );
+};
+
+export default OrderCart;

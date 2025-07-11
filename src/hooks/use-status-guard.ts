@@ -1,7 +1,8 @@
 // import axios from "axios";
+import axiosInstance from "@/utils/axios-instance.ts";
+import { isInvalidAuthData } from "@/utils/is-invalid-auth-data.ts";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { isInvalidAuthData } from "@/utils/is-invalid-auth-data.ts";
 
 export const useStatusGuard = () => {
   const navigate = useNavigate();
@@ -31,18 +32,7 @@ export const useStatusGuard = () => {
           return; // Exit early
         }
 
-        // const response = await axios.get(
-        //   `${import.meta.env.VITE_APP_API_URL}/products`,
-        //   {
-        //     headers: {
-        //       Authorization: `Bearer ${token}`,
-        //     },
-        //   },
-        // );
-
-        const response = {
-          status: 200,
-        };
+        const response = await axiosInstance.get(`/`);
 
         setIsServerOk(response.status === 200);
       } catch (error) {

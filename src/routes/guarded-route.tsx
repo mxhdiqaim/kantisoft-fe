@@ -1,11 +1,11 @@
-import { memo, type ReactNode } from "react";
-import { useStatusGuard } from "@/hooks/use-status-guard";
+import { AuthGuard } from "@/components/auth/auth-guard";
+import ServerDown from "@/components/status-comp/server-down";
 
 import Spinner from "@/components/status-comp/spinner";
-import ServerDown from "@/components/status-comp/server-down";
-import { ErrorBoundary } from "react-error-boundary";
+import { useStatusGuard } from "@/hooks/use-status-guard";
 import ErrorFallback from "@/pages/errors/fallback";
-import { AuthGuard } from "@/components/auth/auth-guard";
+import { memo, type ReactNode } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 
 type GuardProps = {
   authGuard: boolean;
@@ -13,7 +13,10 @@ type GuardProps = {
 };
 
 // This is your GuardedRoute component that checks authentication status
-const GuardedRoute = memo(({ children, authGuard }: GuardProps) => {
+const GuardedRoute = memo(function GuardedRoute({
+  children,
+  authGuard,
+}: GuardProps) {
   const { loading, isServerOk } = useStatusGuard();
 
   // Show loading spinner if still checking status
