@@ -13,7 +13,7 @@ import Layout from "@/components/navigations/layouts";
 import { ScrollToTop, resolveChildren } from "@/utils";
 import { appRoutes, type AppRouteType } from "@/routes";
 
-import { ThemeProvider } from "./theme";
+import { ThemeProvider } from "@/theme";
 
 // function to handle nested children route rendering
 const handleNestedRoutes = (

@@ -82,6 +82,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                 : "transparent",
               "&:hover": {
                 backgroundColor: theme.palette.primary.light,
+                color: "#fff",
               },
               my: -0.8,
             }}

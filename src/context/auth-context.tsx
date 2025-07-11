@@ -1,12 +1,10 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import type { UserLogin, UserType } from "@/types/user-types";
-import { v4 as uuidv4 } from "uuid";
-// import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import axiosInstance from "@/utils/axios-instance";
 
 import type { ErrCallbackType, AuthValuesType } from "@/types";
-
-// const BaseURL: string = import.meta.env.VITE_APP_API_URL;
 
 const defaultProvider: AuthValuesType = {
   user: null,
@@ -67,53 +65,18 @@ const AuthProvider = ({ children }: Props) => {
     setLoading(true);
 
     try {
-      // const { data } = await axios.post(
-      //   `${BaseURL}/login`,
-      //   params,
-      //   // { withCredentials: true }
-      // );
+      const { data } = await axiosInstance.post(`/users/login`, params, {
+        withCredentials: true,
+      });
 
-      // Mock validation
-      if (
-        params.email !== "test@example.com" ||
-        params.password !== "password123"
-      ) {
-        if (errorCallback) {
-          errorCallback("Invalid email or password");
-        }
-        setLoading(false);
-        return;
-      }
+      const { token } = data;
 
-      // Mock successful login response
-      const mockResponse = {
-        token: "mock-jwt-token",
-        user: {
-          id: uuidv4(),
-          username: "test",
-          email: params.email,
-          name: "Test User",
-          isActive: true,
-          role: "manager" as "manager" | "admin" | "user" | "guest", // this is a test
-          createdAt: `${new Date()}`,
-          updatedAt: `${new Date()}`,
-        },
-        status: 200,
-      };
+      const decodedUser = jwtDecode(token);
 
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      localStorage.setItem("token", token);
+      localStorage.setItem("userData", JSON.stringify(decodedUser));
 
-      // localStorage.setItem("token", data.token);
-      // localStorage.setItem("userData", JSON.stringify(data.user));
-
-      // Store mock data
-      localStorage.setItem("token", mockResponse.token);
-      localStorage.setItem("userData", JSON.stringify(mockResponse.user));
-
-      // setUser({ ...data.user });
-
-      setUser({ ...(mockResponse.user as UserType) });
+      setUser({ ...data.user });
 
       navigate("/order-tracking", { replace: true });
       // eslint-disable-next-line
@@ -124,16 +87,30 @@ const AuthProvider = ({ children }: Props) => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userData");
-    setUser(null);
-    setLoading(false);
-    setIsInitialized(false);
+  const handleLogout = async (errorCallback?: ErrCallbackType) => {
+    try {
+      await axiosInstance.post(`/users/logout`);
+      console.log("testing logout");
 
-    navigate("/login");
+      localStorage.removeItem("token");
+      localStorage.removeItem("userData");
+      setUser(null);
+      setIsInitialized(false);
 
-    window.location.reload();
+      navigate("/login", { replace: true });
+      // eslint-disable-next-line
+    } catch (err: any) {
+      // It's good practice to also clear user data and redirect on failure
+      localStorage.removeItem("token");
+      localStorage.removeItem("userData");
+      setUser(null);
+      navigate("/login", { replace: true });
+      console.log("testing logout 2");
+      if (errorCallback) errorCallback(err.response?.data?.message);
+    } finally {
+      setLoading(false);
+      window.location.reload();
+    }
   };
 
   //   const handleRegister = (
