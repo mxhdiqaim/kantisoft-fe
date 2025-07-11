@@ -8,7 +8,6 @@ interface Props {
 }
 
 const MenuItem = ({ item, onAddToCart }: Props) => {
-    console.log("item", item);
     return (
         <CustomCard>
             <Box>

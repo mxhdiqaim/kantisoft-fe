@@ -1,16 +1,28 @@
 import { extendBaseSchema } from "@/types";
 import * as yup from "yup";
 
-export const menuItemSchema = extendBaseSchema(
-    yup.object().shape({
-        name: yup.string().required().min(2),
-        price: yup.number().required(),
-        isAvailable: yup.boolean().required().default(true),
-    }),
-);
+const coreMenuItemSchema = yup.object({
+    name: yup
+        .string()
+        .required("Name is required")
+        .min(2, "Name must be at least 2 characters"),
+    price: yup
+        .number()
+        .typeError("Price must be a number")
+        .positive("Price must be greater than 0")
+        .required("Price is required"),
+    isAvailable: yup.boolean().required().default(true),
+});
 
-// TS Type
+// Schema for a full menu item object, including base fields like id and timestamps
+export const menuItemSchema = extendBaseSchema(coreMenuItemSchema);
+
+// The schema for creating a new menu item is the same as the core schema
+export const createMenuItemSchema = coreMenuItemSchema;
+
+// Inferred type for a full menu item object
 export type MenuItemType = yup.InferType<typeof menuItemSchema>;
+// Inferred type for creating a menu item, ensuring consistency
 export type AddMenuItemType = Pick<
     MenuItemType,
     "name" | "price" | "isAvailable"

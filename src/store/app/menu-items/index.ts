@@ -31,8 +31,6 @@ export const fetchMenuItems = createAsyncThunk(
     async () => {
         const response = await axiosInstance.get(`${MENU_ITEM_URL}/`);
 
-        console.log(response.data);
-
         return response.data;
     },
 );
@@ -40,8 +38,6 @@ export const fetchMenuItems = createAsyncThunk(
 export const createMenuItems = createAsyncThunk(
     "menu-items/create",
     async (data: AddMenuItemType, { dispatch }: ReduxType) => {
-        console.log("data", data);
-
         try {
             const response = await axiosInstance.post(
                 `${MENU_ITEM_URL}/create`,

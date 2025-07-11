@@ -1,10 +1,10 @@
-import type { SxProps, Theme } from '@mui/material';
-import Backdrop from '@mui/material/Backdrop';
-import Box from '@mui/material/Box';
-import Fade from '@mui/material/Fade';
-import Modal from '@mui/material/Modal';
-import Typography from '@mui/material/Typography';
-import type { FC, ReactNode } from 'react';
+import type { SxProps, Theme } from "@mui/material";
+import Backdrop from "@mui/material/Backdrop";
+import Box from "@mui/material/Box";
+import Fade from "@mui/material/Fade";
+import Modal from "@mui/material/Modal";
+import Typography from "@mui/material/Typography";
+import type { FC, ReactNode } from "react";
 
 interface Props {
     open: boolean;
@@ -26,15 +26,17 @@ const CustomModal: FC<Props> = ({
     backdropProps = {},
 }) => {
     const defaultStyle: SxProps<Theme> = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        bgcolor: 'background.paper',
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: { xs: "80vw", md: 600 },
+        bgcolor: "background.paper",
         borderRadius: 4,
         boxShadow: 24,
         p: 4,
+        overflow: "auto",
+        maxHeight: "85vh",
         ...modalStyles,
     };
 
