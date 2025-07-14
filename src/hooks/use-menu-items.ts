@@ -1,6 +1,6 @@
 import type { AppDispatch, RootState } from "@/store";
 import { fetchMenuItems } from "@/store/app/menu-items";
-import type { MenuItemType } from "@/types/menu-cart-type";
+import type { MenuItemType } from "@/types/menu-item-type.ts";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 

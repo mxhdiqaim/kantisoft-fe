@@ -28,7 +28,3 @@ export type AddMenuItemType = Pick<
     "name" | "price" | "isAvailable"
 >;
 export type EditMenuItemType = Partial<MenuItemType>;
-
-export interface CartItem extends MenuItemType {
-    quantity: number;
-}

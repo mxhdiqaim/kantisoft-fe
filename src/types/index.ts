@@ -1,5 +1,5 @@
-import type { CreateUser, UserLogin, UserType } from '@/types/user-types';
-import * as yup from 'yup';
+import type { CreateUser, UserLogin, UserType } from "@/types/user-types";
+import * as yup from "yup";
 
 // Base schema type that all other schemas will extend
 export const baseSchema = yup.object().shape({

@@ -4,7 +4,7 @@ import { createMenuItems } from "@/store/app/menu-items";
 import {
     type AddMenuItemType,
     createMenuItemSchema,
-} from "@/types/menu-cart-type";
+} from "@/types/menu-item-type";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { useEffect } from "react";
@@ -24,9 +24,7 @@ const defaultValues: AddMenuItemType = {
 
 const AddMenuItemModal = ({ open, onClose }: Props) => {
     const dispatch = useDispatch<AppDispatch>();
-    const { submitted: loading } = useSelector(
-        (state: RootState) => state.menuItem,
-    );
+    const { loading } = useSelector((state: RootState) => state.menuItem);
 
     const {
         control,
@@ -39,18 +37,18 @@ const AddMenuItemModal = ({ open, onClose }: Props) => {
         resolver: yupResolver(createMenuItemSchema),
     });
 
-    useEffect(() => {
-        if (open) {
-            reset(defaultValues);
-        }
-    }, [open, reset]);
-
     const onSubmit = async (data: AddMenuItemType) => {
         const result = await dispatch(createMenuItems(data));
         if (createMenuItems.fulfilled.match(result)) {
             onClose();
         }
     };
+
+    useEffect(() => {
+        if (open) {
+            reset(defaultValues);
+        }
+    }, [open, reset]);
 
     return (
         <CustomModal open={open} onClose={onClose}>

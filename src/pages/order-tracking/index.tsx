@@ -2,22 +2,12 @@ import AddMenuItemModal from "@/components/order-tracking/add-menu-item";
 import MenuItem from "@/components/order-tracking/menu-item";
 import OrderCart from "@/components/order-tracking/order-cart";
 import PaymentModal from "@/components/order-tracking/payment-modal";
-import Spinner from "@/components/status-comp/spinner.tsx";
+import Spinner from "@/components/status-comp/spinner";
 import { useMenuItems } from "@/hooks/use-menu-items";
-import type { CartItem, MenuItemType } from "@/types/menu-cart-type";
+import type { CartItem } from "@/types/cart-item-type";
+import type { MenuItemType } from "@/types/menu-item-type";
 import { Alert, Box, Button, Grid, Snackbar, TextField } from "@mui/material";
 import { useMemo, useState } from "react";
-
-// Mocking axios
-const mock = {
-    post: (url: string, data: unknown) => {
-        if (url === "/api/orders") {
-            console.log("Order submitted:", data);
-            return Promise.resolve({ data: { success: true } });
-        }
-        return Promise.resolve({ data: {} });
-    },
-};
 
 const OrderTracking = () => {
     const { menuItems, loading } = useMenuItems();
@@ -72,24 +62,10 @@ const OrderTracking = () => {
         setPaymentDialogOpen(false);
     };
 
-    const handleCompleteSale = async (
-        paymentMethod: string,
-        amountReceived?: number,
-    ) => {
-        const orderDetails = {
-            items: cartItems.map((item) => ({
-                id: item.id,
-                quantity: item.quantity,
-            })),
-            total: cartItems.reduce(
-                (acc, item) => acc + item.price * item.quantity,
-                0,
-            ),
-            paymentMethod,
-            amountReceived,
-        };
+    const handleCompleteSale = async (submitted: boolean) => {
         try {
-            await mock.post("/api/orders", orderDetails);
+            if (!submitted) return;
+
             setSnackbar({
                 open: true,
                 message: "Order completed successfully!",

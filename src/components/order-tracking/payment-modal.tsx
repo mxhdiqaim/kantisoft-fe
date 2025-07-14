@@ -1,98 +1,173 @@
-import CustomModal from '@/components/customs/custom-modal.tsx';
-import { type CartItem } from '@/types/menu-cart-type';
+import CustomModal from "@/components/customs/custom-modal";
+import type { CartItem } from "@/types/cart-item-type";
 import {
-    Box,
+    createOrderSchema,
+    type CreateOrderType,
+} from "@/types/order-types.ts";
+import { yupResolver } from "@hookform/resolvers/yup";
+import {
     Button,
     DialogActions,
+    FormControl,
     FormControlLabel,
+    FormHelperText,
     Radio,
     RadioGroup,
     TextField,
     Typography,
-} from '@mui/material';
-import { useState } from 'react';
+} from "@mui/material";
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { type AppDispatch } from "@/store";
+import { createOrders } from "@/store/app/orders";
 
 interface Props {
     open: boolean;
     onClose: () => void;
-    onCompleteSale: (paymentMethod: string, amountReceived?: number) => void;
+    onCompleteSale: (submitted: boolean) => void;
     cartItems: CartItem[];
 }
 
 const PaymentDialog = ({ open, onClose, onCompleteSale, cartItems }: Props) => {
-    const [paymentMethod, setPaymentMethod] = useState('Card');
-    const [amountReceived, setAmountReceived] = useState(0);
+    const dispatch = useDispatch<AppDispatch>();
+
+    const seller = JSON.parse(localStorage.getItem("userData") as string);
+    const sellerId = seller.id;
 
     const total = cartItems.reduce(
         (acc, item) => acc + item.price * item.quantity,
         0,
     );
 
-    const handleCompleteSale = () => {
-        onCompleteSale(paymentMethod, amountReceived);
-    };
+    const {
+        control,
+        handleSubmit,
+        reset,
+        watch,
+        formState: { errors, isValid },
+    } = useForm<CreateOrderType>({
+        mode: "onChange",
+        resolver: yupResolver(createOrderSchema),
+        defaultValues: {
+            sellerId: sellerId,
+            paymentMethod: "cash",
+            orderStatus: "completed",
+            items: [],
+            amountReceived: 0,
+        },
+    });
+
+    const paymentMethod = watch("paymentMethod");
+    const amountReceived = watch("amountReceived", 0);
 
     const change = amountReceived - total;
+
+    const onSubmit = async (data: Omit<CreateOrderType, "amountReceived">) => {
+        const result = await dispatch(createOrders(data));
+
+        if (createOrders.fulfilled.match(result)) {
+            onClose();
+        }
+
+        onCompleteSale(true);
+    };
+
+    useEffect(() => {
+        if (open) {
+            const items = cartItems.map((item) => ({
+                menuItemId: item.id,
+                quantity: item.quantity,
+            }));
+
+            reset({
+                sellerId: seller.id || "",
+                paymentMethod: "cash",
+                orderStatus: "completed",
+                items: items,
+                amountReceived: 0,
+            });
+        }
+    }, [open, cartItems, seller.id, reset]);
 
     return (
         <CustomModal
             open={open}
             onClose={onClose}
-            title={'Payment'}
+            title={"Payment"}
             description={`Total Amount: ${total.toFixed(2)}`}
         >
-            <Box>
-                <RadioGroup
-                    row
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <FormControl
+                    component="fieldset"
+                    error={!!errors.paymentMethod}
                 >
-                    <FormControlLabel
-                        value="Card"
-                        control={<Radio />}
-                        label="Card"
-                    />
-                    <FormControlLabel
-                        value="Cash"
-                        control={<Radio />}
-                        label="Cash"
-                    />
-                    <FormControlLabel
-                        value="Transfer"
-                        control={<Radio />}
-                        label="Transfer"
-                    />
-                </RadioGroup>
-                {paymentMethod === 'Cash' && (
-                    <Box sx={{ mt: 2 }}>
-                        <TextField
-                            label="Amount Received"
-                            type="number"
-                            fullWidth
-                            value={amountReceived}
-                            onChange={(e) =>
-                                setAmountReceived(Number(e.target.value))
-                            }
-                        />
-                        {amountReceived > 0 && (
-                            <Typography sx={{ mt: 1 }}>
-                                Change: $
-                                {change > 0 ? change.toFixed(2) : '0.00'}
-                            </Typography>
+                    <Controller
+                        name="paymentMethod"
+                        control={control}
+                        render={({ field }) => (
+                            <RadioGroup {...field} row>
+                                <FormControlLabel
+                                    value="cash"
+                                    control={<Radio />}
+                                    label="Cash"
+                                />
+                                <FormControlLabel
+                                    value="card"
+                                    control={<Radio />}
+                                    label="Card"
+                                />
+                                <FormControlLabel
+                                    value="transfer"
+                                    control={<Radio />}
+                                    label="Transfer"
+                                />
+                            </RadioGroup>
                         )}
-                    </Box>
-                )}
-            </Box>
-            <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button
-                    onClick={handleCompleteSale}
-                    variant="contained"
-                    color="primary"
-                >
-                    Complete Sale
-                </Button>
-            </DialogActions>
+                    />
+                    {errors.paymentMethod && (
+                        <FormHelperText>
+                            {errors.paymentMethod.message}
+                        </FormHelperText>
+                    )}
+                    {paymentMethod === "cash" && (
+                        <>
+                            <Controller
+                                name="amountReceived"
+                                control={control}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        label="Amount Received"
+                                        type="number"
+                                        fullWidth
+                                        margin="normal"
+                                        error={!!errors.amountReceived}
+                                        helperText={
+                                            errors.amountReceived?.message
+                                        }
+                                    />
+                                )}
+                            />
+                            <Typography sx={{ mt: 1 }}>
+                                Change: ₦
+                                {change > 0 ? change.toFixed(2) : "0.00"}
+                            </Typography>
+                        </>
+                    )}
+                </FormControl>
+                <DialogActions sx={{ mt: 2, px: 0 }}>
+                    <Button onClick={onClose}>Cancel</Button>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        disabled={!isValid}
+                    >
+                        Complete Order
+                    </Button>
+                </DialogActions>
+            </form>
         </CustomModal>
     );
 };

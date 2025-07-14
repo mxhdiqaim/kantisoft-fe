@@ -1,5 +1,5 @@
 import CustomCard from "@/components/customs/custom-card";
-import type { MenuItemType } from "@/types/menu-cart-type";
+import type { MenuItemType } from "@/types/menu-item-type.ts";
 import { Box, Button, Divider, Typography } from "@mui/material";
 
 interface Props {

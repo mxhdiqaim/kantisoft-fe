@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { AddMenuItemType, MenuItemType } from "@/types/menu-cart-type";
+import type { AddMenuItemType, MenuItemType } from "@/types/menu-item-type.ts";
 import axiosInstance from "@/utils/axios-instance";
 import { createAsyncThunk, createSlice, type Dispatch } from "@reduxjs/toolkit";
 
@@ -8,19 +8,17 @@ interface ReduxType {
     dispatch: Dispatch<any>;
 }
 
-interface ArticlesState {
+interface MenuItemsState {
     menuItems: MenuItemType[];
     menuItem: MenuItemType | null;
     loading: boolean;
-    submitted: boolean;
     error?: any;
 }
 
-const initialState: ArticlesState = {
+const initialState: MenuItemsState = {
     menuItems: [],
     menuItem: null,
     loading: false,
-    submitted: false,
     error: null,
 };
 
@@ -138,14 +136,14 @@ export const appMenuItemsSlice = createSlice({
             });
         builder
             .addCase(createMenuItems.pending, (state) => {
-                state.submitted = true;
+                state.loading = true;
             })
             .addCase(createMenuItems.fulfilled, (state, action) => {
                 state.menuItem = action.payload;
-                state.submitted = false;
+                state.loading = false;
             })
             .addCase(createMenuItems.rejected, (state) => {
-                state.submitted = false;
+                state.loading = false;
             });
     },
 });

@@ -1,4 +1,4 @@
-import { type CartItem } from "@/types/menu-cart-type";
+import { type CartItem } from "@/types/menu-item-type.ts";
 import { Add, Delete, Remove } from "@mui/icons-material";
 import {
     Box,

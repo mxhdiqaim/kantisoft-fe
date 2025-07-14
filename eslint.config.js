@@ -5,33 +5,33 @@ import pluginReact from "eslint-plugin-react";
 import { defineConfig } from "eslint/config";
 
 export default defineConfig([
-  {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    plugins: { js },
-    extends: ["js/recommended"],
-  },
-  {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        React: true,
-      },
+    {
+        files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+        plugins: { js },
+        extends: ["js/recommended"],
     },
-  },
-  tseslint.configs.recommended,
-  {
-    files: ["**/*.{jsx,tsx}"],
-    ...pluginReact.configs.flat.recommended,
-    rules: {
-      "react/react-in-jsx-scope": "off",
-      "react/jsx-uses-react": "off",
+    {
+        files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+        languageOptions: {
+            globals: {
+                ...globals.browser,
+                React: true,
+            },
+        },
     },
-    settings: {
-      react: {
-        version: "detect",
-      },
+    tseslint.configs.recommended,
+    {
+        files: ["**/*.{jsx,tsx}"],
+        ...pluginReact.configs.flat.recommended,
+        rules: {
+            "react/react-in-jsx-scope": "off",
+            "react/jsx-uses-react": "off",
+        },
+        settings: {
+            react: {
+                version: "detect",
+            },
+        },
     },
-  },
-  pluginReact.configs.flat.recommended,
+    pluginReact.configs.flat.recommended,
 ]);
