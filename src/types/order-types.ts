@@ -17,6 +17,8 @@ export const OrderPaymentMethod = {
 const PAYMENT_METHODS = Object.values(OrderPaymentMethod);
 const ORDER_STATUSES = Object.values(OrderStatus);
 
+export const ORDER_PERIODS = ["day", "week", "month"] as const;
+
 // Core schema for creating and validating an order
 const coreOrderSchema = yup.object({
     totalAmount: yup
@@ -122,3 +124,10 @@ export type CreateOrderItemType = Pick<
 // Explicitly define the types for the constants
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export const orderPeriodSchema = yup
+    .string()
+    .oneOf(ORDER_PERIODS, "Invalid period. Must be 'day', 'week', or 'month'.")
+    .required("Period is required.");
+
+export type OrderPeriod = (typeof ORDER_PERIODS)[number];

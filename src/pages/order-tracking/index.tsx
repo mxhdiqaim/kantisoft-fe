@@ -1,26 +1,23 @@
+import { useMemo, useState } from "react";
 import AddMenuItemModal from "@/components/order-tracking/add-menu-item";
 import MenuItem from "@/components/order-tracking/menu-item";
 import OrderCart from "@/components/order-tracking/order-cart";
 import PaymentModal from "@/components/order-tracking/payment-modal";
 import Spinner from "@/components/status-comp/spinner";
 import { useMenuItems } from "@/hooks/use-menu-items";
+import useNotifier from "@/hooks/useNotifier";
 import type { CartItem } from "@/types/cart-item-type";
 import type { MenuItemType } from "@/types/menu-item-type";
-import { Alert, Box, Button, Grid, Snackbar, TextField } from "@mui/material";
-import { useMemo, useState } from "react";
+import { Box, Button, Grid, TextField } from "@mui/material";
 
 const OrderTracking = () => {
+    const notify = useNotifier();
     const { menuItems, loading } = useMenuItems();
 
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
     const [addMenuItemOpen, setAddMenuItemOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [snackbar, setSnackbar] = useState<{
-        open: boolean;
-        message: string;
-        severity: "success" | "error";
-    } | null>(null);
 
     const handleAddToCart = (item: MenuItemType) => {
         setCartItems((prev) => {
@@ -66,25 +63,14 @@ const OrderTracking = () => {
         try {
             if (!submitted) return;
 
-            setSnackbar({
-                open: true,
-                message: "Order completed successfully!",
-                severity: "success",
-            });
+            notify("Order completed successfully!", "success");
+
             setCartItems([]);
             setPaymentDialogOpen(false);
         } catch (error) {
-            setSnackbar({
-                open: true,
-                message: "Failed to complete order.",
-                severity: "error",
-            });
+            notify("Failed to complete order.", "error");
             console.error("Failed to submit order", error);
         }
-    };
-
-    const handleCloseSnackbar = () => {
-        setSnackbar(null);
     };
 
     const filteredMenuItems = useMemo(() => {
@@ -152,21 +138,6 @@ const OrderTracking = () => {
                 open={addMenuItemOpen}
                 onClose={() => setAddMenuItemOpen(false)}
             />
-            {snackbar && (
-                <Snackbar
-                    open={snackbar.open}
-                    autoHideDuration={6000}
-                    onClose={handleCloseSnackbar}
-                >
-                    <Alert
-                        onClose={handleCloseSnackbar}
-                        severity={snackbar.severity}
-                        sx={{ width: "100%" }}
-                    >
-                        {snackbar.message}
-                    </Alert>
-                </Snackbar>
-            )}
         </Box>
     );
 };

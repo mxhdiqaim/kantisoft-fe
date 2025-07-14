@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { CreateOrderType, OrderType } from "@/types/order-types.ts";
+import type {
+    CreateOrderType,
+    OrderPeriod,
+    OrderType,
+} from "@/types/order-types.ts";
 import axiosInstance from "@/utils/axios-instance";
 import { createAsyncThunk, createSlice, type Dispatch } from "@reduxjs/toolkit";
 
@@ -63,6 +67,21 @@ export const getOrder = createAsyncThunk(
     },
 );
 
+export const getOrderByPeriod = createAsyncThunk(
+    "orders/get-by-period",
+    async (period: OrderPeriod = "day", { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.get(`${ORDER_URL}/by-period`, {
+                params: { period },
+            });
+            // Assuming the backend returns an array of orders in response.data
+            return response.data;
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data);
+        }
+    },
+);
+
 export const appOrdersSlice = createSlice({
     name: "appOrders",
     initialState,
@@ -102,6 +121,19 @@ export const appOrdersSlice = createSlice({
             })
             .addCase(createOrders.rejected, (state) => {
                 state.submitted = false;
+            });
+
+        builder
+            .addCase(getOrderByPeriod.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getOrderByPeriod.fulfilled, (state, action) => {
+                state.orders = action.payload; // Update the orders list with the fetched data
+                state.loading = false;
+            })
+            .addCase(getOrderByPeriod.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             });
     },
 });

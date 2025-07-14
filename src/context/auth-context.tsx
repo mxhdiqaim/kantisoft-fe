@@ -2,7 +2,13 @@ import type { AuthValuesType, ErrCallbackType } from "@/types";
 import type { UserLogin, UserType } from "@/types/user-types";
 import axiosInstance from "@/utils/axios-instance";
 import { jwtDecode } from "jwt-decode";
-import { createContext, type ReactNode, useEffect, useState } from "react";
+import {
+    createContext,
+    type ReactNode,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 
 const defaultProvider: AuthValuesType = {
@@ -31,6 +37,9 @@ const AuthProvider = ({ children }: Props) => {
         defaultProvider.isInitialized,
     );
 
+    // ** Refs
+    const logoutTimer = useRef<NodeJS.Timeout | null>(null);
+
     // ** Hooks
     const navigate = useNavigate();
     //   const [searchParams] = useSearchParams();
@@ -45,7 +54,32 @@ const AuthProvider = ({ children }: Props) => {
                 : null;
 
             if (token && userData) {
-                setUser(userData); // Only set a user if userData is valid
+                // setUser(userData); // Only set a user if userData is valid
+                try {
+                    const decodedToken: { exp: number } = jwtDecode(token);
+                    const expirationTime = decodedToken.exp * 1000; // Convert to milliseconds
+
+                    if (expirationTime <= Date.now()) {
+                        // Token is expired, clear data
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("userData");
+                        setUser(null);
+                    } else {
+                        // Token is valid, set user and schedule auto-logout
+                        setUser(userData);
+                        const remainingTime = expirationTime - Date.now();
+                        logoutTimer.current = setTimeout(
+                            handleLogout,
+                            remainingTime,
+                        );
+                    }
+                } catch (error) {
+                    // If token is invalid
+                    console.error("Invalid token:", error);
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("userData");
+                    setUser(null);
+                }
             } else {
                 setUser(null); // Clear user if token or userData is missing
             }

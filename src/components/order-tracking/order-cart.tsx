@@ -1,4 +1,4 @@
-import { type CartItem } from "@/types/menu-item-type.ts";
+import type { CartItem } from "@/types/cart-item-type";
 import { Add, Delete, Remove } from "@mui/icons-material";
 import {
     Box,
@@ -63,7 +63,21 @@ const OrderCart = ({
                         >
                             <ListItemText
                                 primary={item.name}
-                                secondary={`₦${(item.price * item.quantity).toFixed(2)}`}
+                                secondary={`Subtotal: ₦ ${(item.price * item.quantity).toFixed(2)}`}
+                                slotProps={{
+                                    primary: {
+                                        sx: {
+                                            fontWeight: "bold",
+                                            fontSize: "1.5rem",
+                                            color: theme.palette.primary.main,
+                                        },
+                                    },
+                                    secondary: {
+                                        sx: {
+                                            fontSize: "1rem",
+                                        },
+                                    },
+                                }}
                             />
                             <IconButton
                                 onClick={() =>
@@ -88,15 +102,12 @@ const OrderCart = ({
             )}
             <Divider />
             <Box sx={{ mt: 2 }}>
-                <Typography variant="h5">
-                    Subtotal: ₦{subtotal.toFixed(2)}
-                </Typography>
                 <Typography
                     variant="h3"
                     color={theme.palette.success.main}
                     mt={1}
                 >
-                    Total: ₦{subtotal.toFixed(2)}
+                    Total: ₦ {subtotal.toFixed(2)}
                 </Typography>
             </Box>
             <Button

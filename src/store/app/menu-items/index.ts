@@ -60,51 +60,6 @@ export const getMenuItems = createAsyncThunk(
     },
 );
 
-// export const filterArticles = createAsyncThunk("articles/filter", async (filters: FilterParams) => {
-//     const { search, category, publish_date } = filters;
-//     const queryParams = new URLSearchParams();
-//
-//     // Append parameters only if they are defined
-//     if (search) queryParams.append("search", search);
-//     if (category && category !== "all") queryParams.append("category", category);
-//     if (publish_date) queryParams.append("publish_date", publish_date);
-//
-//     if (category === "all") queryParams.delete("category");
-//
-//     const response = await axiosInstance.get(`/articles?${queryParams.toString()}`);
-//
-//     return response.data.data;
-// });
-//
-// export const getCategories = createAsyncThunk("article/categories", async () => {
-//     const response = await axiosInstance.get(`/util/articles/categories`);
-//     return response.data;
-// });
-//
-// export const updateArticle = createAsyncThunk(
-//     "article/update",
-//     async ({ id, data }: { id: number; data: any }, { dispatch }: ReduxType) => {
-//         try {
-//             const response = await axiosInstance.post(`/articles/${id}`, data, {
-//                 headers: {
-//                     "Content-Type": "multipart/form-data",
-//                 },
-//             });
-//             await dispatch(fetchArticles());
-//             return response.data;
-//         } catch (err) {
-//             console.log("err", err);
-//         }
-//     }
-// );
-//
-// export const deleteArticle = createAsyncThunk("article/delete", async (id: number, { dispatch }: ReduxType) => {
-//     const response = await axiosInstance.delete(`/articles/${id}`);
-//
-//     await dispatch(fetchArticles());
-//     return response.data;
-// });
-
 export const appMenuItemsSlice = createSlice({
     name: "appMenuItems",
     initialState,

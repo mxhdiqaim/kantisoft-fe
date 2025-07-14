@@ -63,6 +63,9 @@ const PaymentDialog = ({ open, onClose, onCompleteSale, cartItems }: Props) => {
 
     const change = amountReceived - total;
 
+    const isCashPaymentInsufficient =
+        paymentMethod === "cash" && amountReceived < total;
+
     const onSubmit = async (data: Omit<CreateOrderType, "amountReceived">) => {
         const result = await dispatch(createOrders(data));
 
@@ -150,7 +153,7 @@ const PaymentDialog = ({ open, onClose, onCompleteSale, cartItems }: Props) => {
                                 )}
                             />
                             <Typography sx={{ mt: 1 }}>
-                                Change: ₦
+                                Change: ₦{" "}
                                 {change > 0 ? change.toFixed(2) : "0.00"}
                             </Typography>
                         </>
@@ -162,7 +165,7 @@ const PaymentDialog = ({ open, onClose, onCompleteSale, cartItems }: Props) => {
                         type="submit"
                         variant="contained"
                         color="primary"
-                        disabled={!isValid}
+                        disabled={!isValid || isCashPaymentInsufficient}
                     >
                         Complete Order
                     </Button>
