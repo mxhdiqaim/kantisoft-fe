@@ -1,40 +1,38 @@
 import { useMemo } from "react";
-import Spinner from "@/components/status-comp/spinner";
 import {
     Box,
     FormControl,
-    IconButton,
+    Grid,
     InputLabel,
     MenuItem,
+    Paper,
     Select,
-    styled,
-    Tooltip,
     Typography,
     useTheme,
 } from "@mui/material";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import { useOrders } from "@/hooks/use-orders";
 import { orderPeriodSchema, type OrderPeriod } from "@/types/order-types";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { relativeTime } from "@/utils/get-relative-time";
-import { VisibilityOutlined } from "@mui/icons-material";
+import SalesHistoryTable from "@/components/sales-history/sales-history-table";
+import { ngnFormatter } from "@/utils";
+import {
+    MonetizationOn,
+    DinnerDiningOutlined,
+    Person2Outlined,
+    DomainVerificationOutlined,
+} from "@mui/icons-material";
+import SalesHistoryOverviewCard from "@/components/sales-history/sales-history-overview-card";
 
 // Create a schema for the form object
 const salesFilterSchema = yup.object({
     period: orderPeriodSchema,
 });
 
-const StyledBox = styled(Box)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    height: "100%",
-    gap: theme.spacing(2),
-}));
-
 const SalesHistory = () => {
+    const theme = useTheme();
     const { control, watch } = useForm<{ period: OrderPeriod }>({
         mode: "onChange",
         resolver: yupResolver(salesFilterSchema),
@@ -42,8 +40,6 @@ const SalesHistory = () => {
             period: "day",
         },
     });
-
-    const theme = useTheme();
 
     const period = watch("period");
     const { orders, loading, error } = useOrders(period);
@@ -55,128 +51,15 @@ const SalesHistory = () => {
     const getTitle = () => {
         switch (period) {
             case "day":
-                return "Today's Sales";
+                return "Today";
             case "week":
-                return "This Week's Sales";
+                return "This Week";
             case "month":
-                return "This Month's Sales";
+                return "This Month";
             default:
                 return "Sales History";
         }
     };
-
-    const columns: GridColDef[] = [
-        {
-            flex: 1,
-            field: "seller",
-            headerName: "Seller Name",
-            width: 200,
-            renderCell: (params) => (
-                <StyledBox>
-                    <Typography variant="body2">
-                        {params.value.firstName} {params.value.lastName}
-                    </Typography>
-                </StyledBox>
-            ),
-        },
-        {
-            flex: 1,
-            field: "orderDate",
-            headerName: "Time",
-            align: "center",
-            headerAlign: "center",
-            width: 150,
-            renderCell: (params) => (
-                <StyledBox sx={{ alignItems: "center" }}>
-                    <Typography variant="body2">
-                        {relativeTime(new Date(), new Date(params.value))}
-                    </Typography>
-                </StyledBox>
-            ),
-        },
-        {
-            flex: 1,
-            field: "totalAmount",
-            headerName: "Total Amount",
-            type: "number",
-            width: 180,
-            align: "center",
-            headerAlign: "center",
-            renderCell: (params) => (
-                <StyledBox sx={{ alignItems: "center" }}>
-                    <Typography variant="body2" fontWeight="medium">
-                        ₦{params.value.toFixed(2)}
-                    </Typography>
-                </StyledBox>
-            ),
-        },
-        {
-            flex: 1,
-            field: "paymentMethod",
-            headerName: "Payment Method",
-            width: 180,
-            align: "center",
-            headerAlign: "center",
-            cellClassName: "capitalize-cell",
-        },
-        {
-            flex: 1,
-            field: "orderStatus",
-            headerName: "Status",
-            width: 150,
-            align: "center",
-            headerAlign: "center",
-            renderCell: (params) => (
-                <StyledBox sx={{ alignItems: "center" }}>
-                    <Typography
-                        variant="body2"
-                        className="capitalize"
-                        sx={{
-                            color:
-                                theme.palette.mode === "dark"
-                                    ? theme.palette.text.primary
-                                    : theme.palette.primary.contrastText,
-                            padding: "4px 8px",
-                            borderRadius: "4px",
-                            fontWeight: "500",
-                            textTransform: "capitalize",
-                            backgroundColor:
-                                params.value === "completed"
-                                    ? theme.palette.success.light
-                                    : params.value === "pending"
-                                      ? theme.palette.warning.light
-                                      : theme.palette.error.light,
-                        }}
-                    >
-                        {params.value}
-                    </Typography>
-                </StyledBox>
-            ),
-        },
-        {
-            field: "actions",
-            headerName: "Actions",
-            type: "actions",
-            width: 100,
-            align: "center",
-            headerAlign: "center",
-            renderCell: (params) => (
-                <Tooltip title="View Order">
-                    <IconButton
-                        onClick={() => {
-                            console.log(`View order: ${params.row.id}`);
-                        }}
-                    >
-                        <VisibilityOutlined />
-                    </IconButton>
-                </Tooltip>
-            ),
-        },
-    ];
-
-    if (loading && !orders.length) {
-        return <Spinner />;
-    }
 
     if (error) {
         return (
@@ -187,79 +70,125 @@ const SalesHistory = () => {
     }
 
     return (
-        <Box sx={{ p: 3, mx: "auto" }}>
+        <Box sx={{ mx: "auto" }}>
             <Box
                 sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    mb: 3,
+                    mb: 1,
                 }}
             >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Typography variant="h4" component="h1">
-                        {getTitle()}
-                    </Typography>
-                    <Controller
-                        name="period"
-                        control={control}
-                        render={({ field }) => (
-                            <FormControl sx={{ minWidth: 120 }} size="small">
-                                <InputLabel id="period-select-label">
-                                    Period
-                                </InputLabel>
-                                <Select
-                                    {...field}
-                                    labelId="period-select-label"
-                                    label="Period"
+                <Typography variant="h4">Sales Overview</Typography>
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "right",
+                    }}
+                >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Typography variant="h4" component="h1">
+                            {getTitle()}&apos;s Sales
+                        </Typography>
+                        <Controller
+                            name="period"
+                            control={control}
+                            render={({ field }) => (
+                                <FormControl
+                                    sx={{ minWidth: 120 }}
+                                    size="small"
                                 >
-                                    <MenuItem value={"day"}>Day</MenuItem>
-                                    <MenuItem value={"week"}>Week</MenuItem>
-                                    <MenuItem value={"month"}>Month</MenuItem>
-                                </Select>
-                            </FormControl>
-                        )}
-                    />
-                </Box>
-                <Box sx={{ textAlign: "right" }}>
-                    <Typography variant="h5" component="p" color="primary">
-                        Total Revenue: ₦{totalRevenue.toFixed(2)}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Refresh {relativeTime(new Date(), new Date())}
-                    </Typography>
+                                    <InputLabel id="period-select-label">
+                                        Period
+                                    </InputLabel>
+                                    <Select
+                                        {...field}
+                                        labelId="period-select-label"
+                                        label="Period"
+                                    >
+                                        <MenuItem value={"day"}>Today</MenuItem>
+                                        <MenuItem value={"week"}>
+                                            This Week
+                                        </MenuItem>
+                                        <MenuItem value={"month"}>
+                                            This Month
+                                        </MenuItem>
+                                    </Select>
+                                </FormControl>
+                            )}
+                        />
+                    </Box>
                 </Box>
             </Box>
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                <Typography
+                    variant="h6"
+                    component="span"
+                    color="text.secondary"
+                    align="right"
+                    mb={1}
+                    sx={{
+                        fontWeight: 400,
+                        textAlign: "right",
+                    }}
+                >
+                    Refresh {relativeTime(new Date(), new Date())}
+                </Typography>
+            </Box>
 
-            <Box
+            <Grid container spacing={3} mb={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <SalesHistoryOverviewCard
+                        title="Total Sales Balance"
+                        color="success"
+                        icon={<MonetizationOn />}
+                        value={ngnFormatter.format(totalRevenue)}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <SalesHistoryOverviewCard
+                        title="Most Ordered Item"
+                        color="warning"
+                        icon={<DinnerDiningOutlined />}
+                        value={"Jollof Rice"}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <SalesHistoryOverviewCard
+                        title="Top Seller"
+                        color="secondary"
+                        icon={<Person2Outlined />}
+                        value={"John Doe"}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <SalesHistoryOverviewCard
+                        title="Total Orders"
+                        color="info"
+                        icon={<DomainVerificationOutlined />}
+                        value={orders.length}
+                    />
+                </Grid>
+            </Grid>
+
+            <Paper
+                elevation={-1}
                 sx={{
-                    height: 600,
+                    border: `1px solid ${theme.palette.grey[100]}`,
+                    // height: 600,
                     width: "100%",
                     "& .capitalize-cell": {
                         textTransform: "capitalize",
                     },
                 }}
             >
-                <DataGrid
-                    rows={orders}
-                    columns={columns}
+                <SalesHistoryTable
+                    orders={orders}
                     loading={loading}
-                    initialState={{
-                        pagination: {
-                            paginationModel: { pageSize: 10 },
-                        },
-                    }}
-                    disableColumnResize
-                    pageSizeOptions={[10, 25, 50]}
-                    disableRowSelectionOnClick
-                    sx={{
-                        border: "none",
-                        "& .MuiDataGrid-columnHeaderTitle": {
-                            fontWeight: 600,
-                        },
-                    }}
+                    period={period}
                 />
-            </Box>
+            </Paper>
         </Box>
     );
 };

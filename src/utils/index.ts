@@ -4,17 +4,22 @@ import type { AppRouteType } from "@/routes";
 
 // fixes scroll behaviour on route change
 export const ScrollToTop = () => {
-  const { pathname } = useLocation();
+    const { pathname } = useLocation();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
 
-  return null;
+    return null;
 };
 
 export const resolveChildren = (item: AppRouteType) => {
-  if (item?.children) return true;
+    if (item?.children) return true;
 
-  return false;
+    return false;
 };
+
+export const ngnFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "NGN",
+});
