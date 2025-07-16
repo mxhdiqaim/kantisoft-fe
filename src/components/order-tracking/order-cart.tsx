@@ -1,4 +1,5 @@
 import type { CartItem } from "@/types/cart-item-type";
+import { ngnFormatter } from "@/utils";
 import { Add, Delete, Remove } from "@mui/icons-material";
 import {
     Box,
@@ -26,7 +27,7 @@ const OrderCart = ({
     onOpenPaymentDialog,
 }: Props) => {
     const theme = useTheme();
-    const subtotal = cartItems.reduce(
+    const total = cartItems.reduce(
         (acc, item) => acc + item.price * item.quantity,
         0,
     );
@@ -63,7 +64,9 @@ const OrderCart = ({
                         >
                             <ListItemText
                                 primary={item.name}
-                                secondary={`Subtotal: ₦ ${(item.price * item.quantity).toFixed(2)}`}
+                                secondary={`Subtotal: ${ngnFormatter.format(
+                                    item.price * item.quantity,
+                                )}`}
                                 slotProps={{
                                     primary: {
                                         sx: {
@@ -107,7 +110,7 @@ const OrderCart = ({
                     color={theme.palette.success.main}
                     mt={1}
                 >
-                    Total: ₦ {subtotal.toFixed(2)}
+                    Total: {ngnFormatter.format(total)}{" "}
                 </Typography>
             </Box>
             <Button

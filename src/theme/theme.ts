@@ -262,6 +262,10 @@ export const createAppTheme = (mode: "light" | "dark" = "light") => {
         },
     });
 
+    // Add a custom shadow at index -1
+    // @ts-expect-error: TypeScript does not allow negative indices, but this works at runtime
+    theme.shadows[-1] = "none";
+
     theme = responsiveFontSizes(theme);
 
     return theme;

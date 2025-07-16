@@ -10,7 +10,7 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import { useOrders } from "@/hooks/use-orders";
+import { useGetOrderByPeriod } from "@/hooks/use-orders";
 import { orderPeriodSchema, type OrderPeriod } from "@/types/order-types";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -42,7 +42,7 @@ const SalesHistory = () => {
     });
 
     const period = watch("period");
-    const { orders, loading, error } = useOrders(period);
+    const { orders, loading, error } = useGetOrderByPeriod(period);
 
     const totalRevenue = useMemo(() => {
         return orders.reduce((acc, order) => acc + (order.totalAmount || 0), 0);

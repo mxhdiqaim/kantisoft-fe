@@ -1,4 +1,7 @@
-export const relativeTime = (current: Date, previous: Date): string => {
+export const relativeTime = (
+    current: Date = new Date(),
+    previous: Date,
+): string => {
     const msPerMinute = 60 * 1000;
     const msPerHour = msPerMinute * 60;
     const msPerDay = msPerHour * 24;

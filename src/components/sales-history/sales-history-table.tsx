@@ -19,6 +19,8 @@ import { useTheme } from "@mui/material";
 import { useMemo, useState, type MouseEvent } from "react";
 import { relativeTime } from "@/utils/get-relative-time";
 import type { OrderType } from "@/types/order-types";
+import { ngnFormatter } from "@/utils";
+import { useNavigate } from "react-router-dom";
 
 const StyledBox = styled(Box)(({ theme }) => ({
     display: "flex",
@@ -34,12 +36,16 @@ export interface Props {
     period: string;
 }
 
+const NOW = new Date();
+
 const SalesHistoryTable = ({ orders, loading, period }: Props) => {
     const theme = useTheme();
+    const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
+        console.log(`Clicked row: ${rowId}`);
         setAnchorEl(event.currentTarget);
         setSelectedRowId(rowId);
     };
@@ -74,7 +80,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 renderCell: (params) => (
                     <StyledBox sx={{ alignItems: "center" }}>
                         <Typography variant="body2">
-                            {relativeTime(new Date(), new Date(params.value))}
+                            {relativeTime(NOW, new Date(params.value))}
                         </Typography>
                     </StyledBox>
                 ),
@@ -90,7 +96,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 renderCell: (params) => (
                     <StyledBox sx={{ alignItems: "center" }}>
                         <Typography variant="body2" fontWeight="medium">
-                            ₦{params.value.toFixed(2)}
+                            {ngnFormatter.format(params.value)}{" "}
                         </Typography>
                     </StyledBox>
                 ),
@@ -149,10 +155,9 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                     const isOpen =
                         Boolean(anchorEl) && selectedRowId === params.row.id;
 
-                    console.log(isOpen);
-
                     const handleView = () => {
                         console.log(`View order: ${params.row.id}`);
+                        navigate(`/sales-history/${params.row.id}/view`);
                         handleMenuClose();
                     };
                     const handleEdit = () => {

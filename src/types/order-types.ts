@@ -1,5 +1,6 @@
 import { extendBaseSchema } from "@/types";
 import * as yup from "yup";
+import { menuItemSchema } from "./menu-item-type";
 
 export const OrderStatus = {
     CANCELED: "canceled",
@@ -44,7 +45,6 @@ const coreOrderSchema = yup.object({
         .default("pending")
         .required("Order status is required"),
 
-    // Assuming sellerId is a string, like a user ID
     sellerId: yup.string().required("Seller ID is required"),
 });
 
@@ -57,6 +57,7 @@ const createOrderItemPayloadSchema = yup.object({
         .string()
         .uuid("Menu item ID must be a valid UUID")
         .required("Menu item ID is required"),
+    name: yup.string().default(""),
     quantity: yup
         .number()
         .typeError("Quantity must be a number")
@@ -86,6 +87,22 @@ const coreOrderItemSchema = createOrderItemPayloadSchema.shape({
 // Schema for a full order item object, including base fields like id and timestamps
 export const orderItemSchema = extendBaseSchema(coreOrderItemSchema);
 
+export const singleOrderSchema = extendBaseSchema(
+    orderSchema.shape({
+        ...extendBaseSchema,
+        menuItemId: yup.string().uuid().required(),
+        orderId: yup.string().uuid().required(),
+        priceAtOrder: yup.number().nonNullable(),
+        quantity: yup.number().nullable().default(1),
+        subTotal: yup.number().nonNullable().default(0),
+        orderItems: yup.array().of(menuItemSchema).required(),
+        seller: yup.object({
+            firstName: yup.string().required("First name is required"),
+            lastName: yup.string().required("Last name is required"),
+        }),
+    }),
+);
+
 // Schema for the payload when creating a new order with its items
 export const createOrderSchema = yup.object({
     sellerId: yup.string().uuid().required("Seller ID is required"),
@@ -114,11 +131,12 @@ export const createOrderSchema = yup.object({
 // TypeScript types inferred from schemas
 export type OrderType = yup.InferType<typeof orderSchema>;
 export type CreateOrderType = yup.InferType<typeof createOrderSchema>;
+export type SingleOrderType = yup.InferType<typeof singleOrderSchema>;
 
 export type OrderItemType = yup.InferType<typeof orderItemSchema>;
 export type CreateOrderItemType = Pick<
     OrderItemType,
-    "menuItemId" | "quantity"
+    "menuItemId" | "quantity" | "name"
 >;
 
 // Explicitly define the types for the constants

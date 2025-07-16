@@ -1,5 +1,6 @@
 import CustomCard from "@/components/customs/custom-card";
 import type { MenuItemType } from "@/types/menu-item-type.ts";
+import { ngnFormatter } from "@/utils";
 import { Box, Button, Divider, Typography } from "@mui/material";
 
 interface Props {
@@ -13,7 +14,7 @@ const MenuItem = ({ item, onAddToCart }: Props) => {
             <Box>
                 <Typography variant="h4">{item.name}</Typography>
                 <Typography color="text.secondary">
-                    ₦{item.price.toFixed(2)}
+                    {ngnFormatter.format(item.price)}{" "}
                 </Typography>
                 <Divider />
                 <Button

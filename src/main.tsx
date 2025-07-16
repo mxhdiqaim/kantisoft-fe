@@ -10,9 +10,11 @@ createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <Provider store={store}>
             <SnackbarProvider
-                maxSnack={5}
+                maxSnack={3}
+                autoHideDuration={3000}
+                variant="default"
                 anchorOrigin={{
-                    vertical: "top",
+                    vertical: "bottom",
                     horizontal: "right",
                 }}
             >

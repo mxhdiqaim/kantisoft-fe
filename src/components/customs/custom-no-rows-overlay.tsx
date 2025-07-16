@@ -20,8 +20,12 @@ const CustomNoRowsOverlay = (props: CustomNoRowsOverlayProps) => {
                 flexDirection: "column",
             }}
         >
-            <Typography variant="h6" color="text.secondary" gutterBottom>
-                No sales yet {period ? `for this ${period}` : ""}
+            <Typography
+                variant="h6"
+                color="text.secondary"
+                sx={{ fontWeight: 500 }}
+            >
+                No sales yet {period ? `for this ${period}.` : "."}
             </Typography>
         </Box>
     );
