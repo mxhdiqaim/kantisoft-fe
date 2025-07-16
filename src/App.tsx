@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import GuardedRoute from "@/routes/guarded-route";
 import { ErrorBoundary } from "react-error-boundary";
-import AuthProvider from "@/context/auth-context";
 import ErrorFallback from "@/pages/errors/fallback";
 import Layout from "@/components/navigations/layouts";
 import { ScrollToTop, resolveChildren } from "@/utils";
@@ -103,17 +102,15 @@ function App() {
             <Router>
                 <ScrollToTop />
                 <ErrorBoundary FallbackComponent={ErrorFallback}>
-                    <AuthProvider>
-                        <Routes>
-                            <Route
-                                path={"/"}
-                                element={<Navigate to={"/order-tracking"} />}
-                            />
-                            {appRoutes.map((route, index) =>
-                                renterRoute(route, index),
-                            )}
-                        </Routes>
-                    </AuthProvider>
+                    <Routes>
+                        <Route
+                            path={"/"}
+                            element={<Navigate to={"/order-tracking"} />}
+                        />
+                        {appRoutes.map((route, index) =>
+                            renterRoute(route, index),
+                        )}
+                    </Routes>
                 </ErrorBoundary>
             </Router>
         </ThemeProvider>

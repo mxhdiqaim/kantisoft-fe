@@ -1,5 +1,5 @@
 import type { AuthValuesType, ErrCallbackType } from "@/types";
-import type { UserLogin, UserType } from "@/types/user-types";
+import type { LoginUserType, UserType } from "@/types/user-types";
 import axiosInstance from "@/utils/axios-instance";
 import { jwtDecode } from "jwt-decode";
 import {
@@ -92,7 +92,7 @@ const AuthProvider = ({ children }: Props) => {
     }, []); // Remove isInitialized from dependencies
 
     const handleLogin = async (
-        params: UserLogin,
+        params: LoginUserType,
         errorCallback?: ErrCallbackType,
     ) => {
         setLoading(true);
