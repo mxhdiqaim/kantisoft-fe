@@ -1,11 +1,7 @@
 import type { AppDispatch, RootState } from "@/store";
 import { getOrdersByPeriod, getOrderById } from "@/store/app/orders";
-import type {
-    OrderPeriod,
-    OrderType,
-    SingleOrderType,
-} from "@/types/order-types.ts";
-import { useEffect, useState } from "react";
+import type { OrderPeriod } from "@/types/order-types.ts";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useNotifier from "./useNotifier";
 
@@ -15,35 +11,25 @@ export const useGetOrder = (id: string) => {
     }
     const notify = useNotifier();
     const dispatch = useDispatch<AppDispatch>();
-    const [order, setOrder] = useState<SingleOrderType | null>(null);
 
-    const {
-        order: storeOrder,
-        loading,
-        error,
-    } = useSelector((state: RootState) => state.orders);
+    const { order, loading, error } = useSelector(
+        (state: RootState) => state.orders,
+    );
 
     useEffect(() => {
-        dispatch(getOrderById(id));
-    }, [dispatch, id]);
-
-    useEffect(() => {
-        if (storeOrder) {
-            setOrder({ ...storeOrder });
+        // Fetch if the order in store is not the one we need
+        if (!order || order.id !== id) {
+            dispatch(getOrderById(id));
         }
-    }, [storeOrder]);
 
-    useEffect(() => {
+        // Handle error notifications
         if (error) {
             notify(
                 typeof error === "string" ? error : "An unknown error occurred",
                 "error",
             );
         }
-        if (!loading && !error) {
-            notify("Order fetched successfully", "success");
-        }
-    }, [error, loading]);
+    }, [dispatch, id, order, error, notify]);
 
     return { order, loading, error };
 };
@@ -51,23 +37,14 @@ export const useGetOrder = (id: string) => {
 export const useGetOrderByPeriod = (period: OrderPeriod) => {
     const notify = useNotifier();
     const dispatch = useDispatch<AppDispatch>();
-    const [orders, setOrders] = useState<OrderType[]>([]);
 
-    const {
-        orders: storeOrders,
-        loading,
-        error,
-    } = useSelector((state: RootState) => state.orders);
+    const { orders, loading, error } = useSelector(
+        (state: RootState) => state.orders,
+    );
 
     useEffect(() => {
         dispatch(getOrdersByPeriod(period));
     }, [dispatch, period]);
-
-    useEffect(() => {
-        if (storeOrders) {
-            setOrders([...storeOrders]);
-        }
-    }, [storeOrders]);
 
     useEffect(() => {
         if (error) {

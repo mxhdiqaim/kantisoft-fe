@@ -29,7 +29,6 @@ const ViewSalesHistory = () => {
     const printRef = useRef<HTMLDivElement>(null);
 
     const { order, loading } = useGetOrder(id as string);
-    console.log("order", order);
 
     if (loading || !order) {
         return <Typography>Loading...</Typography>;
