@@ -1,5 +1,5 @@
-import { useHealthCheckQuery } from "@/store/slice";
-import { selectCurrentToken } from "@/store/slice/auth-slice";
+import { useHealthCheckQuery } from "@/store/app/slice";
+import { selectCurrentToken } from "@/store/app/slice/auth-slice";
 import { useSelector } from "react-redux";
 
 export const useAuthStatus = () => {

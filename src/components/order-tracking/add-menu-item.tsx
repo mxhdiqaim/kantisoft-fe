@@ -1,6 +1,6 @@
 import CustomModal from "@/components/customs/custom-modal";
 import useNotifier from "@/hooks/useNotifier";
-import { useCreateMenuItemMutation } from "@/store/slice";
+import { useCreateMenuItemMutation } from "@/store/app/slice";
 import {
     type AddMenuItemType,
     createMenuItemSchema,

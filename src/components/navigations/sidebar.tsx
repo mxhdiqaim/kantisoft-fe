@@ -24,7 +24,7 @@ import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import { LogoutOutlined } from "@mui/icons-material";
 
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useLogoutMutation } from "@/store/slice";
+import { useLogoutMutation } from "@/store/app/slice";
 
 interface Props extends AppBarProps {
     sx?: SxProps<Theme>;
