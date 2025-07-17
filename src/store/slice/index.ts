@@ -6,7 +6,7 @@ import type {
     SingleOrderType,
 } from "@/types/order-types.ts";
 import type { AddMenuItemType, MenuItemType } from "@/types/menu-item-type.ts";
-import type { RootState } from "../../";
+import type { RootState } from "..";
 import { logOut, setCredentials } from "./auth-slice";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;

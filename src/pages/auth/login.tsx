@@ -13,7 +13,7 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useLoginMutation } from "@/store/app/slice";
+import { useLoginMutation } from "@/store/slice";
 
 const defaultValues = {
     password: "",

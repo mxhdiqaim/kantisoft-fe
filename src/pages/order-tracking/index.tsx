@@ -9,10 +9,7 @@ import useNotifier from "@/hooks/useNotifier";
 import type { CartItem } from "@/types/cart-item-type";
 import type { MenuItemType } from "@/types/menu-item-type";
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
-import {
-    useCreateOrderMutation,
-    useGetMenuItemsQuery,
-} from "@/store/app/slice";
+import { useCreateOrderMutation, useGetMenuItemsQuery } from "@/store/slice";
 
 const OrderTracking = () => {
     const notify = useNotifier();

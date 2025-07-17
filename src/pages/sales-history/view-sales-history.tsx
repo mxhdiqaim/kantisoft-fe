@@ -20,7 +20,7 @@ import {
 } from "@mui/icons-material";
 import { ngnFormatter } from "@/utils";
 import { useRef } from "react";
-import { useGetOrderByIdQuery } from "@/store/app/slice";
+import { useGetOrderByIdQuery } from "@/store/slice";
 
 const ViewSalesHistory = () => {
     const navigate = useNavigate();

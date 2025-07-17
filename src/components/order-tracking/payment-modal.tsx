@@ -1,5 +1,5 @@
 import CustomModal from "@/components/customs/custom-modal";
-import { selectCurrentUser } from "@/store/app/slice/auth-slice";
+import { selectCurrentUser } from "@/store/slice/auth-slice";
 import type { CartItem } from "@/types/cart-item-type";
 import {
     createOrderSchema,

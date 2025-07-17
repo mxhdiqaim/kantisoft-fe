@@ -25,7 +25,7 @@ import {
 } from "@mui/icons-material";
 
 import SalesHistoryOverviewCard from "@/components/sales-history/sales-history-overview-card";
-import { useGetOrdersByPeriodQuery } from "@/store/app/slice";
+import { useGetOrdersByPeriodQuery } from "@/store/slice";
 
 // Create a schema for the form object
 const salesFilterSchema = yup.object({
