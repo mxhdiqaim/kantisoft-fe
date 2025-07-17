@@ -1,4 +1,5 @@
 import CustomModal from "@/components/customs/custom-modal";
+import { selectCurrentUser } from "@/store/slice/auth-slice";
 import type { CartItem } from "@/types/cart-item-type";
 import {
     createOrderSchema,
@@ -18,22 +19,25 @@ import {
 } from "@mui/material";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import { type AppDispatch } from "@/store";
-import { createOrders } from "@/store/app/orders";
+import { useSelector } from "react-redux";
 
 interface Props {
     open: boolean;
     onClose: () => void;
-    onCompleteSale: (submitted: boolean) => void;
+    // 1. Update the prop to accept the order data object
+    onCompleteSale: (data: Omit<CreateOrderType, "amountReceived">) => void;
     cartItems: CartItem[];
+    isLoading?: boolean;
 }
 
-const PaymentDialog = ({ open, onClose, onCompleteSale, cartItems }: Props) => {
-    const dispatch = useDispatch<AppDispatch>();
-
-    const seller = JSON.parse(localStorage.getItem("userData") as string);
-    const sellerId = seller.id;
+const PaymentDialog = ({
+    open,
+    onClose,
+    onCompleteSale,
+    cartItems,
+    isLoading,
+}: Props) => {
+    const seller = useSelector(selectCurrentUser);
 
     const total = cartItems.reduce(
         (acc, item) => acc + item.price * item.quantity,
@@ -50,7 +54,7 @@ const PaymentDialog = ({ open, onClose, onCompleteSale, cartItems }: Props) => {
         mode: "onChange",
         resolver: yupResolver(createOrderSchema),
         defaultValues: {
-            sellerId: sellerId,
+            sellerId: seller?.id || "",
             paymentMethod: "cash",
             orderStatus: "completed",
             items: [],
@@ -66,14 +70,11 @@ const PaymentDialog = ({ open, onClose, onCompleteSale, cartItems }: Props) => {
     const isCashPaymentInsufficient =
         paymentMethod === "cash" && amountReceived < total;
 
-    const onSubmit = async (data: Omit<CreateOrderType, "amountReceived">) => {
-        const result = await dispatch(createOrders(data));
-
-        if (createOrders.fulfilled.match(result)) {
-            onClose();
-        }
-
-        onCompleteSale(true);
+    // 2. Update onSubmit to pass the form data to the parent component
+    const onSubmit = (data: CreateOrderType) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { amountReceived, ...orderData } = data;
+        onCompleteSale(orderData);
     };
 
     useEffect(() => {
@@ -84,14 +85,14 @@ const PaymentDialog = ({ open, onClose, onCompleteSale, cartItems }: Props) => {
             }));
 
             reset({
-                sellerId: seller.id || "",
+                sellerId: seller?.id || "",
                 paymentMethod: "cash",
                 orderStatus: "completed",
                 items: items,
                 amountReceived: 0,
             });
         }
-    }, [open, cartItems, seller.id, reset]);
+    }, [open, cartItems, seller?.id, reset]);
 
     return (
         <CustomModal
@@ -165,9 +166,13 @@ const PaymentDialog = ({ open, onClose, onCompleteSale, cartItems }: Props) => {
                         type="submit"
                         variant="contained"
                         color="primary"
-                        disabled={!isValid || isCashPaymentInsufficient}
+                        // 3. Disable the button when loading or form is invalid
+                        disabled={
+                            !isValid || isCashPaymentInsufficient || isLoading
+                        }
                     >
-                        Complete Order
+                        {/* 4. Show a loading indicator text */}
+                        {isLoading ? "Processing..." : "Complete Order"}
                     </Button>
                 </DialogActions>
             </form>

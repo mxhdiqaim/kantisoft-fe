@@ -26,13 +26,17 @@ const authSlice = createSlice({
             state.token = action.payload.token;
             // Persist the token to localStorage
             localStorage.setItem("token", action.payload.token);
-            localStorage.setItem("user", JSON.stringify(action.payload.user));
+            localStorage.setItem(
+                "userData",
+                JSON.stringify(action.payload.user),
+            );
         },
         // Action to clear the token and user data on logout
         logOut: (state) => {
             state.user = null;
             state.token = null;
             localStorage.removeItem("token");
+            localStorage.removeItem("userData");
         },
     },
 });

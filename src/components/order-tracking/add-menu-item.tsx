@@ -1,6 +1,6 @@
 import CustomModal from "@/components/customs/custom-modal";
-import type { AppDispatch, RootState } from "@/store";
-import { createMenuItems } from "@/store/app/menu-items";
+import useNotifier from "@/hooks/useNotifier";
+import { useCreateMenuItemMutation } from "@/store/slice";
 import {
     type AddMenuItemType,
     createMenuItemSchema,
@@ -9,7 +9,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
 
 interface Props {
     open: boolean;
@@ -23,8 +22,8 @@ const defaultValues: AddMenuItemType = {
 };
 
 const AddMenuItemModal = ({ open, onClose }: Props) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const { loading } = useSelector((state: RootState) => state.menuItem);
+    const notify = useNotifier();
+    const [createMenuItem, { isLoading }] = useCreateMenuItemMutation();
 
     const {
         control,
@@ -38,9 +37,14 @@ const AddMenuItemModal = ({ open, onClose }: Props) => {
     });
 
     const onSubmit = async (data: AddMenuItemType) => {
-        const result = await dispatch(createMenuItems(data));
-        if (createMenuItems.fulfilled.match(result)) {
-            onClose();
+        try {
+            await createMenuItem(data).unwrap();
+            notify("Menu item added successfully!", "success");
+            reset(); // Clear the form
+            onClose(); // Close the modal
+        } catch (error) {
+            notify("Failed to add menu item.", "error");
+            console.error("Failed to create menu item:", error);
         }
     };
 
@@ -102,9 +106,9 @@ const AddMenuItemModal = ({ open, onClose }: Props) => {
                         sx={{ mt: 2 }}
                         variant="contained"
                         type="submit"
-                        disabled={loading}
+                        disabled={isLoading}
                     >
-                        {loading ? "Adding Menu..." : "Add Menu"}
+                        {isLoading ? "Adding Menu..." : "Add Menu"}
                     </Button>
                 </form>
             </Box>

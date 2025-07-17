@@ -7,7 +7,7 @@ import type {
 } from "@/types/order-types.ts";
 import type { AddMenuItemType, MenuItemType } from "@/types/menu-item-type.ts";
 import type { RootState } from "../index";
-import { setCredentials } from "./auth-slice";
+import { logOut, setCredentials } from "./auth-slice";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -31,7 +31,7 @@ export const apiSlice = createApi({
     endpoints: (builder) => ({
         // Health Check Endpoint
         healthCheck: builder.query<{ status: string }, void>({
-            query: () => "/", // This will hit your base URL's root
+            query: () => "/",
         }),
 
         // Auth Endpoints
@@ -41,9 +41,10 @@ export const apiSlice = createApi({
                 method: "POST",
                 body: credentials,
             }),
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+            async onQueryStarted(args, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
+
                     // On success, dispatch setCredentials to store token and user
                     dispatch(setCredentials(data));
                 } catch (error) {
@@ -51,6 +52,29 @@ export const apiSlice = createApi({
                 }
             },
         }),
+
+        // Logout Endpoint
+        logout: builder.mutation({
+            query: () => ({
+                url: "/users/logout",
+                method: "POST",
+            }),
+            async onQueryStarted(args, { dispatch, queryFulfilled }) {
+                try {
+                    await queryFulfilled;
+                    // 2. Dispatch the logOut action to clear credentials and localStorage
+                    dispatch(logOut());
+                    // 3. Clear the RTK Query cache
+                    dispatch(apiSlice.util.resetApiState());
+                } catch (error) {
+                    console.error("Logout failed:", error);
+                    // Even if the server call fails, force a local logout
+                    dispatch(logOut());
+                    dispatch(apiSlice.util.resetApiState());
+                }
+            },
+        }),
+
         register: builder.mutation({
             query: (user) => ({
                 url: "/users/register", // Your backend register route
@@ -108,6 +132,7 @@ export const {
     useGetMenuItemsQuery,
     useCreateMenuItemMutation,
     useLoginMutation,
+    useLogoutMutation,
     useRegisterMutation,
     useHealthCheckQuery,
 } = apiSlice;
