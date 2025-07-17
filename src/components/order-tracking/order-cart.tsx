@@ -48,76 +48,89 @@ const OrderCart = ({
             {cartItems.length === 0 ? (
                 <Typography sx={{ my: 2 }}>Cart is empty</Typography>
             ) : (
-                <List>
-                    {cartItems.map((item) => (
-                        <ListItem
-                            key={item.id}
-                            secondaryAction={
-                                <IconButton
-                                    edge="end"
-                                    aria-label="delete"
-                                    onClick={() => onRemoveItem(item.id)}
+                <>
+                    <List>
+                        {cartItems.map((item) => (
+                            <>
+                                <Divider />
+                                <ListItem
+                                    key={item.id}
+                                    secondaryAction={
+                                        <IconButton
+                                            edge="end"
+                                            aria-label="delete"
+                                            onClick={() =>
+                                                onRemoveItem(item.id)
+                                            }
+                                        >
+                                            <Delete />
+                                        </IconButton>
+                                    }
                                 >
-                                    <Delete />
-                                </IconButton>
-                            }
+                                    <ListItemText
+                                        primary={item.name}
+                                        secondary={`Subtotal: ${ngnFormatter.format(
+                                            item.price * item.quantity,
+                                        )}`}
+                                        slotProps={{
+                                            primary: {
+                                                sx: {
+                                                    fontWeight: "bold",
+                                                    fontSize: "1.5rem",
+                                                    color: theme.palette.primary
+                                                        .main,
+                                                },
+                                            },
+                                            secondary: {
+                                                sx: {
+                                                    fontSize: "1rem",
+                                                },
+                                            },
+                                        }}
+                                    />
+                                    <IconButton
+                                        onClick={() =>
+                                            onUpdateQuantity(
+                                                item.id,
+                                                item.quantity - 1,
+                                            )
+                                        }
+                                    >
+                                        <Remove />
+                                    </IconButton>
+                                    <Typography sx={{ mx: 1 }}>
+                                        {item.quantity}
+                                    </Typography>
+                                    <IconButton
+                                        onClick={() =>
+                                            onUpdateQuantity(
+                                                item.id,
+                                                item.quantity + 1,
+                                            )
+                                        }
+                                    >
+                                        <Add />
+                                    </IconButton>
+                                </ListItem>
+                            </>
+                        ))}
+                    </List>
+                    <Divider />
+                    <Box sx={{ mt: 2 }}>
+                        <Typography
+                            variant="h3"
+                            color={theme.palette.success.main}
+                            mt={1}
                         >
-                            <ListItemText
-                                primary={item.name}
-                                secondary={`Subtotal: ${ngnFormatter.format(
-                                    item.price * item.quantity,
-                                )}`}
-                                slotProps={{
-                                    primary: {
-                                        sx: {
-                                            fontWeight: "bold",
-                                            fontSize: "1.5rem",
-                                            color: theme.palette.primary.main,
-                                        },
-                                    },
-                                    secondary: {
-                                        sx: {
-                                            fontSize: "1rem",
-                                        },
-                                    },
-                                }}
-                            />
-                            <IconButton
-                                onClick={() =>
-                                    onUpdateQuantity(item.id, item.quantity - 1)
-                                }
-                            >
-                                <Remove />
-                            </IconButton>
-                            <Typography sx={{ mx: 1 }}>
-                                {item.quantity}
-                            </Typography>
-                            <IconButton
-                                onClick={() =>
-                                    onUpdateQuantity(item.id, item.quantity + 1)
-                                }
-                            >
-                                <Add />
-                            </IconButton>
-                        </ListItem>
-                    ))}
-                </List>
+                            Total: {ngnFormatter.format(total)}{" "}
+                        </Typography>
+                    </Box>
+                </>
             )}
-            <Divider />
-            <Box sx={{ mt: 2 }}>
-                <Typography
-                    variant="h3"
-                    color={theme.palette.success.main}
-                    mt={1}
-                >
-                    Total: {ngnFormatter.format(total)}{" "}
-                </Typography>
-            </Box>
             <Button
                 variant="contained"
                 color="primary"
                 fullWidth
-                sx={{ mt: 2 }}
                 disabled={cartItems.length === 0}
                 onClick={onOpenPaymentDialog}
             >

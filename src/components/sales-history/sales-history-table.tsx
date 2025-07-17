@@ -36,8 +36,6 @@ export interface Props {
     period: string;
 }
 
-const NOW = new Date();
-
 const SalesHistoryTable = ({ orders, loading, period }: Props) => {
     const theme = useTheme();
     const navigate = useNavigate();
@@ -80,7 +78,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 renderCell: (params) => (
                     <StyledBox sx={{ alignItems: "center" }}>
                         <Typography variant="body2">
-                            {relativeTime(NOW, new Date(params.value))}
+                            {relativeTime(new Date(), new Date(params.value))}
                         </Typography>
                     </StyledBox>
                 ),

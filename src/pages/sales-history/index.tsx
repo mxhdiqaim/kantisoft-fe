@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     Box,
     FormControl,
@@ -7,6 +7,7 @@ import {
     MenuItem,
     Paper,
     Select,
+    Skeleton,
     Typography,
     useTheme,
 } from "@mui/material";
@@ -46,9 +47,12 @@ const SalesHistory = () => {
 
     const {
         data: orders,
-        isLoading: loading,
+        isLoading,
         isError,
+        fulfilledTimeStamp,
     } = useGetOrdersByPeriodQuery(period);
+
+    const [lastFetched, setLastFetched] = useState<Date | null>(null);
 
     const totalRevenue = useMemo(() => {
         return (orders ?? []).reduce(
@@ -69,6 +73,60 @@ const SalesHistory = () => {
                 return "Sales History";
         }
     };
+
+    useEffect(() => {
+        if (fulfilledTimeStamp) {
+            setLastFetched(new Date(fulfilledTimeStamp));
+        }
+    }, [fulfilledTimeStamp]);
+
+    if (isLoading) {
+        return (
+            <Box sx={{ mx: "auto" }}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 1,
+                    }}
+                >
+                    <Skeleton variant="text" width={210} height={40} />
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Skeleton variant="text" width={180} height={40} />
+                        <Skeleton
+                            variant="rectangular"
+                            width={120}
+                            height={40}
+                        />
+                    </Box>
+                </Box>
+                <Box
+                    sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}
+                >
+                    <Skeleton variant="text" width={150} height={24} />
+                </Box>
+
+                <Grid container spacing={3} mb={3}>
+                    {Array.from(new Array(4)).map((_, index) => (
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+                            <Skeleton variant="rectangular" height={118} />
+                        </Grid>
+                    ))}
+                </Grid>
+
+                <Paper
+                    elevation={-1}
+                    sx={{
+                        border: `1px solid ${theme.palette.grey[100]}`,
+                        width: "100%",
+                    }}
+                >
+                    <Skeleton variant="rectangular" height={500} />
+                </Paper>
+            </Box>
+        );
+    }
 
     if (isError) {
         return (
@@ -142,7 +200,9 @@ const SalesHistory = () => {
                         textAlign: "right",
                     }}
                 >
-                    Refresh {relativeTime(new Date(), new Date())}
+                    {lastFetched
+                        ? `Last updated ${relativeTime(new Date(), lastFetched)}`
+                        : "Fetching data..."}
                 </Typography>
             </Box>
 
@@ -194,7 +254,7 @@ const SalesHistory = () => {
             >
                 <SalesHistoryTable
                     orders={orders ?? []}
-                    loading={loading}
+                    loading={isLoading}
                     period={period}
                 />
             </Paper>

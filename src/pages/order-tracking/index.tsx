@@ -4,12 +4,20 @@ import AddMenuItemModal from "@/components/order-tracking/add-menu-item";
 import MenuItem from "@/components/order-tracking/menu-item";
 import OrderCart from "@/components/order-tracking/order-cart";
 import PaymentModal from "@/components/order-tracking/payment-modal";
-import Spinner from "@/components/status-comp/spinner";
 import useNotifier from "@/hooks/useNotifier";
 import type { CartItem } from "@/types/cart-item-type";
 import type { MenuItemType } from "@/types/menu-item-type";
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import {
+    Box,
+    Button,
+    Grid,
+    Skeleton,
+    TextField,
+    Typography,
+} from "@mui/material";
 import { useCreateOrderMutation, useGetMenuItemsQuery } from "@/store/slice";
+import MenuItemSkeleton from "@/components/spinners/manu-item-skeleton";
+import OrderCartSkeleton from "@/components/spinners/order-cart-skeleton";
 
 const OrderTracking = () => {
     const notify = useNotifier();
@@ -90,7 +98,35 @@ const OrderTracking = () => {
     }, [menuItems, searchQuery]);
 
     if (isLoadingMenuItems) {
-        return <Spinner />;
+        return (
+            <Box>
+                <Grid container spacing={2} mb={2}>
+                    <Grid size={{ xs: 12, md: 9 }}>
+                        <Skeleton variant="rectangular" height={56} />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 3 }}>
+                        <Skeleton variant="rectangular" height={56} />
+                    </Grid>
+                </Grid>
+                <Grid container spacing={3} mb={2}>
+                    <Grid size={{ xs: 12, md: 8 }}>
+                        <Grid container spacing={2}>
+                            {Array.from(new Array(9)).map((_, index) => (
+                                <Grid
+                                    size={{ xs: 12, sm: 6, md: 4 }}
+                                    key={index}
+                                >
+                                    <MenuItemSkeleton />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <OrderCartSkeleton />
+                    </Grid>
+                </Grid>
+            </Box>
+        );
     }
 
     if (isError) {
