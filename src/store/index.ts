@@ -1,22 +1,17 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import menuItem from "./app/menu-items";
-import orders from "./app/orders";
+import { apiSlice } from "./slice";
+import authReducer from "./slice/auth-slice";
 
 export const store = configureStore({
     reducer: {
-        menuItem,
-        orders,
+        [apiSlice.reducerPath]: apiSlice.reducer,
+        auth: authReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: false,
-            caches: {
-                orders: {
-                    maxAge: 60 * 1000, // 1 minute
-                },
-            },
-        }),
+        }).concat(apiSlice.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

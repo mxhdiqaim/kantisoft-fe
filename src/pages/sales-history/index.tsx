@@ -10,7 +10,6 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import { useGetOrderByPeriod } from "@/hooks/use-orders";
 import { orderPeriodSchema, type OrderPeriod } from "@/types/order-types";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -24,7 +23,9 @@ import {
     Person2Outlined,
     DomainVerificationOutlined,
 } from "@mui/icons-material";
+
 import SalesHistoryOverviewCard from "@/components/sales-history/sales-history-overview-card";
+import { useGetOrdersByPeriodQuery } from "@/store/slice";
 
 // Create a schema for the form object
 const salesFilterSchema = yup.object({
@@ -42,10 +43,18 @@ const SalesHistory = () => {
     });
 
     const period = watch("period");
-    const { orders, loading, error } = useGetOrderByPeriod(period);
+
+    const {
+        data: orders,
+        isLoading: loading,
+        isError,
+    } = useGetOrdersByPeriodQuery(period);
 
     const totalRevenue = useMemo(() => {
-        return orders.reduce((acc, order) => acc + (order.totalAmount || 0), 0);
+        return (orders ?? []).reduce(
+            (acc, order) => acc + (order.totalAmount || 0),
+            0,
+        );
     }, [orders]);
 
     const getTitle = () => {
@@ -61,10 +70,10 @@ const SalesHistory = () => {
         }
     };
 
-    if (error) {
+    if (isError) {
         return (
             <Typography color="error" align="center" sx={{ mt: 4 }}>
-                {error}
+                Failed to load sales history. Please try again later.
             </Typography>
         );
     }
@@ -167,7 +176,7 @@ const SalesHistory = () => {
                         title="Total Orders"
                         color="info"
                         icon={<DomainVerificationOutlined />}
-                        value={orders.length}
+                        value={(orders ?? []).length}
                     />
                 </Grid>
             </Grid>
@@ -184,7 +193,7 @@ const SalesHistory = () => {
                 }}
             >
                 <SalesHistoryTable
-                    orders={orders}
+                    orders={orders ?? []}
                     loading={loading}
                     period={period}
                 />

@@ -1,18 +1,26 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import AddMenuItemModal from "@/components/order-tracking/add-menu-item";
 import MenuItem from "@/components/order-tracking/menu-item";
 import OrderCart from "@/components/order-tracking/order-cart";
 import PaymentModal from "@/components/order-tracking/payment-modal";
 import Spinner from "@/components/status-comp/spinner";
-import { useMenuItems } from "@/hooks/use-menu-items";
 import useNotifier from "@/hooks/useNotifier";
 import type { CartItem } from "@/types/cart-item-type";
 import type { MenuItemType } from "@/types/menu-item-type";
-import { Box, Button, Grid, TextField } from "@mui/material";
+import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import { useCreateOrderMutation, useGetMenuItemsQuery } from "@/store/slice";
 
 const OrderTracking = () => {
     const notify = useNotifier();
-    const { menuItems, loading } = useMenuItems();
+    const {
+        data: menuItems,
+        isLoading: isLoadingMenuItems,
+        isError,
+    } = useGetMenuItemsQuery();
+
+    const [createOrder, { isLoading: isCreatingOrder }] =
+        useCreateOrderMutation();
 
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
@@ -52,6 +60,10 @@ const OrderTracking = () => {
     };
 
     const handleOpenPaymentDialog = () => {
+        if (cartItems.length === 0) {
+            notify("Please add items to the cart first.", "warning");
+            return;
+        }
         setPaymentDialogOpen(true);
     };
 
@@ -59,12 +71,10 @@ const OrderTracking = () => {
         setPaymentDialogOpen(false);
     };
 
-    const handleCompleteSale = async (submitted: boolean) => {
+    const handleCompleteSale = async (orderData: any) => {
         try {
-            if (!submitted) return;
-
+            await createOrder(orderData).unwrap();
             notify("Order completed successfully!", "success");
-
             setCartItems([]);
             setPaymentDialogOpen(false);
         } catch (error) {
@@ -74,13 +84,21 @@ const OrderTracking = () => {
     };
 
     const filteredMenuItems = useMemo(() => {
-        return menuItems.filter((item) =>
+        return (menuItems ?? []).filter((item) =>
             item.name.toLowerCase().includes(searchQuery.toLowerCase()),
         );
     }, [menuItems, searchQuery]);
 
-    if (loading) {
+    if (isLoadingMenuItems) {
         return <Spinner />;
+    }
+
+    if (isError) {
+        return (
+            <Typography color="error">
+                Failed to load menu items. Please try again later.
+            </Typography>
+        );
     }
 
     return (
@@ -133,6 +151,7 @@ const OrderTracking = () => {
                 onClose={handleClosePaymentDialog}
                 onCompleteSale={handleCompleteSale}
                 cartItems={cartItems}
+                isLoading={isCreatingOrder}
             />
             <AddMenuItemModal
                 open={addMenuItemOpen}

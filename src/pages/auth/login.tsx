@@ -1,186 +1,187 @@
-import { validateUserLogin } from "@/helpers/user-validation";
-import { type UserLogin, userLoginSchema } from "@/types/user-types";
+import { loginUserType, type LoginUserType } from "@/types/user-types";
 import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Link,
-  FormControl,
-  FormHelperText,
-  Grid,
+    Box,
+    Button,
+    TextField,
+    Typography,
+    Link,
+    FormControl,
+    FormHelperText,
+    Grid,
 } from "@mui/material";
 
-import { useAuth } from "@/hooks/use-auth";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useLoginMutation } from "@/store/slice";
 
 const defaultValues = {
-  password: "",
-  email: "",
+    password: "",
+    email: "",
 };
 
 const Login = () => {
-  const auth = useAuth();
-  const { loading, login } = auth;
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [login, { isLoading: loading }] = useLoginMutation();
 
-  const {
-    control,
-    setError,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    defaultValues,
-    mode: "onBlur",
-    resolver: yupResolver(userLoginSchema),
-  });
+    // Get the path the user was trying to access before being redirected
+    const from = location.state?.from?.pathname || "/order-tracking";
 
-  const onSubmit = async (data: UserLogin) => {
-    try {
-      // First validate the login data
-      const validatedData = await validateUserLogin(data);
+    const {
+        control,
+        setError,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        defaultValues,
+        mode: "onBlur",
+        resolver: yupResolver(loginUserType),
+    });
 
-      const { email, password } = validatedData;
+    const onSubmit = async (data: LoginUserType) => {
+        try {
+            // The login mutation returns a promise.
+            // .unwrap() will throw an error on failure, which is caught by the catch block.
+            await login(data).unwrap();
 
-      // If validation passes, proceed with login
-      login({ email, password }, (err) => {
-        // Handle specific field errors
-        if (err) {
-          // If err is a general error message, set it for both fields
-          setError("email", {
-            type: "manual",
-            message: err,
-          });
-          setError("password", {
-            type: "manual",
-            message: err,
-          });
+            // On successful login, navigate to the intended page or a default.
+            navigate(from, { replace: true });
+        } catch (error) {
+            // Handle validation errors
+            if (error instanceof Error) {
+                // You can set a general error or parse the error message to set specific field errors
+                setError("email", {
+                    type: "manual",
+                    message: error.message,
+                });
+                setError("password", {
+                    type: "manual",
+                    message: error.message,
+                });
+            }
         }
-      });
-    } catch (error) {
-      // Handle validation errors
-      if (error instanceof Error) {
-        // You can set a general error or parse the error message to set specific field errors
-        setError("email", {
-          type: "manual",
-          message: error.message,
-        });
-        setError("password", {
-          type: "manual",
-          message: error.message,
-        });
-      }
-    }
-  };
+    };
 
-  return (
-    <Grid container spacing={2}>
-      <Grid
-        size={12}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-          m: { xs: 3, md: 0 },
-        }}
-      >
-        <Box
-          sx={{
-            maxWidth: {
-              xs: "100%",
-              sm: "90%",
-              md: "80%",
-              lg: "70%",
-              xl: "60%",
-            },
-          }}
-        >
-          <Box sx={{ textAlign: "center", mb: 5 }}>
-            <Typography variant={"h2"} sx={{ fontWeight: 500 }}>
-              Restaurant POS
-            </Typography>
-          </Box>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <FormControl fullWidth>
-              <Controller
-                name="email"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange, onBlur } }) => (
-                  <TextField
-                    autoFocus
-                    label="Email"
-                    value={value}
-                    onBlur={onBlur}
-                    onChange={onChange}
-                    error={Boolean(errors.email)}
-                    placeholder="example@gmail.com"
-                    sx={{ minWidth: "90%" }}
-                  />
-                )}
-              />
-              {errors.email && (
-                <FormHelperText sx={{ color: "error.main" }}>
-                  {errors.email.message}
-                </FormHelperText>
-              )}
-            </FormControl>
-            <FormControl fullWidth sx={{ mt: 3 }}>
-              <Controller
-                name="password"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange, onBlur } }) => (
-                  <TextField
-                    value={value}
-                    onBlur={onBlur}
-                    label="Password"
-                    onChange={onChange}
-                    id="auth-login-v2-password"
-                    error={Boolean(errors.password)}
-                    type={"password"}
-                  />
-                )}
-              />
-              {errors.password && (
-                <FormHelperText sx={{ color: "error.main" }} id="">
-                  {errors.password.message}
-                </FormHelperText>
-              )}
-            </FormControl>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                my: 3,
-              }}
-            >
-              <Link href="/reset-password" style={{ textDecoration: "none" }}>
-                Forgot Password?
-              </Link>
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
-              <Button
-                type="submit"
-                variant="contained"
+    return (
+        <Grid container spacing={2}>
+            <Grid
+                size={12} // Use xs prop for Grid item sizing
                 sx={{
-                  width: "380px",
-                  color: "#fff",
-                  borderRadius: "48px",
-                  p: 2,
-                  mb: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "100vh",
+                    m: { xs: 3, md: 0 },
                 }}
-                disabled={loading}
-              >
-                Login
-              </Button>
-            </Box>
-          </form>
-        </Box>
-      </Grid>
-    </Grid>
-  );
+            >
+                <Box
+                    sx={{
+                        width: "100%", // Ensure box takes up grid item width
+                        maxWidth: {
+                            xs: "100%",
+                            sm: "400px", // Set a max-width for better layout on larger screens
+                        },
+                    }}
+                >
+                    <Box sx={{ textAlign: "center", mb: 5 }}>
+                        <Typography variant={"h2"} sx={{ fontWeight: 500 }}>
+                            Restaurant POS
+                        </Typography>
+                    </Box>
+                    <form
+                        noValidate
+                        autoComplete="off"
+                        onSubmit={handleSubmit(onSubmit)}
+                    >
+                        <FormControl fullWidth>
+                            <Controller
+                                name="email"
+                                control={control}
+                                rules={{ required: true }}
+                                render={({
+                                    field: { value, onChange, onBlur },
+                                }) => (
+                                    <TextField
+                                        autoFocus
+                                        label="Email"
+                                        value={value}
+                                        onBlur={onBlur}
+                                        onChange={onChange}
+                                        error={Boolean(errors.email)}
+                                        placeholder="example@gmail.com"
+                                    />
+                                )}
+                            />
+                            {errors.email && (
+                                <FormHelperText sx={{ color: "error.main" }}>
+                                    {errors.email.message}
+                                </FormHelperText>
+                            )}
+                        </FormControl>
+                        <FormControl fullWidth sx={{ mt: 3 }}>
+                            <Controller
+                                name="password"
+                                control={control}
+                                rules={{ required: true }}
+                                render={({
+                                    field: { value, onChange, onBlur },
+                                }) => (
+                                    <TextField
+                                        value={value}
+                                        onBlur={onBlur}
+                                        label="Password"
+                                        onChange={onChange}
+                                        id="auth-login-v2-password"
+                                        error={Boolean(errors.password)}
+                                        type={"password"}
+                                    />
+                                )}
+                            />
+                            {errors.password && (
+                                <FormHelperText
+                                    sx={{ color: "error.main" }}
+                                    id=""
+                                >
+                                    {errors.password.message}
+                                </FormHelperText>
+                            )}
+                        </FormControl>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                my: 3,
+                            }}
+                        >
+                            <Link
+                                href="/reset-password"
+                                style={{ textDecoration: "none" }}
+                            >
+                                Forgot Password?
+                            </Link>
+                        </Box>
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                sx={{
+                                    width: "100%", // Make button full width
+                                    color: "#fff",
+                                    borderRadius: "48px",
+                                    p: 2,
+                                    mb: 2,
+                                }}
+                                disabled={loading}
+                            >
+                                {loading ? "Logging in..." : "Login"}
+                            </Button>
+                        </Box>
+                    </form>
+                </Box>
+            </Grid>
+        </Grid>
+    );
 };
 
 export default Login;

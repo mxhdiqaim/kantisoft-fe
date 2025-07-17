@@ -1,7 +1,6 @@
 import { type ComponentType, type ReactNode } from "react";
 import {
     LoginScreen,
-    LogoutScreen,
     NotFoundScreen,
     OrderTrackingScreen,
     SalesHistoryScreen,
@@ -82,13 +81,7 @@ export const appRoutes: AppRouteType[] = [
         useLayout: false,
         authGuard: false,
     },
-    {
-        to: "/logout",
-        title: "Logout",
-        element: LogoutScreen,
-        useLayout: false,
-        authGuard: false,
-    },
+
     // {
     //   to: "/register",
     //   title: "Register Screen",

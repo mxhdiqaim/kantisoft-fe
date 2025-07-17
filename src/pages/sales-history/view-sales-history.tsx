@@ -14,13 +14,13 @@ import {
     useTheme,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetOrder } from "@/hooks/use-orders";
 import {
     ArrowBackIosNewOutlined,
     LocalPrintshopOutlined,
 } from "@mui/icons-material";
 import { ngnFormatter } from "@/utils";
 import { useRef } from "react";
+import { useGetOrderByIdQuery } from "@/store/slice";
 
 const ViewSalesHistory = () => {
     const navigate = useNavigate();
@@ -28,15 +28,25 @@ const ViewSalesHistory = () => {
     const theme = useTheme();
     const printRef = useRef<HTMLDivElement>(null);
 
-    const { order, loading } = useGetOrder(id as string);
+    const {
+        data: order,
+        isLoading: loading,
+        isError,
+    } = useGetOrderByIdQuery(id!, {
+        skip: !id,
+    });
+
+    const handlePrint = () => {
+        window.print();
+    };
 
     if (loading || !order) {
         return <Typography>Loading...</Typography>;
     }
 
-    const handlePrint = () => {
-        window.print();
-    };
+    if (isError || !order) {
+        return <Typography>Failed to load order details.</Typography>;
+    }
 
     return (
         <Box>

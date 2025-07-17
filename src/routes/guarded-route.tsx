@@ -1,41 +1,41 @@
-import { AuthGuard } from "@/components/auth/auth-guard";
 import ServerDown from "@/components/status-comp/server-down";
 
 import Spinner from "@/components/status-comp/spinner";
-import { useStatusGuard } from "@/hooks/use-status-guard";
-import ErrorFallback from "@/pages/errors/fallback";
+import { useAuthStatus } from "@/hooks/use-auth-status";
 import { memo, type ReactNode } from "react";
-import { ErrorBoundary } from "react-error-boundary";
+import { Navigate, useLocation } from "react-router-dom";
 
 type GuardProps = {
-  authGuard: boolean;
-  children: ReactNode;
+    authGuard: boolean;
+    children: ReactNode;
 };
 
 // This is your GuardedRoute component that checks authentication status
 const GuardedRoute = memo(function GuardedRoute({
-  children,
-  authGuard,
+    children,
+    authGuard,
 }: GuardProps) {
-  const { loading, isServerOk } = useStatusGuard();
+    const { isLoading, isAuthenticated, isServerOk } = useAuthStatus();
+    const location = useLocation();
 
-  // Show loading spinner if still checking status
-  if (loading) return <Spinner />;
+    // Show loading spinner if still checking status
+    if (isLoading) return <Spinner />;
 
-  // Show server down page if the server isn't responding
-  if (!isServerOk) return <ServerDown />;
+    // Show server down page if the server isn't responding
+    if (!isServerOk) return <ServerDown />;
 
-  // If this route requires authentication (authGuard is true)
-  if (authGuard) {
-    return (
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>
-      </ErrorBoundary>
-    );
-  }
+    // If route requires auth and user is NOT authenticated, redirect to login
+    if (authGuard && !isAuthenticated) {
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
 
-  // If no authentication is required, just render the children
-  return <>{children}</>;
+    // If route requires auth and user is authenticated, show the page
+    if (authGuard && isAuthenticated) {
+        return <>{children}</>;
+    }
+
+    // If no authentication is required, just render the children
+    return <>{children}</>;
 });
 
 export default GuardedRoute;
