@@ -44,7 +44,6 @@ const OrderCart = ({
             <Typography variant="h5" gutterBottom>
                 Order Cart
             </Typography>
-            <Divider />
             {cartItems.length === 0 ? (
                 <Typography sx={{ my: 2 }}>Cart is empty</Typography>
             ) : (

@@ -1,6 +1,7 @@
 import { type ComponentType, type ReactNode } from "react";
 import {
     LoginScreen,
+    MenuItemScreen,
     NotFoundScreen,
     OrderTrackingScreen,
     SalesHistoryScreen,
@@ -11,6 +12,7 @@ import {
 import { IconButton } from "@mui/material";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
+import RestaurantMenuOutlinedIcon from "@mui/icons-material/RestaurantMenuOutlined";
 
 export interface AppRouteType {
     to: string;
@@ -71,6 +73,25 @@ export const appRoutes: AppRouteType[] = [
         title: "Sales History",
         element: ViewSalesHistoryScreen,
         hidden: true,
+    },
+    {
+        to: "/menu-item",
+        title: "Menu Item",
+        element: MenuItemScreen,
+        icon: {
+            default: (
+                <IconButton size={"medium"}>
+                    <RestaurantMenuOutlinedIcon />
+                </IconButton>
+            ),
+            active: (
+                <IconButton size={"medium"}>
+                    <RestaurantMenuOutlinedIcon
+                        sx={{ color: ICON_ACTIVE_COLOR }}
+                    />
+                </IconButton>
+            ),
+        },
     },
 
     // Auth pages

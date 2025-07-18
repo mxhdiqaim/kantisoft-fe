@@ -7,7 +7,7 @@ type CustomNoRowsOverlayProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 const CustomNoRowsOverlay = (props: CustomNoRowsOverlayProps) => {
-    const { period, ...rest } = props;
+    const { period = "No data to display.", ...rest } = props;
 
     return (
         <Box
@@ -25,7 +25,7 @@ const CustomNoRowsOverlay = (props: CustomNoRowsOverlayProps) => {
                 color="text.secondary"
                 sx={{ fontWeight: 500 }}
             >
-                No sales yet {period ? `for this ${period}.` : "."}
+                {period}
             </Typography>
         </Box>
     );

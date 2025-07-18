@@ -2,48 +2,43 @@ import {
     Box,
     IconButton,
     Menu,
-    MenuItem,
+    MenuItem as MuiMenuItem,
     styled,
     Tooltip,
     Typography,
 } from "@mui/material";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import {
-    EditOutlined,
-    MoreVert,
-    PrintOutlined,
-    VisibilityOutlined,
-} from "@mui/icons-material";
+import { EditOutlined, MoreVert, DeleteOutline } from "@mui/icons-material";
 import CustomNoRowsOverlay from "@/components/customs/custom-no-rows-overlay";
 import { useTheme } from "@mui/material";
 import { useMemo, useState, type MouseEvent } from "react";
-import { relativeTime } from "@/utils/get-relative-time";
-import type { OrderType } from "@/types/order-types";
 import { ngnFormatter } from "@/utils";
-import { useNavigate } from "react-router-dom";
+import type { MenuItemType } from "@/types/menu-item-type";
+import { useDeleteMenuItemMutation } from "@/store/slice";
+import useNotifier from "@/hooks/useNotifier";
 
 const StyledBox = styled(Box)(({ theme }) => ({
     display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
+    alignItems: "center",
     height: "100%",
-    gap: theme.spacing(2),
+    gap: theme.spacing(1),
 }));
 
 export interface Props {
-    orders: OrderType[];
+    menuItems: MenuItemType[];
     loading: boolean;
-    period: string;
+    onEdit: (menuItem: MenuItemType) => void;
 }
 
-const SalesHistoryTable = ({ orders, loading, period }: Props) => {
+const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
     const theme = useTheme();
-    const navigate = useNavigate();
+    const notify = useNotifier();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+    const [deleteMenuItem, { isLoading: isDeleting }] =
+        useDeleteMenuItemMutation();
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
-        console.log(`Clicked row: ${rowId}`);
         setAnchorEl(event.currentTarget);
         setSelectedRowId(rowId);
     };
@@ -53,91 +48,97 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
         setSelectedRowId(null);
     };
 
-    const columns: GridColDef[] = useMemo(
+    const handleDelete = async (rowId: string) => {
+        try {
+            await deleteMenuItem(rowId).unwrap();
+            notify("Menu item deleted successfully", "success");
+        } catch (error) {
+            console.error("Failed to delete menu item:", error);
+            notify("Failed to delete menu item", "error");
+        }
+
+        handleMenuClose();
+    };
+
+    const columns: GridColDef<MenuItemType>[] = useMemo(
         () => [
             {
+                flex: 0.1,
+                field: "itemCode",
+                headerName: "Item Code",
+                minWidth: 150,
+                renderCell: (params) => (
+                    <StyledBox sx={{ justifyContent: "center" }}>
+                        <Typography variant="body2" className="capitalize">
+                            {params?.value}
+                        </Typography>
+                    </StyledBox>
+                ),
+            },
+            {
                 flex: 1,
-                field: "seller",
-                headerName: "Seller Name",
-                width: 200,
+                field: "name",
+                headerName: "Name",
+                minWidth: 150,
                 renderCell: (params) => (
                     <StyledBox>
-                        <Typography variant="body2">
-                            {params.value.firstName} {params.value.lastName}
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                fontWeight: 400,
+                                textTransform: "capitalize",
+                                color: theme.palette.text.primary,
+                                backgroundColor: theme.palette.background.paper,
+                                padding: "4px 8px",
+                                borderRadius: "4px",
+                            }}
+                        >
+                            {params.value}
                         </Typography>
                     </StyledBox>
                 ),
             },
             {
-                flex: 1,
-                field: "orderDate",
-                headerName: "Time",
-                align: "center",
-                headerAlign: "center",
-                width: 150,
-                renderCell: (params) => (
-                    <StyledBox sx={{ alignItems: "center" }}>
-                        <Typography variant="body2">
-                            {relativeTime(new Date(), new Date(params.value))}
-                        </Typography>
-                    </StyledBox>
-                ),
-            },
-            {
-                flex: 1,
-                field: "totalAmount",
-                headerName: "Total Amount",
+                flex: 0.5,
+                field: "price",
+                headerName: "Price",
                 type: "number",
-                width: 180,
+                minWidth: 100,
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <StyledBox sx={{ alignItems: "center" }}>
+                    <StyledBox sx={{ justifyContent: "center" }}>
                         <Typography variant="body2" fontWeight="medium">
-                            {ngnFormatter.format(params.value)}{" "}
+                            {ngnFormatter.format(params.value)}
                         </Typography>
                     </StyledBox>
                 ),
             },
             {
-                flex: 1,
-                field: "paymentMethod",
-                headerName: "Payment Method",
-                width: 180,
-                align: "center",
-                headerAlign: "center",
-                cellClassName: "capitalize-cell",
-            },
-            {
-                flex: 1,
-                field: "orderStatus",
-                headerName: "Status",
-                width: 150,
+                flex: 0.5,
+                field: "isAvailable",
+                headerName: "Is Available",
+                minWidth: 100,
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <StyledBox sx={{ alignItems: "center" }}>
+                    <StyledBox sx={{ justifyContent: "center" }}>
                         <Typography
                             variant="body2"
                             className="capitalize"
                             sx={{
-                                color:
-                                    theme.palette.mode === "dark"
-                                        ? theme.palette.text.primary
-                                        : theme.palette.primary.contrastText,
-                                padding: "4px 8px",
+                                backgroundColor: params.value
+                                    ? theme.palette.success.main
+                                    : theme.palette.error.main,
+                                p: "4px 8px",
                                 borderRadius: "4px",
+                                color: theme.palette.primary.contrastText,
                                 fontWeight: "500",
                                 textTransform: "capitalize",
-                                backgroundColor:
-                                    params.value === "completed"
-                                        ? theme.palette.success.light
-                                        : params.value === "pending"
-                                          ? theme.palette.warning.light
-                                          : theme.palette.error.light,
+                                width: "50px",
                             }}
                         >
-                            {params.value}
+                            {params.value ? "Yes" : "No"}
                         </Typography>
                     </StyledBox>
                 ),
@@ -153,19 +154,8 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                     const isOpen =
                         Boolean(anchorEl) && selectedRowId === params.row.id;
 
-                    const handleView = () => {
-                        console.log(`View order: ${params.row.id}`);
-                        navigate(`/sales-history/${params.row.id}/view`);
-                        handleMenuClose();
-                    };
                     const handleEdit = () => {
-                        console.log(`Edit order: ${params.row.id}`);
-                        handleMenuClose();
-                    };
-                    const handlePrint = () => {
-                        console.log(
-                            `Print receipt for order: ${params.row.id}`,
-                        );
+                        onEdit(params.row);
                         handleMenuClose();
                     };
 
@@ -185,18 +175,21 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                                 open={isOpen}
                                 onClose={handleMenuClose}
                             >
-                                <MenuItem onClick={handleView}>
-                                    <VisibilityOutlined sx={{ mr: 1 }} />
-                                    View
-                                </MenuItem>
-                                <MenuItem onClick={handleEdit}>
+                                <MuiMenuItem onClick={handleEdit}>
                                     <EditOutlined sx={{ mr: 1 }} />
                                     Edit
-                                </MenuItem>
-                                <MenuItem onClick={handlePrint}>
-                                    <PrintOutlined sx={{ mr: 1 }} />
-                                    Print
-                                </MenuItem>
+                                </MuiMenuItem>
+                                <MuiMenuItem
+                                    onClick={() => handleDelete(params.row.id)}
+                                    sx={{ color: "error.main" }}
+                                    disabled={
+                                        isDeleting &&
+                                        selectedRowId === params.row.id
+                                    }
+                                >
+                                    <DeleteOutline sx={{ mr: 1 }} />
+                                    Delete
+                                </MuiMenuItem>
                             </Menu>
                         </>
                     );
@@ -210,13 +203,13 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
             sx={{
                 height: 600,
                 width: "100%",
-                "& .capitalize-cell": {
+                "& .capitalize": {
                     textTransform: "capitalize",
                 },
             }}
         >
             <DataGrid
-                rows={orders}
+                rows={menuItems}
                 columns={columns}
                 loading={loading}
                 slots={{
@@ -228,9 +221,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                         noRowsVariant: "skeleton",
                     },
                     noRowsOverlay: {
-                        period: period
-                            ? `No sales yet for this ${period}.`
-                            : "No sales yet.",
+                        period: "No menu items available.",
                     },
                 }}
                 initialState={{
@@ -252,4 +243,4 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
     );
 };
 
-export default SalesHistoryTable;
+export default MenuItemsTable;

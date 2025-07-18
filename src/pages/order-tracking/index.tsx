@@ -1,20 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import AddMenuItemModal from "@/components/order-tracking/add-menu-item";
+import AddMenuItemModal from "@/components/order-tracking/menu-item-form-modal";
 import MenuItem from "@/components/order-tracking/menu-item";
 import OrderCart from "@/components/order-tracking/order-cart";
 import PaymentModal from "@/components/order-tracking/payment-modal";
 import useNotifier from "@/hooks/useNotifier";
 import type { CartItem } from "@/types/cart-item-type";
 import type { MenuItemType } from "@/types/menu-item-type";
-import {
-    Box,
-    Button,
-    Grid,
-    Skeleton,
-    TextField,
-    Typography,
-} from "@mui/material";
+import { Box, Grid, Skeleton, TextField, Typography } from "@mui/material";
 import { useCreateOrderMutation, useGetMenuItemsQuery } from "@/store/slice";
 import MenuItemSkeleton from "@/components/spinners/manu-item-skeleton";
 import OrderCartSkeleton from "@/components/spinners/order-cart-skeleton";
@@ -139,30 +132,18 @@ const OrderTracking = () => {
 
     return (
         <Box>
-            <Grid container spacing={2} mb={2}>
-                <Grid size={{ xs: 12, md: 9 }}>
-                    <TextField
-                        label="Search Menu Items"
-                        variant="outlined"
-                        fullWidth
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
-                    <Button
-                        variant="contained"
-                        onClick={() => setAddMenuItemOpen(true)}
-                        fullWidth
-                        sx={{ height: "95%" }}
-                    >
-                        Add Menu Item
-                    </Button>
-                </Grid>
-            </Grid>
             <Grid container spacing={3} mb={2}>
                 <Grid size={{ xs: 12, md: 8 }}>
-                    <Grid container spacing={2}>
+                    <Grid size={{ xs: 12 }}>
+                        <TextField
+                            label="Search Menu Items"
+                            variant="outlined"
+                            fullWidth
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid container spacing={2} mt={2}>
                         {filteredMenuItems.map((item) => (
                             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.id}>
                                 <MenuItem

@@ -6,6 +6,10 @@ const coreMenuItemSchema = yup.object({
         .string()
         .required("Name is required")
         .min(2, "Name must be at least 2 characters"),
+    itemCode: yup
+        .number()
+        .optional()
+        .min(100, "Item code must be at least 100"),
     price: yup
         .number()
         .typeError("Price must be a number")
@@ -20,11 +24,15 @@ export const menuItemSchema = extendBaseSchema(coreMenuItemSchema);
 // The schema for creating a new menu item is the same as the core schema
 export const createMenuItemSchema = coreMenuItemSchema;
 
+export type CreateMenuItemType = yup.InferType<typeof createMenuItemSchema>;
+
 // Inferred type for a full menu item object
 export type MenuItemType = yup.InferType<typeof menuItemSchema>;
 // Inferred type for creating a menu item, ensuring consistency
 export type AddMenuItemType = Pick<
     MenuItemType,
     "name" | "price" | "isAvailable"
->;
+> & {
+    itemCode?: number;
+};
 export type EditMenuItemType = Partial<MenuItemType>;

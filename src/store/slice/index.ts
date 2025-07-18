@@ -121,6 +121,27 @@ export const apiSlice = createApi({
             }),
             invalidatesTags: ["MenuItem"],
         }),
+        deleteMenuItem: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `/menu-items/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["MenuItem"],
+        }),
+        updateMenuItem: builder.mutation<
+            MenuItemType,
+            Partial<MenuItemType> & Pick<MenuItemType, "id">
+        >({
+            query: ({ id, ...patch }) => ({
+                url: `/menu-items/${id}`,
+                method: "PATCH",
+                body: patch,
+            }),
+            invalidatesTags: (_result, _error, { id }) => [
+                { type: "MenuItem", id },
+                "MenuItem",
+            ],
+        }),
     }),
 });
 
@@ -135,4 +156,6 @@ export const {
     useLogoutMutation,
     useRegisterMutation,
     useHealthCheckQuery,
+    useDeleteMenuItemMutation,
+    useUpdateMenuItemMutation,
 } = apiSlice;

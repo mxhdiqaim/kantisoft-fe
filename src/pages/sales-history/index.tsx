@@ -245,7 +245,6 @@ const SalesHistory = () => {
                 elevation={-1}
                 sx={{
                     border: `1px solid ${theme.palette.grey[100]}`,
-                    // height: 600,
                     width: "100%",
                     "& .capitalize-cell": {
                         textTransform: "capitalize",
