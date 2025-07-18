@@ -1,4 +1,5 @@
 import CustomModal from "@/components/customs/custom-modal";
+import { getApiError } from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
 import {
     useCreateMenuItemMutation,
@@ -66,11 +67,11 @@ const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
             }
             onClose();
         } catch (error) {
-            notify(
-                `Failed to ${isEditMode ? "update" : "add"} menu item.`,
-                "error",
-            );
-            console.error(
+            const defaultMessage = `Failed to ${isEditMode ? "update" : "add"} menu item.`;
+            const apiError = getApiError(error, defaultMessage);
+
+            notify(apiError.message, "error");
+            console.log(
                 `Failed to ${isEditMode ? "update" : "create"} menu item:`,
                 error,
             );

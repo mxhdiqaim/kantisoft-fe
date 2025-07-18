@@ -63,7 +63,7 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
     const columns: GridColDef<MenuItemType>[] = useMemo(
         () => [
             {
-                flex: 0.1,
+                flex: 0.4,
                 field: "itemCode",
                 headerName: "Item Code",
                 minWidth: 150,
@@ -231,7 +231,14 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                 }}
                 disableColumnResize
                 pageSizeOptions={[10, 25, 50]}
-                disableRowSelectionOnClick
+                // disableRowSelectionOnClick
+                checkboxSelection={true}
+                getRowId={(row) => row.id}
+                onRowClick={(params) => {
+                    if (params.id !== selectedRowId) {
+                        onEdit(params.row);
+                    }
+                }}
                 sx={{
                     border: "none",
                     "& .MuiDataGrid-columnHeaderTitle": {

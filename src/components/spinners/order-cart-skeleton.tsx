@@ -2,12 +2,12 @@ import { Box, Paper, Skeleton, Typography } from "@mui/material";
 
 const OrderCartSkeleton = () => {
     return (
-        <Paper sx={{ p: 2, height: "100%" }}>
+        <Paper sx={{ p: 2 }}>
             <Typography variant="h2" gutterBottom>
                 <Skeleton width="50%" />
             </Typography>
             <Box>
-                {Array.from(new Array(3)).map((_, index) => (
+                {Array.from(new Array(5)).map((_, index) => (
                     <Box
                         key={index}
                         sx={{

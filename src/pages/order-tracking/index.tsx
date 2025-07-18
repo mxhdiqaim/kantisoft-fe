@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import AddMenuItemModal from "@/components/order-tracking/menu-item-form-modal";
+import MenuIteFormmModal from "@/components/order-tracking/menu-item-form-modal";
 import MenuItem from "@/components/order-tracking/menu-item";
 import OrderCart from "@/components/order-tracking/order-cart";
 import PaymentModal from "@/components/order-tracking/payment-modal";
@@ -11,6 +10,8 @@ import { Box, Grid, Skeleton, TextField, Typography } from "@mui/material";
 import { useCreateOrderMutation, useGetMenuItemsQuery } from "@/store/slice";
 import MenuItemSkeleton from "@/components/spinners/manu-item-skeleton";
 import OrderCartSkeleton from "@/components/spinners/order-cart-skeleton";
+import type { CreateOrderType } from "@/types/order-types";
+import { getApiError } from "@/helpers/get-api-error";
 
 const OrderTracking = () => {
     const notify = useNotifier();
@@ -72,15 +73,19 @@ const OrderTracking = () => {
         setPaymentDialogOpen(false);
     };
 
-    const handleCompleteSale = async (orderData: any) => {
+    const handleCompleteSale = async (
+        orderData: Omit<CreateOrderType, "amountReceived">,
+    ) => {
         try {
             await createOrder(orderData).unwrap();
             notify("Order completed successfully!", "success");
             setCartItems([]);
             setPaymentDialogOpen(false);
         } catch (error) {
-            notify("Failed to complete order.", "error");
-            console.error("Failed to submit order", error);
+            console.log(error);
+            const defaultMessage = "Failed to complete order.";
+            const apiError = getApiError(error, defaultMessage);
+            notify(apiError.message, "error");
         }
     };
 
@@ -93,16 +98,11 @@ const OrderTracking = () => {
     if (isLoadingMenuItems) {
         return (
             <Box>
-                <Grid container spacing={2} mb={2}>
-                    <Grid size={{ xs: 12, md: 9 }}>
-                        <Skeleton variant="rectangular" height={56} />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 3 }}>
-                        <Skeleton variant="rectangular" height={56} />
-                    </Grid>
-                </Grid>
                 <Grid container spacing={3} mb={2}>
                     <Grid size={{ xs: 12, md: 8 }}>
+                        <Grid size={12} mb={2}>
+                            <Skeleton variant="rectangular" height={56} />
+                        </Grid>
                         <Grid container spacing={2}>
                             {Array.from(new Array(9)).map((_, index) => (
                                 <Grid
@@ -170,7 +170,7 @@ const OrderTracking = () => {
                 cartItems={cartItems}
                 isLoading={isCreatingOrder}
             />
-            <AddMenuItemModal
+            <MenuIteFormmModal
                 open={addMenuItemOpen}
                 onClose={() => setAddMenuItemOpen(false)}
             />

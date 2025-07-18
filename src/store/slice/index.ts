@@ -1,4 +1,10 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import {
+    createApi,
+    fetchBaseQuery,
+    type BaseQueryFn,
+    type FetchArgs,
+    type FetchBaseQueryError,
+} from "@reduxjs/toolkit/query/react";
 import type {
     CreateOrderType,
     OrderPeriod,
@@ -11,23 +17,47 @@ import { logOut, setCredentials } from "./auth-slice";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;
 
+// Create a new base query that wraps fetchBaseQuery
+const baseQuery = fetchBaseQuery({
+    baseUrl,
+    prepareHeaders: (headers, { getState }) => {
+        // Get the token from the auth state
+        const token = (getState() as RootState).auth.token;
+        if (token) {
+            headers.set("authorization", `Bearer ${token}`);
+        }
+        return headers;
+    },
+});
+
+// Create a new base query function that includes logout logic on 401
+const baseQueryWithAuth: BaseQueryFn<
+    string | FetchArgs,
+    unknown,
+    FetchBaseQueryError
+> = async (args, api, extraOptions) => {
+    const result = await baseQuery(args, api, extraOptions);
+
+    // If a 401 Unauthorized error occurs, dispatch the logOut action
+    if (result.error && result.error.status === 401) {
+        api.dispatch(logOut());
+
+        console.warn("Session expired, logging out.");
+
+        // Resetting the API state
+        api.dispatch(apiSlice.util.resetApiState());
+        return { error: { status: 401, data: "Session expired" } };
+    }
+
+    return result;
+};
+
 // Define your API slice
 export const apiSlice = createApi({
     reducerPath: "api",
-    baseQuery: fetchBaseQuery({
-        baseUrl,
-        prepareHeaders: (headers, { getState }) => {
-            // You can use getState to access the token if it's in Redux state
-            const token = (getState() as RootState).auth.token;
-
-            if (token) {
-                headers.set("authorization", `Bearer ${token}`);
-            }
-            return headers;
-        },
-    }),
+    baseQuery: baseQueryWithAuth,
     // Define tags for caching and automatic refetching
-    tagTypes: ["Order", "MenuItem"],
+    tagTypes: ["Order", "MenuItem", "User"],
     endpoints: (builder) => ({
         // Health Check Endpoint
         healthCheck: builder.query<{ status: string }, void>({

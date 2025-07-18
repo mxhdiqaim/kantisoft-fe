@@ -30,7 +30,7 @@ interface Props {
     isLoading?: boolean;
 }
 
-const PaymentDialog = ({
+const PaymentModal = ({
     open,
     onClose,
     onCompleteSale,
@@ -49,6 +49,7 @@ const PaymentDialog = ({
         handleSubmit,
         reset,
         watch,
+        setValue,
         formState: { errors, isValid },
     } = useForm<CreateOrderType>({
         mode: "onChange",
@@ -93,6 +94,16 @@ const PaymentDialog = ({
             });
         }
     }, [open, cartItems, seller?.id, reset]);
+
+    useEffect(() => {
+        if (paymentMethod !== "cash") {
+            // If payment is not cash, set amountReceived to the total
+            setValue("amountReceived", total, { shouldValidate: true });
+        } else {
+            // If switching back to cash, reset amountReceived
+            setValue("amountReceived", 0, { shouldValidate: true });
+        }
+    }, [paymentMethod, total, setValue]);
 
     return (
         <CustomModal
@@ -180,4 +191,4 @@ const PaymentDialog = ({
     );
 };
 
-export default PaymentDialog;
+export default PaymentModal;
