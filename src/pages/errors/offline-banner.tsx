@@ -28,8 +28,8 @@ const OfflineBanner = () => {
         >
             <CloudOff sx={{ mr: 1 }} />
             <Typography variant="body2" fontWeight="medium">
-                You are currently offline. Operations will be synced when you
-                reconnect.
+                You are currently offline. Checkout your internet connection and
+                try again.
             </Typography>
         </Box>
     );
