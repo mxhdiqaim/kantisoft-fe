@@ -16,13 +16,13 @@ const OfflineBanner = () => {
                 top: 0,
                 left: 0,
                 right: 0,
-                p: 1,
+                py: 1.5,
                 bgcolor: "warning.main",
                 color: "white",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                zIndex: (theme) => theme.zIndex.modal + 1, // Ensure it's on top
+                zIndex: (theme) => theme.zIndex.modal + 1,
                 boxShadow: 3,
             }}
         >
