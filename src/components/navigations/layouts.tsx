@@ -1,14 +1,21 @@
 import { type FC, type ReactNode, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import AppbarComponent from "./appbar";
 import SideBar from "./sidebar";
 import useScreenSize from "@/hooks/use-screen-size";
 import CustomDrawer from "@/components/customs/custom-drawer";
 import OfflineBanner from "@/pages/errors/offline-banner";
+import type { AppRouteType } from "@/routes";
 
-const Layout: FC<{ children: ReactNode }> = ({ children }) => {
+interface Props {
+    children: ReactNode;
+    appRoutes: AppRouteType[]; // Add appRoutes to props
+}
+
+const Layout: FC<Props> = ({ children, appRoutes }) => {
     const screenSize = useScreenSize();
     const [drawerState, setDrawerState] = useState(false);
+    const theme = useTheme();
 
     const showDrawer = screenSize === "mobile" || screenSize === "tablet";
 
@@ -26,15 +33,15 @@ const Layout: FC<{ children: ReactNode }> = ({ children }) => {
                     onClose={() => toggleDrawer(false)}
                     onOpen={() => toggleDrawer(true)}
                 >
-                    <SideBar {...{ toggleDrawer, drawerState }} />
+                    <SideBar {...{ toggleDrawer, drawerState, showDrawer, appRoutes }} />
                 </CustomDrawer>
             ) : (
-                <SideBar />
+                <SideBar {...{ toggleDrawer, drawerState, showDrawer, appRoutes }} />
             )}
 
             {/* Main content area */}
 
-            <Box sx={{ flexGrow: 1 }}>
+            <Box component="main" sx={{ flexGrow: 1, background: theme.palette.background.default }}>
                 <OfflineBanner />
                 <AppbarComponent {...{ toggleDrawer, drawerState }} />
 

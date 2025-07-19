@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, Fragment, type FC } from "react";
 import {
     Box,
@@ -16,7 +17,6 @@ import {
     useTheme,
 } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { appRoutes, type AppRouteType } from "@/routes";
 import type { Props as AppBarProps } from "./appbar";
 
 import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
@@ -26,13 +26,15 @@ import { LogoutOutlined } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useLogoutMutation } from "@/store/slice";
 import { useTranslation } from "react-i18next";
+import { type AppRouteType, type BaseAppRouteType } from "@/routes"; // Import the correct dynamic route type
 
 interface Props extends AppBarProps {
     sx?: SxProps<Theme>;
     showDrawer?: boolean;
+    appRoutes: AppRouteType[]; // Use the dynamic AppRouteType
 }
 
-const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
+const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer, appRoutes }) => {
     const { t } = useTranslation();
     const theme = useTheme();
     const location = useLocation();
@@ -45,10 +47,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
             await logout({}).unwrap();
         } catch (error) {
             // The console will show if the server call failed, but we proceed.
-            console.error(
-                "Server logout failed, proceeding with client-side logout:",
-                error,
-            );
+            console.error("Server logout failed, proceeding with client-side logout:", error);
         } finally {
             // This block runs whether the try succeeded or failed.
             // Since the apiSlice always clears local credentials,
@@ -61,93 +60,55 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
     const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
     // function to handle both drawer close and menu expand
-    const handleItemClick = (route: AppRouteType) => {
-        if (showDrawer) return;
-
-        if (toggleDrawer) {
+    const handleItemClick = (route: BaseAppRouteType) => {
+        if (showDrawer && toggleDrawer) {
             toggleDrawer(!drawerState);
         }
 
-        // Toggle expanded state for items with children
         if (route.children) {
-            setExpandedItems((prev) =>
-                prev.includes(route.to)
-                    ? prev.filter((item) => item !== route.to)
-                    : [...prev, route.to],
+            setExpandedItems((prev: any[]) =>
+                // Use the stable `key` instead of the dynamic `to` path
+                prev.includes(route.key) ? prev.filter((item) => item !== route.key) : [...prev, route.key],
             );
         }
     };
 
     const renderMenuItem = (
-        route: AppRouteType,
+        route: AppRouteType, // Update type here
         index: number,
         level: number = 0,
-        parentPath: string = "",
     ) => {
-        // Calculate the full path for this route
-        const fullPath = parentPath + route.to;
-
-        const isSelected = location.pathname === fullPath;
-        const isExpanded = expandedItems.includes(route.to);
-        const hasChildren = route.children && route.children;
+        const isSelected = location.pathname === route.to;
+        // Use the stable `key` to check if the item is expanded
+        const isExpanded = expandedItems.includes(route.key as any);
+        const hasChildren = route.children && route.children.length > 0;
 
         return (
             <Fragment key={index}>
                 <ListItem sx={{ pl: level * 2 }}>
                     <ListItemButton
                         component={Link}
-                        to={fullPath}
+                        to={route.to}
                         selected={isSelected}
                         onClick={() => handleItemClick(route)}
-                        sx={{
-                            backgroundColor: isSelected
-                                ? `${theme.palette.primary.main} !important`
-                                : "transparent",
-                            "&:hover": {
-                                backgroundColor: theme.palette.primary.light,
-                                color: "#fff",
-                            },
-                            my: -0.8,
-                        }}
                     >
                         <ListItemIcon>
-                            {isSelected && route.icon?.active
-                                ? route.icon.active
-                                : route.icon?.default}
+                            {isSelected && route.icon?.active ? route.icon.active : route.icon?.default}
                         </ListItemIcon>
-                        <ListItemText
-                            primary={t(route.title as string)}
-                            sx={{
-                                ".MuiListItemText-primary": {
-                                    color: isSelected
-                                        ? theme.palette.primary.contrastText
-                                        : "inherit",
-                                },
-                            }}
-                        />
+                        <ListItemText primary={t(route.title as string)} />
                         {hasChildren && (
                             <IconButton size="small">
-                                {isExpanded ? (
-                                    <ExpandLessOutlinedIcon />
-                                ) : (
-                                    <ExpandMoreOutlinedIcon />
-                                )}
+                                {isExpanded ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
                             </IconButton>
                         )}
                     </ListItemButton>
                 </ListItem>
 
-                {/* Render children if expanded */}
-                {hasChildren && isExpanded && (
+                {hasChildren && (
                     <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                         <Box>
                             {route.children?.map((childRoute, childIndex) =>
-                                renderMenuItem(
-                                    childRoute,
-                                    childIndex,
-                                    level + 1,
-                                    fullPath + "/",
-                                ),
+                                renderMenuItem(childRoute, childIndex, level + 1),
                             )}
                         </Box>
                     </Collapse>
@@ -180,14 +141,10 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                     }}
                 >
                     <Button
-                        onClick={() =>
-                            toggleDrawer && toggleDrawer(!drawerState)
-                        }
+                        onClick={() => toggleDrawer && toggleDrawer(!drawerState)}
                         sx={{ width: "fit-content", mt: 1, mr: 0.5 }}
                     >
-                        <CancelIcon
-                            sx={{ color: theme.palette.alternate.dark }}
-                        />
+                        <CancelIcon sx={{ color: theme.palette.alternate.dark }} />
                     </Button>
                 </Box>
                 <ListItem sx={{ width: "100%" }}>
@@ -201,11 +158,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                         }}
                     >
                         <ListItemIcon>
-                            <img
-                                src="/images/SmartStock.svg"
-                                width={200}
-                                alt="Restaurant POS"
-                            />
+                            <img src="/images/SmartStock.svg" width={200} alt="Restaurant POS" />
                         </ListItemIcon>
                         <ListItemText />
                     </ListItemButton>
@@ -213,13 +166,9 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
 
                 <Divider sx={{ display: { xs: "none", md: "block" } }} />
 
-                {/* Routes rendering */}
+                {/* Use the dynamic appRoutes prop for rendering */}
                 {appRoutes.map((route, index) => {
-                    const authGuard = route.authGuard ?? true;
-                    const withLayout = route.useLayout ?? true;
-
-                    if (route.hidden || !authGuard || !withLayout) return;
-
+                    if (route.hidden) return null;
                     return renderMenuItem(route, index);
                 })}
 

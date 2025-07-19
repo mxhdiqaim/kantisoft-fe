@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import type { AppRouteType } from "@/routes";
+import type { BaseAppRouteType } from "@/routes";
 
 // fixes scroll behaviour on route change
 export const ScrollToTop = () => {
@@ -13,7 +13,7 @@ export const ScrollToTop = () => {
     return null;
 };
 
-export const resolveChildren = (item: AppRouteType) => {
+export const resolveChildren = (item: BaseAppRouteType) => {
     if (item?.children) return true;
 
     return false;

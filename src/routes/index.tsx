@@ -1,8 +1,8 @@
 import { type ComponentType, type ReactNode } from "react";
 import {
-    LoginScreen,
+    // LoginScreen,
     MenuItemScreen,
-    NotFoundScreen,
+    // NotFoundScreen,
     OrderTrackingScreen,
     SalesHistoryScreen,
     ViewSalesHistoryScreen,
@@ -14,8 +14,9 @@ import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
 import RestaurantMenuOutlinedIcon from "@mui/icons-material/RestaurantMenuOutlined";
 
-export interface AppRouteType {
-    to: string;
+export interface BaseAppRouteType {
+    to?: string;
+    key: string;
     element: ComponentType;
     title?: string;
     icon?: {
@@ -25,15 +26,21 @@ export interface AppRouteType {
     useLayout?: boolean;
     authGuard?: boolean;
     hidden?: boolean;
-    children?: AppRouteType[];
+    children?: BaseAppRouteType[];
 }
+
+export type AppRouteType = Omit<BaseAppRouteType, "children"> & {
+    to: string;
+    children?: AppRouteType[];
+};
 
 const ICON_ACTIVE_COLOR = "#fff";
 
 // Application routes with layout
-export const appRoutes: AppRouteType[] = [
+export const baseAppRoutes: BaseAppRouteType[] = [
     {
-        to: "/order-tracking",
+        key: "orderTracking",
+        // to: "/order-tracking",
         title: "nav.orderTracking",
         element: OrderTrackingScreen,
         icon: {
@@ -50,7 +57,8 @@ export const appRoutes: AppRouteType[] = [
         },
     },
     {
-        to: "/sales-history",
+        key: "salesHistory",
+        // to: "/sales-history",
         title: "nav.salesHistory",
         element: SalesHistoryScreen,
         icon: {
@@ -61,21 +69,21 @@ export const appRoutes: AppRouteType[] = [
             ),
             active: (
                 <IconButton size={"medium"}>
-                    <ManageAccountsOutlinedIcon
-                        sx={{ color: ICON_ACTIVE_COLOR }}
-                    />
+                    <ManageAccountsOutlinedIcon sx={{ color: ICON_ACTIVE_COLOR }} />
                 </IconButton>
             ),
         },
     },
     {
-        to: "/sales-history/:id/view",
+        key: "viewSalesHistory",
+        // to: "/sales-history/:id/view",
         title: "nav.salesHistory",
         element: ViewSalesHistoryScreen,
         hidden: true,
     },
     {
-        to: "/menu-item",
+        key: "menuItem",
+        // to: "/menu-item",
         title: "nav.menuItem",
         element: MenuItemScreen,
         icon: {
@@ -86,22 +94,21 @@ export const appRoutes: AppRouteType[] = [
             ),
             active: (
                 <IconButton size={"medium"}>
-                    <RestaurantMenuOutlinedIcon
-                        sx={{ color: ICON_ACTIVE_COLOR }}
-                    />
+                    <RestaurantMenuOutlinedIcon sx={{ color: ICON_ACTIVE_COLOR }} />
                 </IconButton>
             ),
         },
     },
 
     // Auth pages
-    {
-        to: "/login",
-        title: "Login",
-        element: LoginScreen,
-        useLayout: false,
-        authGuard: false,
-    },
+    // {
+    //     key: "login",
+    //     to: "/login",
+    //     title: "Login",
+    //     element: LoginScreen,
+    //     useLayout: false,
+    //     authGuard: false,
+    // },
 
     // {
     //   to: "/register",
@@ -119,11 +126,12 @@ export const appRoutes: AppRouteType[] = [
     // },
 
     // Error Pages
-    {
-        to: "*",
-        title: "Not Found",
-        element: NotFoundScreen,
-        hidden: true,
-        useLayout: false,
-    },
+    // {
+    //     key: "*",
+    //     to: "*",
+    //     title: "Not Found",
+    //     element: NotFoundScreen,
+    //     hidden: true,
+    //     useLayout: false,
+    // },
 ];
