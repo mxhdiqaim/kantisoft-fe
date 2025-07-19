@@ -1,4 +1,4 @@
-import type { CreateUser, LoginUserType, UserType } from "@/types/user-types";
+import type { CreateUserType, LoginUserType, UserType } from "@/types/user-types";
 import * as yup from "yup";
 
 // Base schema type that all other schemas will extend
@@ -35,5 +35,5 @@ export type AuthValuesType = {
     setUser: (value: UserType | null) => void;
     setIsInitialized: (value: boolean) => void;
     login: (params: LoginUserType, errorCallback?: ErrCallbackType) => void;
-    register?: (params: CreateUser, errorCallback?: ErrCallbackType) => void;
+    register?: (params: CreateUserType, errorCallback?: ErrCallbackType) => void;
 };

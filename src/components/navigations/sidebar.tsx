@@ -25,6 +25,7 @@ import { LogoutOutlined } from "@mui/icons-material";
 
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useLogoutMutation } from "@/store/slice";
+import { useTranslation } from "react-i18next";
 
 interface Props extends AppBarProps {
     sx?: SxProps<Theme>;
@@ -32,6 +33,7 @@ interface Props extends AppBarProps {
 }
 
 const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
+    const { t } = useTranslation();
     const theme = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
@@ -114,7 +116,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                                 : route.icon?.default}
                         </ListItemIcon>
                         <ListItemText
-                            primary={route.title}
+                            primary={t(route.title as string)}
                             sx={{
                                 ".MuiListItemText-primary": {
                                     color: isSelected

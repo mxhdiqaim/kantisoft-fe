@@ -14,6 +14,8 @@ import { appRoutes, type AppRouteType } from "@/routes";
 
 import { ThemeProvider } from "@/theme";
 
+import "@/config/i18next-config";
+
 // function to handle nested children route rendering
 const handleNestedRoutes = (
     childRoute: AppRouteType,
