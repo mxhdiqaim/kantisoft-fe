@@ -34,7 +34,7 @@ const ICON_ACTIVE_COLOR = "#fff";
 export const appRoutes: AppRouteType[] = [
     {
         to: "/order-tracking",
-        title: "Order Tracking",
+        title: "nav.orderTracking",
         element: OrderTrackingScreen,
         icon: {
             default: (
@@ -51,7 +51,7 @@ export const appRoutes: AppRouteType[] = [
     },
     {
         to: "/sales-history",
-        title: "Sales History",
+        title: "nav.salesHistory",
         element: SalesHistoryScreen,
         icon: {
             default: (
@@ -70,13 +70,13 @@ export const appRoutes: AppRouteType[] = [
     },
     {
         to: "/sales-history/:id/view",
-        title: "Sales History",
+        title: "nav.salesHistory",
         element: ViewSalesHistoryScreen,
         hidden: true,
     },
     {
         to: "/menu-item",
-        title: "Menu Item",
+        title: "nav.menuItem",
         element: MenuItemScreen,
         icon: {
             default: (

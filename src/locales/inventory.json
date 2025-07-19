@@ -1,0 +1,19 @@
+{
+    "nav": {
+        "orderTracking": "Point of Sale",
+        "salesHistory": "Sales History",
+        "menuItem": "Product Management"
+    },
+    "routes": {
+        "orderTracking": "/point-of-sale",
+        "salesHistory": "/sales-history",
+        "viewSale": "/sales-history/:id/view",
+        "menuItem": "/products"
+    },
+    "pageTitles": {
+        "menuItems": "Products"
+    },
+    "actions": {
+        "addMenuItem": "Add Product"
+    }
+}

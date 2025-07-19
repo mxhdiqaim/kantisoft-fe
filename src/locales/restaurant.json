@@ -1,0 +1,19 @@
+{
+    "nav": {
+        "orderTracking": "Order Tracking",
+        "salesHistory": "Sales History",
+        "menuItem": "Menu Items"
+    },
+    "routes": {
+        "orderTracking": "/order-tracking",
+        "salesHistory": "/sales-history",
+        "viewSale": "/sales-history/:id/view",
+        "menuItem": "/menu-item"
+    },
+    "pageTitles": {
+        "menuItems": "Menu Items"
+    },
+    "actions": {
+        "addMenuItem": "Add Menu Item"
+    }
+}
