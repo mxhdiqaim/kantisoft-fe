@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import SalesHistoryOverviewCard from "@/components/sales-history/sales-history-overview-card";
+import SalesHistoryTable from "@/components/sales-history/sales-history-table";
+import { useGetOrdersByPeriodQuery } from "@/store/slice";
+import { salesFilterSchema } from "@/types/dashboard-types.ts";
+import { type Period } from "@/types/order-types";
+import { getTitle, ngnFormatter } from "@/utils";
+import { relativeTime } from "@/utils/get-relative-time";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { DinnerDiningOutlined, DomainVerificationOutlined, MonetizationOn, Person2Outlined } from "@mui/icons-material";
 import {
     Box,
     FormControl,
@@ -11,68 +19,28 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import { orderPeriodSchema, type OrderPeriod } from "@/types/order-types";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { relativeTime } from "@/utils/get-relative-time";
-import SalesHistoryTable from "@/components/sales-history/sales-history-table";
-import { ngnFormatter } from "@/utils";
-import {
-    MonetizationOn,
-    DinnerDiningOutlined,
-    Person2Outlined,
-    DomainVerificationOutlined,
-} from "@mui/icons-material";
-
-import SalesHistoryOverviewCard from "@/components/sales-history/sales-history-overview-card";
-import { useGetOrdersByPeriodQuery } from "@/store/slice";
-
-// Create a schema for the form object
-const salesFilterSchema = yup.object({
-    period: orderPeriodSchema,
-});
 
 const SalesHistory = () => {
     const theme = useTheme();
-    const { control, watch } = useForm<{ period: OrderPeriod }>({
+    const { control, watch } = useForm<{ period: Period }>({
         mode: "onChange",
         resolver: yupResolver(salesFilterSchema),
         defaultValues: {
-            period: "day",
+            period: "today",
         },
     });
 
     const period = watch("period");
 
-    const {
-        data: orders,
-        isLoading,
-        isError,
-        fulfilledTimeStamp,
-    } = useGetOrdersByPeriodQuery(period);
+    const { data: orders, isLoading, isError, fulfilledTimeStamp } = useGetOrdersByPeriodQuery(period);
 
     const [lastFetched, setLastFetched] = useState<Date | null>(null);
 
     const totalRevenue = useMemo(() => {
-        return (orders ?? []).reduce(
-            (acc, order) => acc + (order.totalAmount || 0),
-            0,
-        );
+        return (orders ?? []).reduce((acc: number, order) => acc + (order.totalAmount || 0), 0);
     }, [orders]);
-
-    const getTitle = () => {
-        switch (period) {
-            case "day":
-                return "Today";
-            case "week":
-                return "This Week";
-            case "month":
-                return "This Month";
-            default:
-                return "Sales History";
-        }
-    };
 
     useEffect(() => {
         if (fulfilledTimeStamp) {
@@ -94,16 +62,10 @@ const SalesHistory = () => {
                     <Skeleton variant="text" width={210} height={40} />
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                         <Skeleton variant="text" width={180} height={40} />
-                        <Skeleton
-                            variant="rectangular"
-                            width={120}
-                            height={40}
-                        />
+                        <Skeleton variant="rectangular" width={120} height={40} />
                     </Box>
                 </Box>
-                <Box
-                    sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}
-                >
+                <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
                     <Skeleton variant="text" width={150} height={24} />
                 </Box>
 
@@ -156,31 +118,19 @@ const SalesHistory = () => {
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                         <Typography variant="h4" component="h1">
-                            {getTitle()}&apos;s Sales
+                            {getTitle(period)}&apos;s Sales
                         </Typography>
                         <Controller
                             name="period"
                             control={control}
                             render={({ field }) => (
-                                <FormControl
-                                    sx={{ minWidth: 120 }}
-                                    size="small"
-                                >
-                                    <InputLabel id="period-select-label">
-                                        Period
-                                    </InputLabel>
-                                    <Select
-                                        {...field}
-                                        labelId="period-select-label"
-                                        label="Period"
-                                    >
-                                        <MenuItem value={"day"}>Today</MenuItem>
-                                        <MenuItem value={"week"}>
-                                            This Week
-                                        </MenuItem>
-                                        <MenuItem value={"month"}>
-                                            This Month
-                                        </MenuItem>
+                                <FormControl sx={{ minWidth: 120 }} size="small">
+                                    <InputLabel id="period-select-label">Period</InputLabel>
+                                    <Select {...field} labelId="period-select-label" label="Period">
+                                        <MenuItem value={"today"}>Today</MenuItem>
+                                        <MenuItem value={"week"}>This Week</MenuItem>
+                                        <MenuItem value={"month"}>This Month</MenuItem>
+                                        <MenuItem value={"all-time"}>All Time</MenuItem>
                                     </Select>
                                 </FormControl>
                             )}
@@ -200,9 +150,7 @@ const SalesHistory = () => {
                         textAlign: "right",
                     }}
                 >
-                    {lastFetched
-                        ? `Last updated ${relativeTime(new Date(), lastFetched)}`
-                        : "Fetching data..."}
+                    {lastFetched ? `Last updated ${relativeTime(new Date(), lastFetched)}` : "Fetching data..."}
                 </Typography>
             </Box>
 
@@ -251,11 +199,7 @@ const SalesHistory = () => {
                     },
                 }}
             >
-                <SalesHistoryTable
-                    orders={orders ?? []}
-                    loading={isLoading}
-                    period={period}
-                />
+                <SalesHistoryTable orders={orders ?? []} loading={isLoading} period={period} />
             </Paper>
         </Box>
     );

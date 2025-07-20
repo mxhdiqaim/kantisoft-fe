@@ -1,17 +1,13 @@
+import type { SaleSummarySchemaType } from "@/types/dashboard-types.ts";
+import type { AddMenuItemType, MenuItemType } from "@/types/menu-item-type.ts";
+import type { CreateOrderType, OrderType, Period, SingleOrderType } from "@/types/order-types.ts";
 import {
-    createApi,
-    fetchBaseQuery,
     type BaseQueryFn,
+    createApi,
     type FetchArgs,
+    fetchBaseQuery,
     type FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
-import type {
-    CreateOrderType,
-    OrderPeriod,
-    OrderType,
-    SingleOrderType,
-} from "@/types/order-types.ts";
-import type { AddMenuItemType, MenuItemType } from "@/types/menu-item-type.ts";
 import type { RootState } from "..";
 import { logOut, setCredentials } from "./auth-slice";
 
@@ -31,11 +27,11 @@ const baseQuery = fetchBaseQuery({
 });
 
 // Create a new base query function that includes logout logic on 401
-const baseQueryWithAuth: BaseQueryFn<
-    string | FetchArgs,
-    unknown,
-    FetchBaseQueryError
-> = async (args, api, extraOptions) => {
+const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+    args,
+    api,
+    extraOptions,
+) => {
     const result = await baseQuery(args, api, extraOptions);
 
     // If a 401 Unauthorized error occurs, dispatch the logOut action
@@ -57,7 +53,7 @@ export const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: baseQueryWithAuth,
     // Define tags for caching and automatic refetching
-    tagTypes: ["Order", "MenuItem", "User"],
+    tagTypes: ["Order", "MenuItem", "User", "Summary"],
     endpoints: (builder) => ({
         // Health Check Endpoint
         healthCheck: builder.query<{ status: string }, void>({
@@ -71,7 +67,7 @@ export const apiSlice = createApi({
                 method: "POST",
                 body: credentials,
             }),
-            async onQueryStarted(args, { dispatch, queryFulfilled }) {
+            async onQueryStarted(_args, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
 
@@ -89,7 +85,7 @@ export const apiSlice = createApi({
                 url: "/users/logout",
                 method: "POST",
             }),
-            async onQueryStarted(args, { dispatch, queryFulfilled }) {
+            async onQueryStarted(_args, { dispatch, queryFulfilled }) {
                 try {
                     await queryFulfilled;
                     // 2. Dispatch the logOut action to clear credentials and localStorage
@@ -113,8 +109,17 @@ export const apiSlice = createApi({
             }),
         }),
 
+        // Dashboard Endpoint
+        getSalesSummary: builder.query<SaleSummarySchemaType, Period>({
+            query: (period = "day") => ({
+                url: "/dashboard/sales-summary",
+                params: { period },
+            }),
+            providesTags: ["Summary"],
+        }),
+
         // Order Endpoints
-        getOrdersByPeriod: builder.query<OrderType[], OrderPeriod>({
+        getOrdersByPeriod: builder.query<OrderType[], Period>({
             query: (period = "day") => ({
                 url: "/orders/by-period",
                 params: { period },
@@ -123,12 +128,9 @@ export const apiSlice = createApi({
         }),
         getOrderById: builder.query<SingleOrderType, string>({
             query: (id) => `/orders/${id}`,
-            providesTags: (result, error, id) => [{ type: "Order", id }],
+            providesTags: (_result, _error, id) => [{ type: "Order", id }],
         }),
-        createOrder: builder.mutation<
-            SingleOrderType,
-            Omit<CreateOrderType, "amountReceived">
-        >({
+        createOrder: builder.mutation<SingleOrderType, Omit<CreateOrderType, "amountReceived">>({
             query: (newOrder) => ({
                 url: "/orders/create",
                 method: "POST",
@@ -158,19 +160,13 @@ export const apiSlice = createApi({
             }),
             invalidatesTags: ["MenuItem"],
         }),
-        updateMenuItem: builder.mutation<
-            MenuItemType,
-            Partial<MenuItemType> & Pick<MenuItemType, "id">
-        >({
+        updateMenuItem: builder.mutation<MenuItemType, Partial<MenuItemType> & Pick<MenuItemType, "id">>({
             query: ({ id, ...patch }) => ({
                 url: `/menu-items/${id}`,
                 method: "PATCH",
                 body: patch,
             }),
-            invalidatesTags: (_result, _error, { id }) => [
-                { type: "MenuItem", id },
-                "MenuItem",
-            ],
+            invalidatesTags: (_result, _error, { id }) => [{ type: "MenuItem", id }, "MenuItem"],
         }),
     }),
 });
@@ -188,4 +184,5 @@ export const {
     useHealthCheckQuery,
     useDeleteMenuItemMutation,
     useUpdateMenuItemMutation,
+    useGetSalesSummaryQuery,
 } = apiSlice;

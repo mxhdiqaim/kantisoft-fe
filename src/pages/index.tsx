@@ -4,3 +4,4 @@ export { default as ViewSalesHistoryScreen } from "./sales-history/view-sales-hi
 export { default as MenuItemScreen } from "./menu-item";
 export { default as LoginScreen } from "./auth/login";
 export { default as NotFoundScreen } from "./errors/not-found";
+export { default as DashboardScreen } from "./dashboard";

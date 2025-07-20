@@ -1,10 +1,5 @@
 import { type JSX } from "react";
-import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import GuardedRoute from "@/routes/guarded-route";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "@/pages/errors/fallback";
@@ -17,10 +12,7 @@ import { ThemeProvider } from "@/theme";
 import "@/config/i18next-config";
 
 // function to handle nested children route rendering
-const handleNestedRoutes = (
-    childRoute: AppRouteType,
-    index: number,
-): JSX.Element => {
+const handleNestedRoutes = (childRoute: AppRouteType, index: number): JSX.Element => {
     // Set default authGuard to true if not explicitly set to false
     // This means all routes require authentication by default
     const authGuard = childRoute.authGuard ?? true;
@@ -63,13 +55,7 @@ const handleNestedRoutes = (
 
     // Handle routes that don't need layout or authentication
     // Typically used for authentication pages (login/register) or error pages
-    return (
-        <Route
-            key={index}
-            path={childRoute.to}
-            element={<childRoute.element />}
-        />
-    );
+    return <Route key={index} path={childRoute.to} element={<childRoute.element />} />;
 };
 
 const renterRoute = (route: AppRouteType, index: number) => {
@@ -105,13 +91,8 @@ function App() {
                 <ScrollToTop />
                 <ErrorBoundary FallbackComponent={ErrorFallback}>
                     <Routes>
-                        <Route
-                            path={"/"}
-                            element={<Navigate to={"/order-tracking"} />}
-                        />
-                        {appRoutes.map((route, index) =>
-                            renterRoute(route, index),
-                        )}
+                        <Route path={"/"} element={<Navigate to={"/dashboard"} />} />
+                        {appRoutes.map((route, index) => renterRoute(route, index))}
                     </Routes>
                 </ErrorBoundary>
             </Router>

@@ -1,5 +1,5 @@
-import { type ComponentType, type ReactNode } from "react";
 import {
+    DashboardScreen,
     LoginScreen,
     MenuItemScreen,
     NotFoundScreen,
@@ -7,12 +7,13 @@ import {
     SalesHistoryScreen,
     ViewSalesHistoryScreen,
 } from "@/pages";
-
-// MUI Icons
-import { IconButton } from "@mui/material";
+import { DashboardOutlined } from "@mui/icons-material";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
 import RestaurantMenuOutlinedIcon from "@mui/icons-material/RestaurantMenuOutlined";
+
+import { IconButton } from "@mui/material";
+import { type ComponentType, type ReactNode } from "react";
 
 export interface AppRouteType {
     to: string;
@@ -32,6 +33,23 @@ const ICON_ACTIVE_COLOR = "#fff";
 
 // Application routes with layout
 export const appRoutes: AppRouteType[] = [
+    {
+        to: "/dashboard",
+        title: "Dashboard",
+        element: DashboardScreen,
+        icon: {
+            default: (
+                <IconButton size={"medium"}>
+                    <DashboardOutlined />
+                </IconButton>
+            ),
+            active: (
+                <IconButton size={"medium"}>
+                    <DashboardOutlined sx={{ color: ICON_ACTIVE_COLOR }} />
+                </IconButton>
+            ),
+        },
+    },
     {
         to: "/order-tracking",
         title: "nav.orderTracking",
@@ -61,9 +79,7 @@ export const appRoutes: AppRouteType[] = [
             ),
             active: (
                 <IconButton size={"medium"}>
-                    <ManageAccountsOutlinedIcon
-                        sx={{ color: ICON_ACTIVE_COLOR }}
-                    />
+                    <ManageAccountsOutlinedIcon sx={{ color: ICON_ACTIVE_COLOR }} />
                 </IconButton>
             ),
         },
@@ -86,9 +102,7 @@ export const appRoutes: AppRouteType[] = [
             ),
             active: (
                 <IconButton size={"medium"}>
-                    <RestaurantMenuOutlinedIcon
-                        sx={{ color: ICON_ACTIVE_COLOR }}
-                    />
+                    <RestaurantMenuOutlinedIcon sx={{ color: ICON_ACTIVE_COLOR }} />
                 </IconButton>
             ),
         },

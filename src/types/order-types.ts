@@ -18,7 +18,7 @@ export const OrderPaymentMethod = {
 const PAYMENT_METHODS = Object.values(OrderPaymentMethod);
 const ORDER_STATUSES = Object.values(OrderStatus);
 
-export const ORDER_PERIODS = ["day", "week", "month"] as const;
+export const ORDER_PERIODS = ["today", "week", "month", "all-time"] as const;
 
 // Core schema for creating and validating an order
 const coreOrderSchema = yup.object({
@@ -28,10 +28,7 @@ const coreOrderSchema = yup.object({
         .positive("Total amount must be greater than 0")
         .required("Total amount is required"),
 
-    paymentMethod: yup
-        .string()
-        .oneOf(PAYMENT_METHODS, "Invalid payment method")
-        .required("Payment method is required"),
+    paymentMethod: yup.string().oneOf(PAYMENT_METHODS, "Invalid payment method").required("Payment method is required"),
 
     orderDate: yup
         .date()
@@ -53,10 +50,7 @@ export const orderSchema = extendBaseSchema(coreOrderSchema);
 
 // Schema for a single item when creating an order
 const createOrderItemPayloadSchema = yup.object({
-    menuItemId: yup
-        .string()
-        .uuid("Menu item ID must be a valid UUID")
-        .required("Menu item ID is required"),
+    menuItemId: yup.string().uuid("Menu item ID must be a valid UUID").required("Menu item ID is required"),
     name: yup.string().default(""),
     quantity: yup
         .number()
@@ -67,10 +61,7 @@ const createOrderItemPayloadSchema = yup.object({
 
 // Core schema for a full order item, often retrieved from the DB
 const coreOrderItemSchema = createOrderItemPayloadSchema.shape({
-    orderId: yup
-        .string()
-        .uuid("Order ID must be a valid UUID")
-        .required("Order ID is required"),
+    orderId: yup.string().uuid("Order ID must be a valid UUID").required("Order ID is required"),
     priceAtOrder: yup
         .number()
         .typeError("Price at order must be a number")
@@ -134,10 +125,7 @@ export type CreateOrderType = yup.InferType<typeof createOrderSchema>;
 export type SingleOrderType = yup.InferType<typeof singleOrderSchema>;
 
 export type OrderItemType = yup.InferType<typeof orderItemSchema>;
-export type CreateOrderItemType = Pick<
-    OrderItemType,
-    "menuItemId" | "quantity" | "name"
->;
+export type CreateOrderItemType = Pick<OrderItemType, "menuItemId" | "quantity" | "name">;
 
 // Explicitly define the types for the constants
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
@@ -148,4 +136,4 @@ export const orderPeriodSchema = yup
     .oneOf(ORDER_PERIODS, "Invalid period. Must be 'day', 'week', or 'month'.")
     .required("Period is required.");
 
-export type OrderPeriod = (typeof ORDER_PERIODS)[number];
+export type Period = (typeof ORDER_PERIODS)[number];

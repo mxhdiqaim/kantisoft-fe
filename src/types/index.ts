@@ -1,4 +1,3 @@
-import type { CreateUserType, LoginUserType, UserType } from "@/types/user-types";
 import * as yup from "yup";
 
 // Base schema type that all other schemas will extend
@@ -25,15 +24,3 @@ export const extendBaseSchema = <T extends yup.ObjectSchema<any>>(
 };
 
 export type ErrCallbackType = (err: string) => void;
-
-export type AuthValuesType = {
-    loading: boolean;
-    setLoading: (value: boolean) => void;
-    logout: () => void;
-    isInitialized: boolean;
-    user: UserType | null;
-    setUser: (value: UserType | null) => void;
-    setIsInitialized: (value: boolean) => void;
-    login: (params: LoginUserType, errorCallback?: ErrCallbackType) => void;
-    register?: (params: CreateUserType, errorCallback?: ErrCallbackType) => void;
-};
