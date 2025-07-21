@@ -17,6 +17,7 @@ import {
 import type { RootState } from "..";
 import { logOut, setCredentials } from "./auth-slice";
 import type { CreateUserType, UserType } from "@/types/user-types";
+import type { CreateStoreType, StoreType } from "@/types/store-types";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -60,7 +61,7 @@ export const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: baseQueryWithAuth,
     // Define tags for caching and automatic refetching
-    tagTypes: ["Order", "MenuItem", "User", "Summary", "TopSells", "InventorySummary", "SalesTrend"],
+    tagTypes: ["Order", "MenuItem", "User", "Summary", "TopSells", "InventorySummary", "SalesTrend", "Store"],
     endpoints: (builder) => ({
         // Health Check Endpoint
         healthCheck: builder.query<{ status: string }, void>({
@@ -213,6 +214,45 @@ export const apiSlice = createApi({
             }),
             invalidatesTags: [{ type: "User", id: "LIST" }],
         }),
+
+        // Store Endpoints
+        getAllStores: builder.query<StoreType[], void>({
+            query: () => "/stores",
+            providesTags: (result) =>
+                result
+                    ? [...result.map(({ id }) => ({ type: "Store" as const, id })), { type: "Store", id: "LIST" }]
+                    : [{ type: "Store", id: "LIST" }],
+        }),
+        getStoreById: builder.query<StoreType, string>({
+            query: (id) => `/stores/${id}`,
+            providesTags: (_result, _error, id) => [{ type: "Store", id }],
+        }),
+        createStore: builder.mutation<StoreType, CreateStoreType>({
+            query: (newStore) => ({
+                url: "/stores",
+                method: "POST",
+                body: newStore,
+            }),
+            invalidatesTags: [{ type: "Store", id: "LIST" }],
+        }),
+        updateStore: builder.mutation<StoreType, Partial<StoreType> & Pick<StoreType, "id">>({
+            query: ({ id, ...patch }) => ({
+                url: `/stores/${id}`,
+                method: "PATCH",
+                body: patch,
+            }),
+            invalidatesTags: (_result, _error, { id }) => [
+                { type: "Store", id },
+                { type: "Store", id: "LIST" },
+            ],
+        }),
+        deleteStore: builder.mutation<{ message: string }, string>({
+            query: (id) => ({
+                url: `/stores/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: [{ type: "Store", id: "LIST" }],
+        }),
     }),
 });
 
@@ -235,4 +275,9 @@ export const {
     useGetSalesTrendQuery,
     useGetAllUsersQuery,
     useCreateUserMutation,
+    useGetAllStoresQuery,
+    useGetStoreByIdQuery,
+    useCreateStoreMutation,
+    useUpdateStoreMutation,
+    useDeleteStoreMutation,
 } = apiSlice;

@@ -114,7 +114,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                             },
                         }}
                     >
-                        <ListItemIcon sx={{ minWidth: 40, color: "inherit" }}>{route.icon?.default}</ListItemIcon>
+                        <ListItemIcon sx={{ minWidth: 40, color: "inherit" }}>{route?.icon}</ListItemIcon>
                         <ListItemText
                             primary={t(route.title as string)}
                             primaryTypographyProps={{

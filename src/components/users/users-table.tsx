@@ -92,7 +92,7 @@ const UsersTable = ({ users, loading }: Props) => {
             },
             {
                 field: "createdAt",
-                headerName: "Created On",
+                headerName: "Date Created",
                 width: 180,
                 align: "center",
                 headerAlign: "center",
@@ -121,16 +121,15 @@ const UsersTable = ({ users, loading }: Props) => {
                     const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
 
                     const handleView = () => {
-                        console.log(`View order: ${params.row.id}`);
                         navigate(`/sales-history/${params.row.id}/view`);
                         handleMenuClose();
                     };
                     const handleEdit = () => {
-                        console.log(`Edit order: ${params.row.id}`);
+                        console.log(`Edit User: ${params.row.id}`);
                         handleMenuClose();
                     };
-                    const handlePrint = () => {
-                        console.log(`Print receipt for order: ${params.row.id}`);
+                    const handleDelete = () => {
+                        console.log(`Delete User: ${params.row.id}`);
                         handleMenuClose();
                     };
 
@@ -150,7 +149,7 @@ const UsersTable = ({ users, loading }: Props) => {
                                     <EditOutlined sx={{ mr: 1 }} />
                                     Edit
                                 </MenuItem>
-                                <MenuItem onClick={handlePrint}>
+                                <MenuItem onClick={handleDelete}>
                                     <DeleteOutline sx={{ mr: 1 }} />
                                     Delete
                                 </MenuItem>
@@ -175,9 +174,6 @@ const UsersTable = ({ users, loading }: Props) => {
                     variant: "skeleton",
                     noRowsVariant: "skeleton",
                 },
-                // noRowsOverlay: {
-                //     period: period ? `No sales yet for this ${period}.` : "No sales yet.",
-                // },
             }}
             initialState={{
                 pagination: {
@@ -187,6 +183,13 @@ const UsersTable = ({ users, loading }: Props) => {
             disableColumnResize
             pageSizeOptions={[10, 25, 50]}
             disableRowSelectionOnClick
+            checkboxSelection={true}
+            getRowId={(row) => row.id}
+            // onRowClick={(params) => {
+            //     if (params.id !== selectedRowId) {
+            //         onEdit(params.row);
+            //     }
+            // }}
             sx={{
                 border: "none",
                 "& .MuiDataGrid-columnHeaderTitle": {
