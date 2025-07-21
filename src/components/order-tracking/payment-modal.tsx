@@ -1,10 +1,7 @@
 import CustomModal from "@/components/customs/custom-modal";
 import { selectCurrentUser } from "@/store/slice/auth-slice";
 import type { CartItem } from "@/types/cart-item-type";
-import {
-    createOrderSchema,
-    type CreateOrderType,
-} from "@/types/order-types.ts";
+import { createOrderSchema, type CreateOrderType } from "@/types/order-types.ts";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
     Button,
@@ -24,25 +21,15 @@ import { useSelector } from "react-redux";
 interface Props {
     open: boolean;
     onClose: () => void;
-    // 1. Update the prop to accept the order data object
     onCompleteSale: (data: Omit<CreateOrderType, "amountReceived">) => void;
     cartItems: CartItem[];
     isLoading?: boolean;
 }
 
-const PaymentModal = ({
-    open,
-    onClose,
-    onCompleteSale,
-    cartItems,
-    isLoading,
-}: Props) => {
+const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: Props) => {
     const seller = useSelector(selectCurrentUser);
 
-    const total = cartItems.reduce(
-        (acc, item) => acc + item.price * item.quantity,
-        0,
-    );
+    const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
     const {
         control,
@@ -50,6 +37,8 @@ const PaymentModal = ({
         reset,
         watch,
         setValue,
+        setError,
+        clearErrors,
         formState: { errors, isValid },
     } = useForm<CreateOrderType>({
         mode: "onChange",
@@ -68,10 +57,8 @@ const PaymentModal = ({
 
     const change = amountReceived - total;
 
-    const isCashPaymentInsufficient =
-        paymentMethod === "cash" && amountReceived < total;
+    const isCashPaymentInsufficient = paymentMethod === "cash" && amountReceived < total;
 
-    // 2. Update onSubmit to pass the form data to the parent component
     const onSubmit = (data: CreateOrderType) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { amountReceived, ...orderData } = data;
@@ -96,6 +83,24 @@ const PaymentModal = ({
     }, [open, cartItems, seller?.id, reset]);
 
     useEffect(() => {
+        if (paymentMethod === "cash") {
+            if (amountReceived < total) {
+                // If cash is insufficient, manually set an error
+                setError("amountReceived", {
+                    type: "manual",
+                    message: "Amount received must be at least the total.",
+                });
+            } else {
+                // If cash is sufficient, clear the error
+                clearErrors("amountReceived");
+            }
+        } else {
+            // For other payment methods, ensure the error is cleared
+            clearErrors("amountReceived");
+        }
+    }, [amountReceived, paymentMethod, total, setError, clearErrors]);
+
+    useEffect(() => {
         if (paymentMethod !== "cash") {
             // If payment is not cash, set amountReceived to the total
             setValue("amountReceived", total, { shouldValidate: true });
@@ -106,45 +111,21 @@ const PaymentModal = ({
     }, [paymentMethod, total, setValue]);
 
     return (
-        <CustomModal
-            open={open}
-            onClose={onClose}
-            title={"Payment"}
-            description={`Total Amount: ${total.toFixed(2)}`}
-        >
+        <CustomModal open={open} onClose={onClose} title={"Payment"} description={`Total Amount: ${total.toFixed(2)}`}>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <FormControl
-                    component="fieldset"
-                    error={!!errors.paymentMethod}
-                >
+                <FormControl component="fieldset" error={!!errors.paymentMethod}>
                     <Controller
                         name="paymentMethod"
                         control={control}
                         render={({ field }) => (
                             <RadioGroup {...field} row>
-                                <FormControlLabel
-                                    value="cash"
-                                    control={<Radio />}
-                                    label="Cash"
-                                />
-                                <FormControlLabel
-                                    value="card"
-                                    control={<Radio />}
-                                    label="Card"
-                                />
-                                <FormControlLabel
-                                    value="transfer"
-                                    control={<Radio />}
-                                    label="Transfer"
-                                />
+                                <FormControlLabel value="cash" control={<Radio />} label="Cash" />
+                                <FormControlLabel value="card" control={<Radio />} label="Card" />
+                                <FormControlLabel value="transfer" control={<Radio />} label="Transfer" />
                             </RadioGroup>
                         )}
                     />
-                    {errors.paymentMethod && (
-                        <FormHelperText>
-                            {errors.paymentMethod.message}
-                        </FormHelperText>
-                    )}
+                    {errors.paymentMethod && <FormHelperText>{errors.paymentMethod.message}</FormHelperText>}
                     {paymentMethod === "cash" && (
                         <>
                             <Controller
@@ -158,16 +139,11 @@ const PaymentModal = ({
                                         fullWidth
                                         margin="normal"
                                         error={!!errors.amountReceived}
-                                        helperText={
-                                            errors.amountReceived?.message
-                                        }
+                                        helperText={errors.amountReceived?.message}
                                     />
                                 )}
                             />
-                            <Typography sx={{ mt: 1 }}>
-                                Change: ₦{" "}
-                                {change > 0 ? change.toFixed(2) : "0.00"}
-                            </Typography>
+                            <Typography sx={{ mt: 1 }}>Change: ₦ {change > 0 ? change.toFixed(2) : "0.00"}</Typography>
                         </>
                     )}
                 </FormControl>
@@ -177,12 +153,8 @@ const PaymentModal = ({
                         type="submit"
                         variant="contained"
                         color="primary"
-                        // 3. Disable the button when loading or form is invalid
-                        disabled={
-                            !isValid || isCashPaymentInsufficient || isLoading
-                        }
+                        disabled={!isValid || isCashPaymentInsufficient || isLoading}
                     >
-                        {/* 4. Show a loading indicator text */}
                         {isLoading ? "Processing..." : "Complete Order"}
                     </Button>
                 </DialogActions>

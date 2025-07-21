@@ -1,6 +1,12 @@
-import type { SaleSummarySchemaType } from "@/types/dashboard-types.ts";
+import type {
+    InventorySummaryType,
+    SalesTrendType,
+    SaleSummarySchemaType,
+    TopSellsItemType,
+    TopSellsSchemaType,
+} from "@/types/dashboard-types.ts";
 import type { AddMenuItemType, MenuItemType } from "@/types/menu-item-type.ts";
-import type { CreateOrderType, OrderType, Period, SingleOrderType } from "@/types/order-types.ts";
+import type { CreateOrderType, OrdersByPeriodResponse, Period, SingleOrderType } from "@/types/order-types.ts";
 import {
     type BaseQueryFn,
     createApi,
@@ -53,7 +59,7 @@ export const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: baseQueryWithAuth,
     // Define tags for caching and automatic refetching
-    tagTypes: ["Order", "MenuItem", "User", "Summary"],
+    tagTypes: ["Order", "MenuItem", "User", "Summary", "TopSells", "InventorySummary", "SalesTrend"],
     endpoints: (builder) => ({
         // Health Check Endpoint
         healthCheck: builder.query<{ status: string }, void>({
@@ -111,16 +117,37 @@ export const apiSlice = createApi({
 
         // Dashboard Endpoint
         getSalesSummary: builder.query<SaleSummarySchemaType, Period>({
-            query: (period = "day") => ({
+            query: (period = "today") => ({
                 url: "/dashboard/sales-summary",
                 params: { period },
             }),
             providesTags: ["Summary"],
         }),
 
+        getTopSells: builder.query<TopSellsItemType[], TopSellsSchemaType>({
+            query: ({ period = "month", limit = "5", orderBy = "quantity" }) => ({
+                url: "/dashboard/top-sells",
+                params: { period, limit, orderBy },
+            }),
+            providesTags: ["TopSells"],
+        }),
+
+        getInventorySummary: builder.query<InventorySummaryType, void>({
+            query: () => "/dashboard/inventory-summary",
+            providesTags: ["InventorySummary"],
+        }),
+
+        getSalesTrend: builder.query<SalesTrendType[], Period | void>({
+            query: (period = "week") => ({
+                url: "/dashboard/sales-trend",
+                params: { period },
+            }),
+            providesTags: ["SalesTrend"],
+        }),
+
         // Order Endpoints
-        getOrdersByPeriod: builder.query<OrderType[], Period>({
-            query: (period = "day") => ({
+        getOrdersByPeriod: builder.query<OrdersByPeriodResponse, Period>({
+            query: (period = "today") => ({
                 url: "/orders/by-period",
                 params: { period },
             }),
@@ -185,4 +212,7 @@ export const {
     useDeleteMenuItemMutation,
     useUpdateMenuItemMutation,
     useGetSalesSummaryQuery,
+    useGetTopSellsQuery,
+    useGetInventorySummaryQuery,
+    useGetSalesTrendQuery,
 } = apiSlice;

@@ -10,11 +10,10 @@ interface Props {
     value: number | string;
     icon: ReactElement;
     color?: string;
-    prefix?: string;
     index: number;
 }
 
-const SummaryCard = ({ title, value, icon, color, prefix = "", index }: Props) => {
+const SummaryCard = ({ title, value, icon, color, index }: Props) => {
     const theme = useTheme();
     const cardColor = color || theme.palette.primary.main;
 
@@ -55,14 +54,10 @@ const SummaryCard = ({ title, value, icon, color, prefix = "", index }: Props) =
                                 end={numericValue}
                                 duration={2}
                                 separator=","
-                                prefix={prefix}
                                 decimals={Number.isInteger(numericValue) ? 0 : 2}
                             />
                         ) : (
-                            <>
-                                {ngnFormatter.format(Number(numericValue))}
-                                {/* {`${prefix}${value}`} */}
-                            </>
+                            <>{ngnFormatter.format(Number(numericValue))}</>
                         )}
                     </Typography>
                 </Box>

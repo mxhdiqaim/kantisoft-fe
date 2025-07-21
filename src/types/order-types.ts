@@ -1,6 +1,6 @@
 import { extendBaseSchema } from "@/types";
 import * as yup from "yup";
-import { menuItemSchema } from "./menu-item-type";
+import { menuItemSchema, type MenuItemType } from "./menu-item-type";
 
 export const OrderStatus = {
     CANCELED: "canceled",
@@ -117,6 +117,22 @@ export const createOrderSchema = yup.object({
         .typeError("Amount received must be a number")
         .min(0, "Amount must be greater than or equal to 0")
         .required("Amount received is required"),
+    // amountReceived: yup
+    //     .number()
+    //     .typeError("Amount received must be a number")
+    //     .min(0, "Amount must be greater than or equal to 0")
+    //     .required("Amount received is required.")
+    //     // Add conditional validation using .when()
+    //     .when(["paymentMethod", "items"], (fields, schema) => {
+    //         const [paymentMethod, items] = fields;
+    //         // This logic is complex and better handled in the component state.
+    //         // The schema should only validate the type and minimum value.
+    //         // We will rely on `isCashPaymentInsufficient` in the component.
+    //         // For non-cash payments, the value is set programmatically.
+    //         // For cash, the component logic handles the check.
+    //         // Therefore, a simpler validation is more robust here.
+    //         return schema; // Keep basic validation, the component logic is sufficient.
+    //     }),
 });
 
 // TypeScript types inferred from schemas
@@ -137,3 +153,24 @@ export const orderPeriodSchema = yup
     .required("Period is required.");
 
 export type Period = (typeof ORDER_PERIODS)[number];
+
+export type _SingleOrderType = OrderType & {
+    orderItems: (OrderItemType & { menuItem: MenuItemType })[];
+    seller: { firstName: string; lastName: string };
+};
+
+// New type for the getOrdersByPeriod response
+export interface OrdersByPeriodResponse {
+    period: string;
+    totalRevenue: string;
+    totalOrders: number;
+    mostOrderedItem: {
+        name: string;
+        quantity: number;
+    } | null;
+    topSeller: {
+        name: string;
+        totalRevenue: string;
+    } | null;
+    orders: _SingleOrderType[]; // Use SingleOrderType as it includes nested details
+}

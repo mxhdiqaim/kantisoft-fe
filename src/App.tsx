@@ -10,6 +10,7 @@ import { appRoutes, type AppRouteType } from "@/routes";
 import { ThemeProvider } from "@/theme";
 
 import "@/config/i18next-config";
+import { FullscreenProvider } from "./context/fullscreen-context";
 
 // function to handle nested children route rendering
 const handleNestedRoutes = (childRoute: AppRouteType, index: number): JSX.Element => {
@@ -87,15 +88,17 @@ const renterRoute = (route: AppRouteType, index: number) => {
 function App() {
     return (
         <ThemeProvider>
-            <Router>
-                <ScrollToTop />
-                <ErrorBoundary FallbackComponent={ErrorFallback}>
-                    <Routes>
-                        <Route path={"/"} element={<Navigate to={"/dashboard"} />} />
-                        {appRoutes.map((route, index) => renterRoute(route, index))}
-                    </Routes>
-                </ErrorBoundary>
-            </Router>
+            <FullscreenProvider>
+                <Router>
+                    <ScrollToTop />
+                    <ErrorBoundary FallbackComponent={ErrorFallback}>
+                        <Routes>
+                            <Route path={"/"} element={<Navigate to={"/dashboard"} />} />
+                            {appRoutes.map((route, index) => renterRoute(route, index))}
+                        </Routes>
+                    </ErrorBoundary>
+                </Router>
+            </FullscreenProvider>
         </ThemeProvider>
     );
 }

@@ -1,60 +1,84 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Paper, Skeleton, Typography, useTheme } from "@mui/material";
 import type { FC, ReactNode } from "react";
 
 interface Props {
+    isLoading: boolean;
     title: string;
     value: string | number;
     icon: ReactNode;
-    color: string;
+    color: "primary" | "secondary" | "error" | "warning" | "info" | "success";
+    subValue?: string | number;
 }
 
-const SalesHistoryOverviewCard: FC<Props> = ({ title, value, icon, color }) => {
+const SalesHistoryOverviewCard: FC<Props> = ({ title, value, icon, color, subValue, isLoading }) => {
+    const theme = useTheme();
+    const paletteColor = theme.palette[color];
+
+    if (isLoading) {
+        return (
+            <Box sx={{ mx: "auto" }}>
+                <Skeleton variant="rectangular" height={118} sx={{ borderRadius: theme.borderRadius.small }} />
+            </Box>
+        );
+    }
+
     return (
         <Paper
             sx={{
                 p: 2,
-                borderRadius: 2,
+                borderRadius: theme.borderRadius.small,
                 height: "100%",
                 display: "flex",
                 alignItems: "center",
-                backgroundColor: `${color}.light`,
+                backgroundColor: paletteColor.light,
+                transition: theme.transitions.create(["background-color", "color"], {
+                    duration: theme.transitions.duration.short,
+                }),
                 "&:hover": {
-                    backgroundColor: `${color}.main`,
-                    "& .icon, & .text": {
-                        color: "white",
-                    },
+                    backgroundColor: paletteColor.main,
+                    color: paletteColor.contrastText,
+                    cursor: "pointer",
                 },
             }}
-            elevation={-1}
+            elevation={0}
         >
             <Box
-                className="icon"
                 sx={{
-                    p: 1.3,
-                    borderRadius: 2,
-                    backgroundColor: `${color}.lighter`,
-                    color: `${color}.main`,
-                    mr: 0.8,
+                    p: 1.5,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: theme.palette.background.paper,
+                    color: paletteColor.main,
+                    mr: 2,
+                    transition: theme.transitions.create(["color", "background-color"], {
+                        duration: theme.transitions.duration.short,
+                    }),
                 }}
             >
                 {icon}
             </Box>
             <Box>
-                <Typography
-                    variant="h6"
-                    className="text"
-                    color={`${color}.darker`}
-                    sx={{ fontSize: "1.25rem", fontWeight: 600 }}
-                >
+                <Typography variant="h5" component={"div"} sx={{ fontWeight: "bold", lineHeight: 1.2 }}>
                     {value}
                 </Typography>
-                <Typography
-                    variant="body2"
-                    className="text"
-                    color={`${color}.darker`}
-                >
+                <Typography variant="body2" sx={{ opacity: 0.8 }}>
                     {title}
                 </Typography>
+                {subValue && (
+                    <Typography
+                        variant="caption"
+                        component="div"
+                        sx={{
+                            fontWeight: 500,
+                            opacity: 0.9,
+                            mt: 0.5,
+                        }}
+                    >
+                        {subValue}
+                    </Typography>
+                )}
             </Box>
         </Paper>
     );

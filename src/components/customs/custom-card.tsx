@@ -1,13 +1,16 @@
-import { Card, CardActions, CardContent, type SxProps, type Theme } from "@mui/material";
+import { Card, CardActions, CardContent, CardHeader, type SxProps, type Theme } from "@mui/material";
 import { forwardRef, type ReactNode } from "react";
 
 interface Props {
     children?: ReactNode;
     variant?: "outlined" | "elevation";
     sx?: SxProps<Theme>;
+    title?: string;
+    subheader?: string;
+    actions?: ReactNode;
 }
 
-const CustomCard = ({ children, variant = "outlined", sx }: Props) => {
+const CustomCard = ({ children, variant = "outlined", sx, title, subheader, actions }: Props) => {
     if (!children) {
         return <></>;
     }
@@ -16,8 +19,11 @@ const CustomCard = ({ children, variant = "outlined", sx }: Props) => {
         <>
             {children && (
                 <Card variant={variant} sx={sx}>
+                    {title && subheader && <CardHeader title={title} subheader={subheader} />}
+                    {(!title || !subheader) && <CardHeader sx={{ display: "none" }} />}
                     <CardContent>{children && children}</CardContent>
-                    <CardActions sx={{ display: "none" }} />
+                    {actions && <CardActions>{actions}</CardActions>}
+                    {!actions && <CardActions sx={{ display: "none" }} />}
                 </Card>
             )}
         </>

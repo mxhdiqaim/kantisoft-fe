@@ -1,3 +1,4 @@
+import SalesHistoryLoading from "@/components/sales-history/loading";
 import SalesHistoryOverviewCard from "@/components/sales-history/sales-history-overview-card";
 import SalesHistoryTable from "@/components/sales-history/sales-history-table";
 import { useGetOrdersByPeriodQuery } from "@/store/slice";
@@ -7,19 +8,8 @@ import { getTitle, ngnFormatter } from "@/utils";
 import { relativeTime } from "@/utils/get-relative-time";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { DinnerDiningOutlined, DomainVerificationOutlined, MonetizationOn, Person2Outlined } from "@mui/icons-material";
-import {
-    Box,
-    FormControl,
-    Grid,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Select,
-    Skeleton,
-    Typography,
-    useTheme,
-} from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { Box, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Typography, useTheme } from "@mui/material";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 const SalesHistory = () => {
@@ -34,13 +24,9 @@ const SalesHistory = () => {
 
     const period = watch("period");
 
-    const { data: orders, isLoading, isError, fulfilledTimeStamp } = useGetOrdersByPeriodQuery(period);
+    const { data: ordersData, isLoading, isError, fulfilledTimeStamp } = useGetOrdersByPeriodQuery(period);
 
     const [lastFetched, setLastFetched] = useState<Date | null>(null);
-
-    const totalRevenue = useMemo(() => {
-        return (orders ?? []).reduce((acc: number, order) => acc + (order.totalAmount || 0), 0);
-    }, [orders]);
 
     useEffect(() => {
         if (fulfilledTimeStamp) {
@@ -48,47 +34,7 @@ const SalesHistory = () => {
         }
     }, [fulfilledTimeStamp]);
 
-    if (isLoading) {
-        return (
-            <Box sx={{ mx: "auto" }}>
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 1,
-                    }}
-                >
-                    <Skeleton variant="text" width={210} height={40} />
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                        <Skeleton variant="text" width={180} height={40} />
-                        <Skeleton variant="rectangular" width={120} height={40} />
-                    </Box>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
-                    <Skeleton variant="text" width={150} height={24} />
-                </Box>
-
-                <Grid container spacing={3} mb={3}>
-                    {Array.from(new Array(4)).map((_, index) => (
-                        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
-                            <Skeleton variant="rectangular" height={118} />
-                        </Grid>
-                    ))}
-                </Grid>
-
-                <Paper
-                    elevation={-1}
-                    sx={{
-                        border: `1px solid ${theme.palette.grey[100]}`,
-                        width: "100%",
-                    }}
-                >
-                    <Skeleton variant="rectangular" height={500} />
-                </Paper>
-            </Box>
-        );
-    }
+    if (isLoading) return <SalesHistoryLoading />;
 
     if (isError) {
         return (
@@ -160,7 +106,8 @@ const SalesHistory = () => {
                         title="Total Sales Balance"
                         color="success"
                         icon={<MonetizationOn />}
-                        value={ngnFormatter.format(totalRevenue)}
+                        value={ngnFormatter.format(Number(ordersData?.totalRevenue ?? 0))}
+                        isLoading={isLoading}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -168,7 +115,9 @@ const SalesHistory = () => {
                         title="Most Ordered Item"
                         color="warning"
                         icon={<DinnerDiningOutlined />}
-                        value={"Jollof Rice"}
+                        value={ordersData?.mostOrderedItem?.name || "N/A"}
+                        subValue={ordersData?.mostOrderedItem ? `(${ordersData.mostOrderedItem.quantity} sold)` : ""}
+                        isLoading={isLoading}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -176,7 +125,8 @@ const SalesHistory = () => {
                         title="Top Seller"
                         color="secondary"
                         icon={<Person2Outlined />}
-                        value={"John Doe"}
+                        value={ordersData?.topSeller?.name || "N/A"}
+                        isLoading={isLoading}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -184,7 +134,8 @@ const SalesHistory = () => {
                         title="Total Orders"
                         color="info"
                         icon={<DomainVerificationOutlined />}
-                        value={(orders ?? []).length}
+                        value={ordersData?.totalOrders ?? 0}
+                        isLoading={isLoading}
                     />
                 </Grid>
             </Grid>
@@ -199,7 +150,7 @@ const SalesHistory = () => {
                     },
                 }}
             >
-                <SalesHistoryTable orders={orders ?? []} loading={isLoading} period={period} />
+                <SalesHistoryTable orders={ordersData?.orders ?? []} loading={isLoading} period={period} />
             </Paper>
         </Box>
     );

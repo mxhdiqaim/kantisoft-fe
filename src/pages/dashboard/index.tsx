@@ -1,4 +1,8 @@
+import InventorySummary from "@/components/dashboard/inventory-summary";
+import DashboardLoading from "@/components/dashboard/loading";
+import SalesTrendChart from "@/components/dashboard/sales-trend-chart";
 import SummaryCard from "@/components/dashboard/summary-card";
+import TopSells from "@/components/dashboard/top-sells";
 import { useGetSalesSummaryQuery } from "@/store/slice";
 import { salesFilterSchema } from "@/types/dashboard-types";
 import type { Period } from "@/types/order-types.ts";
@@ -6,18 +10,7 @@ import { getTitle } from "@/utils";
 import { relativeTime } from "@/utils/get-relative-time.ts";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AttachMoney, PointOfSale, ShoppingCart } from "@mui/icons-material";
-import {
-    Box,
-    FormControl,
-    Grid,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Select,
-    Skeleton,
-    Typography,
-    useTheme,
-} from "@mui/material";
+import { Box, FormControl, Grid, InputLabel, MenuItem, Select, Typography, useTheme } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -40,24 +33,22 @@ const Index = () => {
 
         return [
             {
-                title: "Total Revenue",
+                title: `Revenue`,
                 value: totalRevenue,
                 icon: <AttachMoney />,
                 color: theme.palette.success.main,
-                prefix: "₦",
             },
             {
-                title: "Total Orders",
+                title: `Orders`,
                 value: totalOrders,
                 icon: <ShoppingCart />,
                 color: theme.palette.info.main,
             },
             {
-                title: "Avg. Order Value",
+                title: `Avg. Order Value`,
                 value: avgOrderValue,
                 icon: <PointOfSale />,
                 color: theme.palette.warning.main,
-                prefix: "₦",
             },
         ];
     }, [salesSummary, theme]);
@@ -70,47 +61,7 @@ const Index = () => {
         }
     }, [fulfilledTimeStamp]);
 
-    if (isLoading) {
-        return (
-            <Box sx={{ mx: "auto" }}>
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 1,
-                    }}
-                >
-                    <Skeleton variant="text" width={210} height={40} />
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                        <Skeleton variant="text" width={180} height={40} />
-                        <Skeleton variant="rectangular" width={120} height={40} />
-                    </Box>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
-                    <Skeleton variant="text" width={150} height={24} />
-                </Box>
-
-                <Grid container spacing={3} mb={3}>
-                    {Array.from(new Array(4)).map((_, index) => (
-                        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
-                            <Skeleton variant="rectangular" height={118} />
-                        </Grid>
-                    ))}
-                </Grid>
-
-                <Paper
-                    elevation={-1}
-                    sx={{
-                        border: `1px solid ${theme.palette.grey[100]}`,
-                        width: "100%",
-                    }}
-                >
-                    <Skeleton variant="rectangular" height={500} />
-                </Paper>
-            </Box>
-        );
-    }
+    if (isLoading) return <DashboardLoading />;
 
     if (isError) {
         return (
@@ -184,10 +135,21 @@ const Index = () => {
                             value={card.value}
                             icon={card.icon}
                             color={card.color}
-                            prefix={card.prefix}
                         />
                     </Grid>
                 ))}
+            </Grid>
+
+            <Grid container spacing={3}>
+                <Grid size={{ xs: 12, lg: 8 }}>
+                    <SalesTrendChart period={period} />
+                </Grid>
+                <Grid size={{ xs: 12, lg: 4 }}>
+                    <TopSells period={period} />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                    <InventorySummary />
+                </Grid>
             </Grid>
         </Box>
     );

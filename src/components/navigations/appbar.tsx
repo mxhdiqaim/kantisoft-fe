@@ -1,8 +1,11 @@
+import { useFullscreen } from "@/hooks/use-fullscreen";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import { AppBar, Box, IconButton, Toolbar, useTheme, alpha } from "@mui/material";
+import { type FC } from "react";
 
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import { AppBar, Box, IconButton, Toolbar, useTheme } from "@mui/material";
-import { type FC } from "react";
+import FullscreenOutlinedIcon from "@mui/icons-material/FullscreenOutlined";
+import FullscreenExitOutlinedIcon from "@mui/icons-material/FullscreenExitOutlined";
 
 export interface Props {
     toggleDrawer?: (open: boolean) => void;
@@ -11,14 +14,17 @@ export interface Props {
 
 const AppbarComponent: FC<Props> = ({ toggleDrawer, drawerState }) => {
     const theme = useTheme();
+    const { isFullscreen, toggleFullscreen } = useFullscreen();
     return (
         <AppBar
             position="sticky"
             sx={{
-                background: theme.palette.background.paper,
+                background: alpha(theme.palette.background.paper, 0.6),
                 height: theme.layout.appBarHeight,
                 boxShadow: "none",
-                backdropFilter: "blur(15px)",
+                backdropFilter: "blur(8px)",
+                borderBottom: `1px solid ${theme.palette.divider}`,
+                width: { md: `calc(100% - ${theme.layout.sidebarWidth})` },
             }}
         >
             <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -34,16 +40,33 @@ const AppbarComponent: FC<Props> = ({ toggleDrawer, drawerState }) => {
                 >
                     <MenuOutlinedIcon />
                 </IconButton>
-                <IconButton
-                    aria-label="notifications"
-                    sx={{
-                        background: theme.palette.background.default,
-                        width: "40px",
-                        height: "40px",
-                    }}
-                >
-                    <NotificationsNoneOutlinedIcon />
-                </IconButton>
+
+                <Box sx={{ flexGrow: 1 }} />
+
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <IconButton
+                        aria-label="toggle fullscreen"
+                        onClick={toggleFullscreen} // Use the function from context
+                        sx={{
+                            background: theme.palette.background.default,
+                            width: "40px",
+                            height: "40px",
+                        }}
+                    >
+                        {isFullscreen ? <FullscreenExitOutlinedIcon /> : <FullscreenOutlinedIcon />}
+                    </IconButton>
+
+                    <IconButton
+                        aria-label="notifications"
+                        sx={{
+                            background: theme.palette.background.default,
+                            width: "40px",
+                            height: "40px",
+                        }}
+                    >
+                        <NotificationsNoneOutlinedIcon />
+                    </IconButton>
+                </Box>
             </Toolbar>
         </AppBar>
     );
