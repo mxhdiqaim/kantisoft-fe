@@ -1,4 +1,4 @@
-import SalesHistoryLoading from "@/components/sales-history/loading";
+import Spinner from "@/components/sales-history/spinners";
 import SalesHistoryOverviewCard from "@/components/sales-history/sales-history-overview-card";
 import SalesHistoryTable from "@/components/sales-history/sales-history-table";
 import { useGetOrdersByPeriodQuery } from "@/store/slice";
@@ -34,7 +34,7 @@ const SalesHistory = () => {
         }
     }, [fulfilledTimeStamp]);
 
-    if (isLoading) return <SalesHistoryLoading />;
+    if (isLoading) return <Spinner />;
 
     if (isError) {
         return (

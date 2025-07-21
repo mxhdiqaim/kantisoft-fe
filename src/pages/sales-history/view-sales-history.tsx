@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import ViewSalesHistoryLoading from "@/components/sales-history/spinners/view-sales-history-loading";
+import { useGetOrderByIdQuery } from "@/store/slice";
+import { ngnFormatter } from "@/utils";
+import { ArrowBackIosNewOutlined, LocalPrintshopOutlined } from "@mui/icons-material";
 import {
     Box,
-    Typography,
+    Button,
+    Chip,
+    Divider,
+    Grid,
     Paper,
     Table,
     TableBody,
@@ -9,18 +16,11 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Divider,
-    Button,
+    Typography,
     useTheme,
 } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
-import {
-    ArrowBackIosNewOutlined,
-    LocalPrintshopOutlined,
-} from "@mui/icons-material";
-import { ngnFormatter } from "@/utils";
 import { useRef } from "react";
-import { useGetOrderByIdQuery } from "@/store/slice";
+import { useNavigate, useParams } from "react-router-dom";
 
 const ViewSalesHistory = () => {
     const navigate = useNavigate();
@@ -40,120 +40,183 @@ const ViewSalesHistory = () => {
         window.print();
     };
 
-    if (loading || !order) {
-        return <Typography>Loading...</Typography>;
-    }
+    if (loading) return <ViewSalesHistoryLoading />;
 
     if (isError || !order) {
         return <Typography>Failed to load order details.</Typography>;
     }
 
+    const getStatusChipColor = (status: string) => {
+        switch (status) {
+            case "completed":
+                return "success";
+            case "pending":
+                return "warning";
+            default:
+                return "error";
+        }
+    };
+
     return (
         <Box>
-            <Button
-                variant="outlined"
-                size="small"
-                onClick={() => navigate(-1)}
-            >
-                <ArrowBackIosNewOutlined fontSize="small" sx={{ height: 16 }} />
-                Go Back
-            </Button>
-            <Button
-                variant="contained"
-                size="small"
-                onClick={handlePrint}
-                sx={{ ml: 2 }}
-            >
-                <LocalPrintshopOutlined fontSize="small" sx={{ height: 16 }} />
-                Print
-            </Button>
-            <Box sx={{ py: 2 }} ref={printRef} className="print-area">
-                <Typography variant="h4" gutterBottom>
-                    Sales History Details
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                <Typography variant="subtitle1">
-                    <b>Order ID:</b> {order.id}
-                </Typography>
-                <Typography variant="subtitle1">
-                    <b>Status:</b>
-                    <Box
-                        component={"span"}
-                        sx={{
-                            ml: 1,
-                            color:
-                                theme.palette.mode === "dark"
-                                    ? theme.palette.text.primary
-                                    : theme.palette.primary.contrastText,
-                            padding: "4px 8px",
-                            borderRadius: "4px",
-                            fontWeight: "500",
-                            textTransform: "capitalize",
-                            backgroundColor:
-                                order.orderStatus === "completed"
-                                    ? theme.palette.success.light
-                                    : order.orderStatus === "pending"
-                                      ? theme.palette.warning.light
-                                      : theme.palette.error.light,
-                        }}
-                    >
-                        {order.orderStatus}
-                    </Box>
-                </Typography>
-                <Typography variant="subtitle1">
-                    <b>Date:</b> {new Date(order.orderDate).toLocaleString()}
-                </Typography>
-                <Typography variant="subtitle1">
-                    <b>Seller:</b> {order.seller?.firstName}{" "}
-                    {order.seller?.lastName}
-                </Typography>
-                <Typography variant="subtitle1">
-                    <b>Payment Method:</b>{" "}
-                    <Box
-                        component={"span"}
-                        sx={{ textTransform: "capitalize" }}
-                    >
-                        {order.paymentMethod}
-                    </Box>
-                </Typography>
-                <Typography variant="subtitle1" sx={{ mb: 2 }}>
-                    <b>Total Amount:</b>{" "}
-                    <Box component={"span"}>
-                        {ngnFormatter.format(order.totalAmount)}
-                    </Box>
-                </Typography>
+            {/* --- Action Buttons --- */}
+            <Box className="no-print" sx={{ mb: 3, display: "flex", gap: 1 }}>
+                <Button variant="outlined" size="small" onClick={() => navigate(-1)}>
+                    <ArrowBackIosNewOutlined fontSize="small" sx={{ height: 16, mr: 0.5 }} />
+                    Go Back
+                </Button>
+                <Button variant="contained" size="small" onClick={handlePrint}>
+                    <LocalPrintshopOutlined fontSize="small" sx={{ height: 16, mr: 0.5 }} />
+                    Print Receipt
+                </Button>
+            </Box>
 
-                <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
+            {/* --- Printable Receipt Area --- */}
+            <Paper
+                ref={printRef}
+                className="printable-area"
+                elevation={0}
+                sx={{
+                    p: { xs: 2, md: 4 },
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: theme.borderRadius.small,
+                }}
+            >
+                <style type="text/css" media="print">
+                    {`
+                        @page { size: auto; margin: 0mm; }
+                        body { background-color: #fff; }
+                        
+                        /* Hide everything on the page */
+                        body * {
+                            visibility: hidden;
+                        }
+                        
+                        /* Make the printable area and its children visible */
+                        .printable-area, .printable-area * {
+                            visibility: visible;
+                        }
+                        
+                        /* Position the printable area to fill the page */
+                        .printable-area {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                            border: none !important;
+                            box-shadow: none !important;
+                        }
+
+                        .no-print {
+                            display: none;
+                        }
+                    `}
+                </style>
+
+                {/* --- Receipt Header --- */}
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 3 }}>
+                    <Box>
+                        <Typography variant="h4" sx={{ fontWeight: "bold", color: theme.palette.text.primary }}>
+                            Receipt
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Order ID: {order.id}
+                        </Typography>
+                    </Box>
+                    <Chip
+                        label={order.orderStatus}
+                        color={getStatusChipColor(order.orderStatus)}
+                        size="medium"
+                        sx={{ textTransform: "capitalize", fontWeight: "bold" }}
+                    />
+                </Box>
+
+                <Divider sx={{ mb: 3 }} />
+
+                {/* --- Order Details Grid --- */}
+                <Grid container spacing={2} sx={{ mb: 4 }}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <Typography variant="body2" color="text.secondary">
+                            Date
+                        </Typography>
+                        <Typography variant="body1" fontWeight="500">
+                            {new Date(order.orderDate).toLocaleString()}
+                        </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <Typography variant="body2" color="text.secondary">
+                            Seller
+                        </Typography>
+                        <Typography
+                            variant="body1"
+                            fontWeight="500"
+                        >{`${order.seller?.firstName} ${order.seller?.lastName}`}</Typography>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <Typography variant="body2" color="text.secondary">
+                            Payment Method
+                        </Typography>
+                        <Typography variant="body1" fontWeight="500" sx={{ textTransform: "capitalize" }}>
+                            {order.paymentMethod}
+                        </Typography>
+                    </Grid>
+                </Grid>
+
+                {/* --- Order Items Table --- */}
+                <Typography variant="h6" sx={{ mb: 2 }}>
                     Order Items
                 </Typography>
-                <TableContainer component={Paper}>
-                    <Table size="medium" sx={{ height: 50 }}>
+                <TableContainer>
+                    <Table size="medium">
                         <TableHead>
-                            <TableRow>
+                            <TableRow
+                                sx={{
+                                    "& .MuiTableCell-head": {
+                                        fontWeight: "bold",
+                                        backgroundColor: theme.palette.action.hover,
+                                    },
+                                }}
+                            >
+                                <TableCell>Item Code</TableCell>
                                 <TableCell>Item</TableCell>
-                                <TableCell>Quantity</TableCell>
-                                <TableCell>Unit Price</TableCell>
-                                <TableCell>Subtotal</TableCell>
+                                <TableCell align="center">Quantity</TableCell>
+                                <TableCell align="right">Unit Price</TableCell>
+                                <TableCell align="right">Subtotal</TableCell>
                             </TableRow>
                         </TableHead>
-                        <TableBody sx={{ borderBottom: "1px solid" }}>
+                        <TableBody>
                             {order.orderItems?.map((item: any) => (
-                                <TableRow key={item.menuItemId}>
+                                <TableRow
+                                    key={item.menuItemId}
+                                    sx={{ "&:nth-of-type(odd)": { backgroundColor: theme.palette.action.hover } }}
+                                >
+                                    <TableCell>{item.menuItem?.itemCode || "N/A"}</TableCell>
                                     <TableCell>{item.menuItem?.name}</TableCell>
-                                    <TableCell>{item.quantity}</TableCell>
-                                    <TableCell>
-                                        {ngnFormatter.format(item.priceAtOrder)}
-                                    </TableCell>
-                                    <TableCell>
-                                        {ngnFormatter.format(item.subTotal)}
-                                    </TableCell>
+                                    <TableCell align="center">{item.quantity}</TableCell>
+                                    <TableCell align="right">{ngnFormatter.format(item.priceAtOrder)}</TableCell>
+                                    <TableCell align="right">{ngnFormatter.format(item.subTotal)}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
-            </Box>
+
+                <Divider sx={{ my: 3 }} />
+
+                {/* --- Grand Total --- */}
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                    <Box sx={{ textAlign: "right" }}>
+                        <Typography variant="body1" color="text.secondary">
+                            Total Amount
+                        </Typography>
+                        <Typography variant="h5" fontWeight="bold" color="primary.main">
+                            {ngnFormatter.format(order.totalAmount)}
+                        </Typography>
+                    </Box>
+                </Box>
+            </Paper>
         </Box>
     );
 };
+
 export default ViewSalesHistory;

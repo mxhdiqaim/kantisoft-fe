@@ -5,7 +5,6 @@ import {
     Collapse,
     Divider,
     Drawer,
-    IconButton,
     List,
     ListItem,
     ListItemButton,
@@ -45,10 +44,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
             await logout({}).unwrap();
         } catch (error) {
             // The console will show if the server call failed, but we proceed.
-            console.error(
-                "Server logout failed, proceeding with client-side logout:",
-                error,
-            );
+            console.error("Server logout failed, proceeding with client-side logout:", error);
         } finally {
             // This block runs whether the try succeeded or failed.
             // Since the apiSlice always clears local credentials,
@@ -71,85 +67,81 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
         // Toggle expanded state for items with children
         if (route.children) {
             setExpandedItems((prev) =>
-                prev.includes(route.to)
-                    ? prev.filter((item) => item !== route.to)
-                    : [...prev, route.to],
+                prev.includes(route.to) ? prev.filter((item) => item !== route.to) : [...prev, route.to],
             );
         }
     };
 
-    const renderMenuItem = (
-        route: AppRouteType,
-        index: number,
-        level: number = 0,
-        parentPath: string = "",
-    ) => {
+    const renderMenuItem = (route: AppRouteType, index: number, level: number = 0, parentPath: string = "") => {
         // Calculate the full path for this route
         const fullPath = parentPath + route.to;
 
+        const isActive = location.pathname.startsWith(fullPath);
         const isSelected = location.pathname === fullPath;
         const isExpanded = expandedItems.includes(route.to);
         const hasChildren = route.children && route.children;
 
         return (
             <Fragment key={index}>
-                <ListItem sx={{ pl: level * 2 }}>
+                <ListItem disablePadding sx={{ px: 2, py: 0.5 }}>
                     <ListItemButton
                         component={Link}
                         to={fullPath}
                         selected={isSelected}
                         onClick={() => handleItemClick(route)}
                         sx={{
-                            backgroundColor: isSelected
-                                ? `${theme.palette.primary.main} !important`
-                                : "transparent",
-                            "&:hover": {
-                                backgroundColor: theme.palette.primary.light,
-                                color: "#fff",
+                            borderRadius: theme.shape.borderRadius,
+                            py: 1,
+                            px: 2,
+                            color: theme.palette.text.secondary,
+                            transition: theme.transitions.create(["background-color", "color"], {
+                                duration: theme.transitions.duration.short,
+                            }),
+
+                            "&.Mui-selected": {
+                                color: theme.palette.primary.main,
+                                backgroundColor: theme.palette.action.selected,
+                                fontWeight: "fontWeightBold",
+                                "&:hover": {
+                                    backgroundColor: theme.palette.action.hover,
+                                },
                             },
-                            my: -0.8,
+
+                            // Hover styles for non-selected items
+                            "&:hover": {
+                                backgroundColor: theme.palette.action.hover,
+                                color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
+                            },
                         }}
                     >
-                        <ListItemIcon>
-                            {isSelected && route.icon?.active
-                                ? route.icon.active
-                                : route.icon?.default}
-                        </ListItemIcon>
+                        <ListItemIcon sx={{ minWidth: 40, color: "inherit" }}>{route.icon?.default}</ListItemIcon>
                         <ListItemText
                             primary={t(route.title as string)}
-                            sx={{
-                                ".MuiListItemText-primary": {
-                                    color: isSelected
-                                        ? theme.palette.primary.contrastText
-                                        : "inherit",
-                                },
+                            primaryTypographyProps={{
+                                fontWeight: isSelected ? "bold" : "regular",
+                                variant: "body2",
                             }}
                         />
                         {hasChildren && (
-                            <IconButton size="small">
-                                {isExpanded ? (
-                                    <ExpandLessOutlinedIcon />
-                                ) : (
-                                    <ExpandMoreOutlinedIcon />
-                                )}
-                            </IconButton>
+                            <Box
+                                component={isExpanded ? ExpandLessOutlinedIcon : ExpandMoreOutlinedIcon}
+                                sx={{
+                                    fontSize: 20,
+                                    color: theme.palette.text.secondary,
+                                }}
+                            />
                         )}
                     </ListItemButton>
                 </ListItem>
 
                 {/* Render children if expanded */}
-                {hasChildren && isExpanded && (
+                {hasChildren && (
                     <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                        <Box>
+                        <List component="div" disablePadding sx={{ pl: 2 }}>
                             {route.children?.map((childRoute, childIndex) =>
-                                renderMenuItem(
-                                    childRoute,
-                                    childIndex,
-                                    level + 1,
-                                    fullPath + "/",
-                                ),
+                                renderMenuItem(childRoute, childIndex, level + 1, fullPath + "/"),
                             )}
-                        </Box>
+                        </List>
                     </Collapse>
                 )}
             </Fragment>
@@ -172,7 +164,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                 ...sx,
             }}
         >
-            <List sx={{ height: `${theme.layout.sidebarHeight}vh` }}>
+            <List sx={{ height: "100%", display: "flex", flexDirection: "column", p: 1 }}>
                 <Box
                     sx={{
                         display: { xs: "flex", md: "none" },
@@ -180,14 +172,10 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                     }}
                 >
                     <Button
-                        onClick={() =>
-                            toggleDrawer && toggleDrawer(!drawerState)
-                        }
+                        onClick={() => toggleDrawer && toggleDrawer(!drawerState)}
                         sx={{ width: "fit-content", mt: 1, mr: 0.5 }}
                     >
-                        <CancelIcon
-                            sx={{ color: theme.palette.alternate.dark }}
-                        />
+                        <CancelIcon sx={{ color: theme.palette.alternate.dark }} />
                     </Button>
                 </Box>
                 <ListItem sx={{ width: "100%" }}>
@@ -201,11 +189,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                         }}
                     >
                         <ListItemIcon>
-                            <img
-                                src="/images/SmartStock.svg"
-                                width={200}
-                                alt="Restaurant POS"
-                            />
+                            <img src="/images/SmartStock.svg" width={200} alt="Restaurant POS" />
                         </ListItemIcon>
                         <ListItemText />
                     </ListItemButton>
@@ -214,35 +198,44 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                 <Divider sx={{ display: { xs: "none", md: "block" } }} />
 
                 {/* Routes rendering */}
-                {appRoutes.map((route, index) => {
-                    const authGuard = route.authGuard ?? true;
-                    const withLayout = route.useLayout ?? true;
+                <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
+                    {appRoutes.map((route, index) => {
+                        const authGuard = route.authGuard ?? true;
+                        const withLayout = route.useLayout ?? true;
 
-                    if (route.hidden || !authGuard || !withLayout) return;
+                        if (route.hidden || !authGuard || !withLayout) return;
 
-                    return renderMenuItem(route, index);
-                })}
+                        return renderMenuItem(route, index);
+                    })}
+                </Box>
 
-                <Box position={"absolute"} bottom={0} width={"100%"}>
-                    <ListItemButton
-                        component={Button}
+                <Box position={"absolute"} bottom={0} width={"100%"} p={2}>
+                    <Button
                         fullWidth
                         onClick={handleLogout}
                         disabled={isLoading}
-                        variant="outlined"
+                        variant="contained"
                         startIcon={<LogoutOutlined />}
                         sx={{
-                            backgroundColor: "transparent",
+                            backgroundColor: theme.palette.error.main,
+                            color: theme.palette.error.contrastText,
+                            justifyContent: "flex-start",
+                            py: 1.5,
+                            px: 2,
+                            boxShadow: theme.customShadows.button,
+                            transition: theme.transitions.create(["background-color", "transform"], {
+                                duration: theme.transitions.duration.short,
+                            }),
                             "&:hover": {
-                                backgroundColor: theme.palette.error.light,
-                                color: theme.palette.error.contrastText,
+                                // Darken the button on hover for clear visual feedback
+                                backgroundColor: theme.palette.error.dark,
+                                // Add a subtle scale effect for a modern feel
+                                transform: "scale(1.02)",
                             },
-                            py: 2,
-                            pl: 2,
                         }}
                     >
-                        Logout
-                    </ListItemButton>
+                        {isLoading ? "Logging out..." : t("Logout")}
+                    </Button>
                 </Box>
             </List>
         </Drawer>

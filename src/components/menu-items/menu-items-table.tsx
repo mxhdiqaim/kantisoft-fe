@@ -1,12 +1,4 @@
-import {
-    Box,
-    IconButton,
-    Menu,
-    MenuItem as MuiMenuItem,
-    styled,
-    Tooltip,
-    Typography,
-} from "@mui/material";
+import { Box, IconButton, Menu, MenuItem as MuiMenuItem, Tooltip, Typography } from "@mui/material";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import { EditOutlined, MoreVert, DeleteOutline } from "@mui/icons-material";
 import CustomNoRowsOverlay from "@/components/customs/custom-no-rows-overlay";
@@ -16,13 +8,7 @@ import { ngnFormatter } from "@/utils";
 import type { MenuItemType } from "@/types/menu-item-type";
 import { useDeleteMenuItemMutation } from "@/store/slice";
 import useNotifier from "@/hooks/useNotifier";
-
-const StyledBox = styled(Box)(({ theme }) => ({
-    display: "flex",
-    alignItems: "center",
-    height: "100%",
-    gap: theme.spacing(1),
-}));
+import TableStyledBox from "../ui/table-styled-box";
 
 export interface Props {
     menuItems: MenuItemType[];
@@ -35,8 +21,7 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
     const notify = useNotifier();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
-    const [deleteMenuItem, { isLoading: isDeleting }] =
-        useDeleteMenuItemMutation();
+    const [deleteMenuItem, { isLoading: isDeleting }] = useDeleteMenuItemMutation();
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
         setAnchorEl(event.currentTarget);
@@ -68,11 +53,11 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                 headerName: "Item Code",
                 minWidth: 150,
                 renderCell: (params) => (
-                    <StyledBox sx={{ justifyContent: "center" }}>
+                    <TableStyledBox sx={{ justifyContent: "center" }}>
                         <Typography variant="body2" className="capitalize">
                             {params?.value}
                         </Typography>
-                    </StyledBox>
+                    </TableStyledBox>
                 ),
             },
             {
@@ -81,7 +66,7 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                 headerName: "Name",
                 minWidth: 150,
                 renderCell: (params) => (
-                    <StyledBox>
+                    <TableStyledBox>
                         <Typography
                             variant="body2"
                             sx={{
@@ -95,7 +80,7 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                         >
                             {params.value}
                         </Typography>
-                    </StyledBox>
+                    </TableStyledBox>
                 ),
             },
             {
@@ -107,11 +92,11 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <StyledBox sx={{ justifyContent: "center" }}>
+                    <TableStyledBox sx={{ justifyContent: "center" }}>
                         <Typography variant="body2" fontWeight="medium">
                             {ngnFormatter.format(params.value)}
                         </Typography>
-                    </StyledBox>
+                    </TableStyledBox>
                 ),
             },
             {
@@ -122,14 +107,12 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <StyledBox sx={{ justifyContent: "center" }}>
+                    <TableStyledBox sx={{ justifyContent: "center" }}>
                         <Typography
                             variant="body2"
                             className="capitalize"
                             sx={{
-                                backgroundColor: params.value
-                                    ? theme.palette.success.main
-                                    : theme.palette.error.main,
+                                backgroundColor: params.value ? theme.palette.success.main : theme.palette.error.main,
                                 p: "4px 8px",
                                 borderRadius: "4px",
                                 color: theme.palette.primary.contrastText,
@@ -140,7 +123,7 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                         >
                             {params.value ? "Yes" : "No"}
                         </Typography>
-                    </StyledBox>
+                    </TableStyledBox>
                 ),
             },
             {
@@ -151,8 +134,7 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => {
-                    const isOpen =
-                        Boolean(anchorEl) && selectedRowId === params.row.id;
+                    const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
 
                     const handleEdit = () => {
                         onEdit(params.row);
@@ -162,19 +144,11 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                     return (
                         <>
                             <Tooltip title="More Actions">
-                                <IconButton
-                                    onClick={(e) =>
-                                        handleMenuClick(e, params.row.id)
-                                    }
-                                >
+                                <IconButton onClick={(e) => handleMenuClick(e, params.row.id)}>
                                     <MoreVert />
                                 </IconButton>
                             </Tooltip>
-                            <Menu
-                                anchorEl={anchorEl}
-                                open={isOpen}
-                                onClose={handleMenuClose}
-                            >
+                            <Menu anchorEl={anchorEl} open={isOpen} onClose={handleMenuClose}>
                                 <MuiMenuItem onClick={handleEdit}>
                                     <EditOutlined sx={{ mr: 1 }} />
                                     Edit
@@ -182,10 +156,7 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                                 <MuiMenuItem
                                     onClick={() => handleDelete(params.row.id)}
                                     sx={{ color: "error.main" }}
-                                    disabled={
-                                        isDeleting &&
-                                        selectedRowId === params.row.id
-                                    }
+                                    disabled={isDeleting && selectedRowId === params.row.id}
                                 >
                                     <DeleteOutline sx={{ mr: 1 }} />
                                     Delete

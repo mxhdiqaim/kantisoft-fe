@@ -16,6 +16,7 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import type { RootState } from "..";
 import { logOut, setCredentials } from "./auth-slice";
+import type { CreateUserType, UserType } from "@/types/user-types";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -195,6 +196,23 @@ export const apiSlice = createApi({
             }),
             invalidatesTags: (_result, _error, { id }) => [{ type: "MenuItem", id }, "MenuItem"],
         }),
+
+        // User Management Endpoints
+        getAllUsers: builder.query<UserType[], void>({
+            query: () => "/users",
+            providesTags: (result) =>
+                result
+                    ? [...result.map(({ id }) => ({ type: "User" as const, id })), { type: "User", id: "LIST" }]
+                    : [{ type: "User", id: "LIST" }],
+        }),
+        createUser: builder.mutation<UserType, CreateUserType>({
+            query: (newUser) => ({
+                url: "/users/create",
+                method: "POST",
+                body: newUser,
+            }),
+            invalidatesTags: [{ type: "User", id: "LIST" }],
+        }),
     }),
 });
 
@@ -215,4 +233,6 @@ export const {
     useGetTopSellsQuery,
     useGetInventorySummaryQuery,
     useGetSalesTrendQuery,
+    useGetAllUsersQuery,
+    useCreateUserMutation,
 } = apiSlice;

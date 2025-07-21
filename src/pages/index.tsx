@@ -5,3 +5,5 @@ export { default as MenuItemScreen } from "./menu-item";
 export { default as LoginScreen } from "./auth/login";
 export { default as NotFoundScreen } from "./errors/not-found";
 export { default as DashboardScreen } from "./dashboard";
+export { default as UsersScreen } from "./users";
+export { default as CreateUserScreen } from "./users/create-user";

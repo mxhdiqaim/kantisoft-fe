@@ -23,35 +23,24 @@ export const createUserType = yup.object().shape({
         .string()
         .email("Please enter a valid email address")
         .required("Email address is required")
-        .matches(
-            /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-            "Invalid email format",
-        ),
+        .matches(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, "Invalid email format"),
     password: yup
         .string()
         .required("Password is required")
-        .min(
-            PASSWORD_RULES.min,
-            `Password must be at least ${PASSWORD_RULES.min} characters`,
-        )
-        .max(
-            PASSWORD_RULES.max,
-            `Password cannot exceed ${PASSWORD_RULES.max} characters`,
-        )
+        .min(PASSWORD_RULES.min, `Password must be at least ${PASSWORD_RULES.min} characters`)
+        .max(PASSWORD_RULES.max, `Password cannot exceed ${PASSWORD_RULES.max} characters`)
         .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
         .matches(/[a-z]/, "Password must contain at least one lowercase letter")
         .matches(/[0-9]/, "Password must contain at least one number")
-        .matches(
-            /[^A-Za-z0-9]/,
-            "Password must contain at least one special character",
-        ),
+        .matches(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
     confirmPassword: yup
         .string()
         .required("Please confirm your password")
         .oneOf([yup.ref("password")], "Passwords must match"),
     phone: yup
         .string()
-        .matches(/^[0-9]{12}$/, "Phone number must be 12 digits"),
+        .optional()
+        .matches(/^[0-9]{11}$/, "Phone number must be 11 digits"),
     role: yup.string().oneOf(USER_ROLES).default("user"),
     status: yup.string().oneOf(USER_STATUSES).default("active"),
 });
@@ -69,7 +58,7 @@ export const userSchema = extendBaseSchema(createUserType);
 export type CreateUserType = yup.InferType<typeof createUserType>;
 export type LoginUserType = yup.InferType<typeof loginUserType>;
 export type userType = yup.InferType<typeof userSchema>;
-export type UserType = Omit<userType, "password">;
+export type UserType = Omit<userType, "password" | "confirmPassword">;
 
 export type UserRole = (typeof USER_ROLES)[number];
 export type UserStatus = (typeof USER_STATUSES)[number];

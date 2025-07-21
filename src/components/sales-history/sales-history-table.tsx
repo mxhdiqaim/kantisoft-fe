@@ -1,19 +1,6 @@
-import {
-    Box,
-    IconButton,
-    Menu,
-    MenuItem,
-    styled,
-    Tooltip,
-    Typography,
-} from "@mui/material";
+import { Box, IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import {
-    EditOutlined,
-    MoreVert,
-    PrintOutlined,
-    VisibilityOutlined,
-} from "@mui/icons-material";
+import { EditOutlined, MoreVert, PrintOutlined, VisibilityOutlined } from "@mui/icons-material";
 import CustomNoRowsOverlay from "@/components/customs/custom-no-rows-overlay";
 import { useTheme } from "@mui/material";
 import { useMemo, useState, type MouseEvent } from "react";
@@ -21,14 +8,7 @@ import { relativeTime } from "@/utils/get-relative-time";
 import type { OrderType } from "@/types/order-types";
 import { ngnFormatter } from "@/utils";
 import { useNavigate } from "react-router-dom";
-
-const StyledBox = styled(Box)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    height: "100%",
-    gap: theme.spacing(2),
-}));
+import TableStyledBox from "../ui/table-styled-box";
 
 export interface Props {
     orders: OrderType[];
@@ -61,11 +41,11 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 headerName: "Seller Name",
                 width: 200,
                 renderCell: (params) => (
-                    <StyledBox>
+                    <TableStyledBox>
                         <Typography variant="body2">
                             {params.value.firstName} {params.value.lastName}
                         </Typography>
-                    </StyledBox>
+                    </TableStyledBox>
                 ),
             },
             {
@@ -76,11 +56,9 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 headerAlign: "center",
                 width: 150,
                 renderCell: (params) => (
-                    <StyledBox sx={{ alignItems: "center" }}>
-                        <Typography variant="body2">
-                            {relativeTime(new Date(), new Date(params.value))}
-                        </Typography>
-                    </StyledBox>
+                    <TableStyledBox sx={{ alignItems: "center" }}>
+                        <Typography variant="body2">{relativeTime(new Date(), new Date(params.value))}</Typography>
+                    </TableStyledBox>
                 ),
             },
             {
@@ -92,11 +70,11 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <StyledBox sx={{ alignItems: "center" }}>
+                    <TableStyledBox sx={{ alignItems: "center" }}>
                         <Typography variant="body2" fontWeight="medium">
                             {ngnFormatter.format(params.value)}{" "}
                         </Typography>
-                    </StyledBox>
+                    </TableStyledBox>
                 ),
             },
             {
@@ -116,7 +94,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <StyledBox sx={{ alignItems: "center" }}>
+                    <TableStyledBox sx={{ alignItems: "center" }}>
                         <Typography
                             variant="body2"
                             className="capitalize"
@@ -139,7 +117,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                         >
                             {params.value}
                         </Typography>
-                    </StyledBox>
+                    </TableStyledBox>
                 ),
             },
             {
@@ -150,8 +128,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => {
-                    const isOpen =
-                        Boolean(anchorEl) && selectedRowId === params.row.id;
+                    const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
 
                     const handleView = () => {
                         console.log(`View order: ${params.row.id}`);
@@ -163,28 +140,18 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                         handleMenuClose();
                     };
                     const handlePrint = () => {
-                        console.log(
-                            `Print receipt for order: ${params.row.id}`,
-                        );
+                        console.log(`Print receipt for order: ${params.row.id}`);
                         handleMenuClose();
                     };
 
                     return (
                         <>
                             <Tooltip title="More Actions">
-                                <IconButton
-                                    onClick={(e) =>
-                                        handleMenuClick(e, params.row.id)
-                                    }
-                                >
+                                <IconButton onClick={(e) => handleMenuClick(e, params.row.id)}>
                                     <MoreVert />
                                 </IconButton>
                             </Tooltip>
-                            <Menu
-                                anchorEl={anchorEl}
-                                open={isOpen}
-                                onClose={handleMenuClose}
-                            >
+                            <Menu anchorEl={anchorEl} open={isOpen} onClose={handleMenuClose}>
                                 <MenuItem onClick={handleView}>
                                     <VisibilityOutlined sx={{ mr: 1 }} />
                                     View
@@ -228,9 +195,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                         noRowsVariant: "skeleton",
                     },
                     noRowsOverlay: {
-                        period: period
-                            ? `No sales yet for this ${period}.`
-                            : "No sales yet.",
+                        period: period ? `No sales yet for this ${period}.` : "No sales yet.",
                     },
                 }}
                 initialState={{

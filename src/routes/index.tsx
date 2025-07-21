@@ -1,16 +1,19 @@
 import {
+    CreateUserScreen,
     DashboardScreen,
     LoginScreen,
     MenuItemScreen,
     NotFoundScreen,
     OrderTrackingScreen,
     SalesHistoryScreen,
+    UsersScreen,
     ViewSalesHistoryScreen,
 } from "@/pages";
 import { DashboardOutlined } from "@mui/icons-material";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
 import RestaurantMenuOutlinedIcon from "@mui/icons-material/RestaurantMenuOutlined";
+import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 
 import { IconButton } from "@mui/material";
 import { type ComponentType, type ReactNode } from "react";
@@ -106,6 +109,30 @@ export const appRoutes: AppRouteType[] = [
                 </IconButton>
             ),
         },
+    },
+    // Users management
+    {
+        to: "/users",
+        title: "Users",
+        element: UsersScreen,
+        icon: {
+            default: (
+                <IconButton size={"medium"}>
+                    <GroupOutlinedIcon />
+                </IconButton>
+            ),
+            active: (
+                <IconButton size={"medium"}>
+                    <GroupOutlinedIcon sx={{ color: ICON_ACTIVE_COLOR }} />
+                </IconButton>
+            ),
+        },
+    },
+    {
+        to: "/users/new",
+        title: "Create User",
+        element: CreateUserScreen,
+        hidden: true,
     },
 
     // Auth pages
