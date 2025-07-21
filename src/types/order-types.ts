@@ -43,6 +43,8 @@ const coreOrderSchema = yup.object({
         .required("Order status is required"),
 
     sellerId: yup.string().required("Seller ID is required"),
+    storeId: yup.string().required("Store ID is required"),
+    reference: yup.string().nullable().default(null),
 });
 
 // Schema for a full order object, including base fields like id and timestamps
@@ -62,6 +64,7 @@ const createOrderItemPayloadSchema = yup.object({
 // Core schema for a full order item, often retrieved from the DB
 const coreOrderItemSchema = createOrderItemPayloadSchema.shape({
     orderId: yup.string().uuid("Order ID must be a valid UUID").required("Order ID is required"),
+    storeId: yup.string().uuid("Store ID must be a valid UUID").required("Store ID is required"),
     priceAtOrder: yup
         .number()
         .typeError("Price at order must be a number")
@@ -84,6 +87,7 @@ export const singleOrderSchema = extendBaseSchema(
         reference: yup.string().nullable(),
         menuItemId: yup.string().uuid().required(),
         orderId: yup.string().uuid().required(),
+        storeId: yup.string().uuid().required(),
         priceAtOrder: yup.number().nonNullable(),
         quantity: yup.number().nullable().default(1),
         subTotal: yup.number().nonNullable().default(0),
@@ -98,6 +102,7 @@ export const singleOrderSchema = extendBaseSchema(
 // Schema for the payload when creating a new order with its items
 export const createOrderSchema = yup.object({
     sellerId: yup.string().uuid().required("Seller ID is required"),
+    storeId: yup.string().uuid().required("Store ID is required"),
     paymentMethod: yup
         .string()
         .oneOf(PAYMENT_METHODS, "Invalid payment method")

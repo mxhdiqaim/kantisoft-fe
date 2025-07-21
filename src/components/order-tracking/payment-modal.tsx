@@ -1,5 +1,6 @@
 import CustomModal from "@/components/customs/custom-modal";
 import { selectCurrentUser } from "@/store/slice/auth-slice";
+import { selectActiveStore } from "@/store/slice/store-slice";
 import type { CartItem } from "@/types/cart-item-type";
 import { createOrderSchema, type CreateOrderType } from "@/types/order-types.ts";
 import { ngnFormatter } from "@/utils";
@@ -29,6 +30,7 @@ interface Props {
 
 const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: Props) => {
     const seller = useSelector(selectCurrentUser);
+    const activeStore = useSelector(selectActiveStore);
 
     const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -46,6 +48,7 @@ const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: P
         resolver: yupResolver(createOrderSchema),
         defaultValues: {
             sellerId: seller?.id || "",
+            storeId: activeStore?.id || "",
             paymentMethod: "cash",
             orderStatus: "completed",
             items: [],
@@ -61,6 +64,7 @@ const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: P
     const isCashPaymentInsufficient = paymentMethod === "cash" && amountReceived < total;
 
     const onSubmit = (data: CreateOrderType) => {
+        console.log("Form submitted with data:", data);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { amountReceived, ...orderData } = data;
         onCompleteSale(orderData);
@@ -75,13 +79,14 @@ const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: P
 
             reset({
                 sellerId: seller?.id || "",
+                storeId: activeStore?.id || "",
                 paymentMethod: "cash",
                 orderStatus: "completed",
                 items: items,
                 amountReceived: 0,
             });
         }
-    }, [open, cartItems, seller?.id, reset]);
+    }, [open, cartItems, seller?.id, activeStore?.id, reset]);
 
     useEffect(() => {
         if (paymentMethod === "cash") {

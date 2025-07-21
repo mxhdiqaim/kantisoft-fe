@@ -18,18 +18,12 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         // Action to set the token and user data after login
-        setCredentials: (
-            state,
-            action: PayloadAction<{ user: UserType; token: string }>,
-        ) => {
+        setCredentials: (state, action: PayloadAction<{ user: UserType; token: string }>) => {
             state.user = action.payload.user;
             state.token = action.payload.token;
             // Persist the token to localStorage
             localStorage.setItem("token", action.payload.token);
-            localStorage.setItem(
-                "userData",
-                JSON.stringify(action.payload.user),
-            );
+            localStorage.setItem("userData", JSON.stringify(action.payload.user));
         },
         // Action to clear the token and user data on logout
         logOut: (state) => {
@@ -37,6 +31,7 @@ const authSlice = createSlice({
             state.token = null;
             localStorage.removeItem("token");
             localStorage.removeItem("userData");
+            localStorage.removeItem("activeStoreState");
         },
     },
 });

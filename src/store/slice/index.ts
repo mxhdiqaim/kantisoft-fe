@@ -34,6 +34,9 @@ const baseQuery = fetchBaseQuery({
     },
 });
 
+// Lock to prevent multiple logout dispatches
+let isLoggingOut = false;
+
 // Create a new base query function that includes logout logic on 401
 const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
     args,
@@ -44,13 +47,27 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
 
     // If a 401 Unauthorized error occurs, dispatch the logOut action
     if (result.error && result.error.status === 401) {
-        api.dispatch(logOut());
+        if (!isLoggingOut) {
+            isLoggingOut = true; // Set the lock
+            console.warn("Session expired, initiating logout.");
 
-        console.warn("Session expired, logging out.");
+            // Dispatch the logOut action to clear credentials
+            api.dispatch(logOut());
 
-        // Resetting the API state
-        api.dispatch(apiSlice.util.resetApiState());
-        return { error: { status: 401, data: "Session expired" } };
+            // Reset the entire API state to clear cache and stop other queries
+            api.dispatch(apiSlice.util.resetApiState());
+
+            // Redirect to login page
+            window.location.href = "/login";
+        }
+        // For subsequent calls that fail while logging out, we can return a custom error
+        // or just the original error, but we prevent re-dispatching logout.
+        return { error: { status: 401, data: "Session expired. Logging out." } };
+    }
+
+    // Reset the flag if a request succeeds after a login
+    if (!result.error) {
+        isLoggingOut = false;
     }
 
     return result;

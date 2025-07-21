@@ -9,20 +9,14 @@ interface Props {
 }
 
 const MenuItem = ({ item, onAddToCart }: Props) => {
+    console.log("item", item);
     return (
         <CustomCard>
             <Box>
                 <Typography variant="h4">{item.name}</Typography>
-                <Typography color="text.secondary">
-                    {ngnFormatter.format(item.price)}{" "}
-                </Typography>
+                <Typography color="text.secondary">{ngnFormatter.format(item.price)} </Typography>
                 <Divider />
-                <Button
-                    sx={{ mt: 1 }}
-                    variant={"contained"}
-                    size="small"
-                    onClick={() => onAddToCart(item)}
-                >
+                <Button sx={{ mt: 1 }} variant={"contained"} size="small" onClick={() => onAddToCart(item)}>
                     Add to Cart
                 </Button>
             </Box>

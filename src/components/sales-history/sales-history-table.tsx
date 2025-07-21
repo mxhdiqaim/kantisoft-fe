@@ -1,6 +1,6 @@
-import { Box, IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
+import { Box, IconButton, InputAdornment, Menu, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import { EditOutlined, MoreVert, PrintOutlined, VisibilityOutlined } from "@mui/icons-material";
+import { EditOutlined, MoreVert, PrintOutlined, VisibilityOutlined, Search as SearchIcon } from "@mui/icons-material";
 import CustomNoRowsOverlay from "@/components/customs/custom-no-rows-overlay";
 import { useTheme } from "@mui/material";
 import { useMemo, useState, type MouseEvent } from "react";
@@ -21,6 +21,14 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+    const [searchText, setSearchText] = useState("");
+
+    const filteredOrders = useMemo(() => {
+        if (!searchText) {
+            return orders;
+        }
+        return orders.filter((order) => (order.reference || order.id).toLowerCase().includes(searchText.toLowerCase()));
+    }, [orders, searchText]);
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
         console.log(`Clicked row: ${rowId}`);
@@ -184,18 +192,28 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
         ],
         [theme, anchorEl, selectedRowId],
     );
+
     return (
-        <Box
-            sx={{
-                height: 600,
-                width: "100%",
-                "& .capitalize-cell": {
-                    textTransform: "capitalize",
-                },
-            }}
-        >
+        <Box>
+            <Box sx={{ p: 2, display: "flex", justifyContent: "flex-start" }}>
+                <TextField
+                    variant="outlined"
+                    size="small"
+                    placeholder="Search by reference..."
+                    value={searchText}
+                    fullWidth
+                    onChange={(e) => setSearchText(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </Box>
             <DataGrid
-                rows={orders}
+                rows={filteredOrders}
                 columns={columns}
                 loading={loading}
                 slots={{
