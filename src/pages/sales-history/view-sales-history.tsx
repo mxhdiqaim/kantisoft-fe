@@ -120,7 +120,7 @@ const ViewSalesHistory = () => {
                             Receipt
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Order ID: {order.id}
+                            Order Reference: {order.reference || order.id}
                         </Typography>
                     </Box>
                     <Chip
