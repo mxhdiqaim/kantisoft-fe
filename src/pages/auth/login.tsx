@@ -1,14 +1,5 @@
 import { loginUserType, type LoginUserType } from "@/types/user-types";
-import {
-    Box,
-    Button,
-    TextField,
-    Typography,
-    Link,
-    FormControl,
-    FormHelperText,
-    Grid,
-} from "@mui/material";
+import { Box, Button, TextField, Typography, Link, FormControl, FormHelperText, Grid } from "@mui/material";
 
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -26,7 +17,7 @@ const Login = () => {
     const [login, { isLoading: loading }] = useLoginMutation();
 
     // Get the path the user was trying to access before being redirected
-    const from = location.state?.from?.pathname || "/order-tracking";
+    const from = location.state?.from?.pathname || "/dashboard";
 
     const {
         control,
@@ -89,19 +80,13 @@ const Login = () => {
                             Restaurant POS
                         </Typography>
                     </Box>
-                    <form
-                        noValidate
-                        autoComplete="off"
-                        onSubmit={handleSubmit(onSubmit)}
-                    >
+                    <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                         <FormControl fullWidth>
                             <Controller
                                 name="email"
                                 control={control}
                                 rules={{ required: true }}
-                                render={({
-                                    field: { value, onChange, onBlur },
-                                }) => (
+                                render={({ field: { value, onChange, onBlur } }) => (
                                     <TextField
                                         autoFocus
                                         label="Email"
@@ -114,9 +99,7 @@ const Login = () => {
                                 )}
                             />
                             {errors.email && (
-                                <FormHelperText sx={{ color: "error.main" }}>
-                                    {errors.email.message}
-                                </FormHelperText>
+                                <FormHelperText sx={{ color: "error.main" }}>{errors.email.message}</FormHelperText>
                             )}
                         </FormControl>
                         <FormControl fullWidth sx={{ mt: 3 }}>
@@ -124,9 +107,7 @@ const Login = () => {
                                 name="password"
                                 control={control}
                                 rules={{ required: true }}
-                                render={({
-                                    field: { value, onChange, onBlur },
-                                }) => (
+                                render={({ field: { value, onChange, onBlur } }) => (
                                     <TextField
                                         value={value}
                                         onBlur={onBlur}
@@ -139,10 +120,7 @@ const Login = () => {
                                 )}
                             />
                             {errors.password && (
-                                <FormHelperText
-                                    sx={{ color: "error.main" }}
-                                    id=""
-                                >
+                                <FormHelperText sx={{ color: "error.main" }} id="">
                                     {errors.password.message}
                                 </FormHelperText>
                             )}
@@ -154,10 +132,7 @@ const Login = () => {
                                 my: 3,
                             }}
                         >
-                            <Link
-                                href="/reset-password"
-                                style={{ textDecoration: "none" }}
-                            >
+                            <Link href="/reset-password" style={{ textDecoration: "none" }}>
                                 Forgot Password?
                             </Link>
                         </Box>

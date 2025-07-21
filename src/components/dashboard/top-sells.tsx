@@ -4,7 +4,6 @@ import { ngnFormatter } from "@/utils";
 import {
     Box,
     Card,
-    CardContent,
     CardHeader,
     LinearProgress,
     List,
@@ -36,7 +35,7 @@ const TopSells = ({ period }: Props) => {
     return (
         <Card sx={{ boxShadow: theme.customShadows.card, borderRadius: theme.borderRadius.small, height: "100%" }}>
             <CardHeader title="Top Selling Products" subheader={`By revenue for this ${period}`} />
-            <CardContent>
+            <Box sx={{ px: 2, mt: -2 }}>
                 <List disablePadding>
                     {topSells?.map((item, index) => {
                         const revenue = parseFloat(item.totalRevenueGenerated);
@@ -76,7 +75,7 @@ const TopSells = ({ period }: Props) => {
                         );
                     })}
                 </List>
-            </CardContent>
+            </Box>
         </Card>
     );
 };
