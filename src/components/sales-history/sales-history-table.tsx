@@ -37,6 +37,18 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
         () => [
             {
                 flex: 1,
+                field: "reference",
+                headerName: "Order Reference",
+                width: 200,
+                cellClassName: "capitalize-cell",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography variant="body2">{params.value || params.row.id}</Typography>
+                    </TableStyledBox>
+                ),
+            },
+            {
+                flex: 1,
                 field: "seller",
                 headerName: "Seller Name",
                 width: 200,
@@ -56,7 +68,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 headerAlign: "center",
                 width: 150,
                 renderCell: (params) => (
-                    <TableStyledBox sx={{ alignItems: "center" }}>
+                    <TableStyledBox sx={{ alignItems: "center", justifyContent: "center" }}>
                         <Typography variant="body2">{relativeTime(new Date(), new Date(params.value))}</Typography>
                     </TableStyledBox>
                 ),
@@ -70,7 +82,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{ alignItems: "center" }}>
+                    <TableStyledBox sx={{ alignItems: "center", justifyContent: "center" }}>
                         <Typography variant="body2" fontWeight="medium">
                             {ngnFormatter.format(params.value)}{" "}
                         </Typography>
@@ -94,7 +106,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{ alignItems: "center" }}>
+                    <TableStyledBox sx={{ alignItems: "center", justifyContent: "center" }}>
                         <Typography
                             variant="body2"
                             className="capitalize"
