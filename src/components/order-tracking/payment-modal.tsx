@@ -2,6 +2,7 @@ import CustomModal from "@/components/customs/custom-modal";
 import { selectCurrentUser } from "@/store/slice/auth-slice";
 import type { CartItem } from "@/types/cart-item-type";
 import { createOrderSchema, type CreateOrderType } from "@/types/order-types.ts";
+import { ngnFormatter } from "@/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
     Button,
@@ -111,7 +112,12 @@ const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: P
     }, [paymentMethod, total, setValue]);
 
     return (
-        <CustomModal open={open} onClose={onClose} title={"Payment"} description={`Total Amount: ${total.toFixed(2)}`}>
+        <CustomModal
+            open={open}
+            onClose={onClose}
+            title={"Payment"}
+            description={`Total Amount: ${ngnFormatter.format(total)}`}
+        >
             <form onSubmit={handleSubmit(onSubmit)}>
                 <FormControl component="fieldset" error={!!errors.paymentMethod}>
                     <Controller
@@ -143,7 +149,9 @@ const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: P
                                     />
                                 )}
                             />
-                            <Typography sx={{ mt: 1 }}>Change: ₦ {change > 0 ? change.toFixed(2) : "0.00"}</Typography>
+                            <Typography sx={{ mt: 1 }}>
+                                Change: {change > 0 ? ngnFormatter.format(change) : "NGN 0.00"}
+                            </Typography>
                         </>
                     )}
                 </FormControl>
