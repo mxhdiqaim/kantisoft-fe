@@ -22,6 +22,7 @@ import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 
 import { IconButton } from "@mui/material";
 import { type ComponentType, type ReactNode } from "react";
+import { UserRoleEnum, type UserRole } from "@/types/user-types";
 
 export interface AppRouteType {
     to: string;
@@ -33,6 +34,7 @@ export interface AppRouteType {
     authGuard?: boolean;
     hidden?: boolean;
     children?: AppRouteType[];
+    roles?: UserRole[]; // Add roles property
 }
 
 // Application routes with layout
@@ -47,6 +49,7 @@ export const appRoutes: AppRouteType[] = [
                 <DashboardOutlined />
             </IconButton>
         ),
+        roles: [UserRoleEnum.MANAGER],
     },
     {
         to: "/order-tracking",
@@ -58,6 +61,7 @@ export const appRoutes: AppRouteType[] = [
                 <AddAlertOutlinedIcon />
             </IconButton>
         ),
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
     },
     {
         to: "/sales-history",
@@ -69,6 +73,7 @@ export const appRoutes: AppRouteType[] = [
                 <ManageAccountsOutlinedIcon />
             </IconButton>
         ),
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
     },
     {
         to: "/sales-history/:id/view",
@@ -76,6 +81,7 @@ export const appRoutes: AppRouteType[] = [
         title: "viewSalesHistory",
         element: ViewSalesHistoryScreen,
         hidden: true,
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
     },
     {
         to: "/menu-item",
@@ -87,6 +93,7 @@ export const appRoutes: AppRouteType[] = [
                 <RestaurantMenuOutlinedIcon />
             </IconButton>
         ),
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
     },
     // Users management
     {
@@ -99,6 +106,7 @@ export const appRoutes: AppRouteType[] = [
                 <GroupOutlinedIcon />
             </IconButton>
         ),
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
     },
     {
         to: "/users/new",
@@ -106,6 +114,7 @@ export const appRoutes: AppRouteType[] = [
         title: "createUser",
         element: CreateUserScreen,
         hidden: true,
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
     },
 
     // Store management
@@ -119,6 +128,7 @@ export const appRoutes: AppRouteType[] = [
                 <StorefrontOutlinedIcon />
             </IconButton>
         ),
+        roles: [UserRoleEnum.MANAGER],
     },
     {
         to: "/stores/new",
@@ -126,6 +136,7 @@ export const appRoutes: AppRouteType[] = [
         title: "createStore",
         element: StoreFormScreen,
         hidden: true,
+        roles: [UserRoleEnum.MANAGER],
     },
     {
         to: "/stores/:id/view",
@@ -133,6 +144,7 @@ export const appRoutes: AppRouteType[] = [
         title: "viewStore",
         element: ViewStoreScreen,
         hidden: true,
+        roles: [UserRoleEnum.MANAGER],
     },
     {
         to: "/stores/:id/edit",
@@ -140,6 +152,7 @@ export const appRoutes: AppRouteType[] = [
         title: "editStore",
         element: EditStoreScreen,
         hidden: true,
+        roles: [UserRoleEnum.MANAGER],
     },
 
     // Auth pages
@@ -150,6 +163,7 @@ export const appRoutes: AppRouteType[] = [
         element: LoginScreen,
         useLayout: false,
         authGuard: false,
+        roles: [UserRoleEnum.GUEST],
     },
 
     // {
@@ -158,6 +172,8 @@ export const appRoutes: AppRouteType[] = [
     //   element: RegisterScreen,
     //   useLayout: false,
     //   authGuard: false,
+    //   hidden: true,
+    //   roles: [UserRoleEnum.GUEST],
     // },
     // {
     //   to: "/reset-password",

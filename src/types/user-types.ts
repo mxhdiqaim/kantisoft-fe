@@ -11,8 +11,16 @@ const PASSWORD_RULES = {
     requireSpecialChar: true,
 } as const;
 
+export const UserRoleEnum = {
+    MANAGER: "manager",
+    ADMIN: "admin",
+    USER: "user",
+    GUEST: "guest",
+} as const;
+
 // User roles and statuses
-export const USER_ROLES = ["admin", "manager", "user", "guest"] as const;
+export const USER_ROLES = Object.values(UserRoleEnum);
+
 export const USER_STATUSES = ["active", "inactive", "banned"] as const;
 
 // Schema for creating a new user without ID, createdAt & updatedAt fields
@@ -60,5 +68,6 @@ export type LoginUserType = yup.InferType<typeof loginUserType>;
 export type userType = yup.InferType<typeof userSchema>;
 export type UserType = Omit<userType, "password" | "confirmPassword">;
 
-export type UserRole = (typeof USER_ROLES)[number];
+// export type UserRole = (typeof USER_ROLES)[number];
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 export type UserStatus = (typeof USER_STATUSES)[number];

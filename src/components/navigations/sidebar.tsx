@@ -25,6 +25,8 @@ import { LogoutOutlined } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useLogoutMutation } from "@/store/slice";
 import { useTranslation } from "react-i18next";
+import { selectCurrentUser } from "@/store/slice/auth-slice";
+import { useAppSelector } from "@/store";
 
 interface Props extends AppBarProps {
     sx?: SxProps<Theme>;
@@ -37,6 +39,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const [logout, { isLoading }] = useLogoutMutation();
+    const currentUser = useAppSelector(selectCurrentUser);
 
     const handleLogout = async () => {
         try {
@@ -166,7 +169,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                 ...sx,
             }}
         >
-            <List sx={{ height: "100%", display: "flex", flexDirection: "column", p: 1 }}>
+            <List sx={{ height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
                 <Box
                     sx={{
                         display: { xs: "flex", md: "none" },
@@ -201,14 +204,28 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
 
                 {/* Routes rendering */}
                 <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
-                    {appRoutes.map((route, index) => {
+                    {/* {appRoutes.map((route, index) => {
                         const authGuard = route.authGuard ?? true;
                         const withLayout = route.useLayout ?? true;
 
                         if (route.hidden || !authGuard || !withLayout) return;
 
                         return renderMenuItem(route, index);
-                    })}
+                    })} */}
+                    {appRoutes
+                        .filter((route) => {
+                            // Basic filtering for hidden/auth routes
+                            if (route.hidden || !(route.authGuard ?? true) || !(route.useLayout ?? true)) {
+                                return false;
+                            }
+                            // Role-based filtering
+                            if (route.roles && currentUser) {
+                                return route.roles.includes(currentUser.role);
+                            }
+                            // If no roles are specified, show to all authenticated users
+                            return true;
+                        })
+                        .map((route, index) => renderMenuItem(route, index))}
                 </Box>
 
                 <Box position={"absolute"} bottom={0} width={"100%"} p={2}>

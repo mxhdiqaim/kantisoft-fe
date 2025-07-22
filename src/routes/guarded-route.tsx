@@ -2,19 +2,18 @@ import ServerDown from "@/components/status-comp/server-down";
 
 import Spinner from "@/components/status-comp/spinner";
 import { useAuthStatus } from "@/hooks/use-auth-status";
+import type { UserRole } from "@/types/user-types";
 import { memo, type ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 type GuardProps = {
     authGuard: boolean;
     children: ReactNode;
+    roles?: UserRole[];
 };
 
 // This is your GuardedRoute component that checks authentication status
-const GuardedRoute = memo(function GuardedRoute({
-    children,
-    authGuard,
-}: GuardProps) {
+const GuardedRoute = memo(function GuardedRoute({ children, authGuard }: GuardProps) {
     const { isLoading, isAuthenticated, isServerOk } = useAuthStatus();
     const location = useLocation();
 

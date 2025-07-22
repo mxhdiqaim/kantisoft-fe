@@ -7,9 +7,25 @@ type AuthState = {
     token: string | null;
 };
 
+// Function to safely parse user data from localStorage
+const getUserDataFromStorage = (): UserType | null => {
+    const storedUser = localStorage.getItem("userData");
+    if (storedUser) {
+        try {
+            return JSON.parse(storedUser) as UserType;
+        } catch (error) {
+            console.error("Failed to parse user data from localStorage", error);
+            // Clear corrupted data
+            localStorage.removeItem("userData");
+            return null;
+        }
+    }
+    return null;
+};
+
 // Attempt to load token from localStorage for persistence across reloads
 const initialState: AuthState = {
-    user: null,
+    user: getUserDataFromStorage(), // Load user data on initial load
     token: localStorage.getItem("token"),
 };
 
