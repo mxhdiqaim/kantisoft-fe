@@ -45,8 +45,11 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
 ) => {
     const result = await baseQuery(args, api, extraOptions);
 
+    // Check if the error is a 401 and the request was NOT to the login endpoint
+    const isLoginAttempt = typeof args === "object" && "url" in args && args.url.includes("/login");
+
     // If a 401 Unauthorized error occurs, dispatch the logOut action
-    if (result.error && result.error.status === 401) {
+    if (result.error && result.error.status === 401 && !isLoginAttempt) {
         if (!isLoggingOut) {
             isLoggingOut = true; // Set the lock
             console.warn("Session expired, initiating logout.");
@@ -60,15 +63,15 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
             // Redirect to login page
             window.location.href = "/login";
         }
-        // For subsequent calls that fail while logging out, we can return a custom error
-        // or just the original error, but we prevent re-dispatching logout.
-        return { error: { status: 401, data: "Session expired. Logging out." } };
+        // // For subsequent calls that fail while logging out, we can return a custom error
+        // // or just the original error, but we prevent re-dispatching logout.
+        // return { error: { status: 401, data: "Session expired. Logging out." } };
     }
 
-    // Reset the flag if a request succeeds after a login
-    if (!result.error) {
-        isLoggingOut = false;
-    }
+    // // Reset the flag if a request succeeds after a login
+    // if (!result.error) {
+    //     isLoggingOut = false;
+    // }
 
     return result;
 };

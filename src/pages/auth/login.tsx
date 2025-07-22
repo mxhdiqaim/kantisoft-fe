@@ -5,6 +5,8 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/store/slice";
+import { getApiError } from "@/helpers/get-api-error";
+import useNotifier from "@/hooks/useNotifier";
 
 const defaultValues = {
     password: "",
@@ -14,6 +16,7 @@ const defaultValues = {
 const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const notify = useNotifier();
     const [login, { isLoading: loading }] = useLoginMutation();
 
     // Get the path the user was trying to access before being redirected
@@ -38,26 +41,22 @@ const Login = () => {
 
             // On successful login, navigate to the intended page or a default.
             navigate(from, { replace: true });
-        } catch (error) {
-            // Handle validation errors
-            if (error instanceof Error) {
-                // You can set a general error or parse the error message to set specific field errors
-                setError("email", {
-                    type: "manual",
-                    message: error.message,
-                });
-                setError("password", {
-                    type: "manual",
-                    message: error.message,
-                });
-            }
+        } catch (err) {
+            // 2. Use the getApiError helper for clean, consistent error parsing
+            const defaultMessage = "Invalid email or password.";
+            const apiError = getApiError(err, defaultMessage);
+
+            notify(apiError.message, "error");
+
+            setError("email", { type: "manual" });
+            setError("password", { type: "manual" });
         }
     };
 
     return (
         <Grid container spacing={2}>
             <Grid
-                size={12} // Use xs prop for Grid item sizing
+                size={12}
                 sx={{
                     display: "flex",
                     justifyContent: "center",
