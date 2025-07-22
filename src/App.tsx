@@ -1,4 +1,4 @@
-import { type JSX } from "react";
+import { useEffect, type JSX } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import GuardedRoute from "@/routes/guarded-route";
 import { ErrorBoundary } from "react-error-boundary";
@@ -9,8 +9,11 @@ import { appRoutes, type AppRouteType } from "@/routes";
 
 import { ThemeProvider } from "@/theme";
 
-import "@/config/i18next-config";
 import { FullscreenProvider } from "./context/fullscreen-context";
+import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { selectActiveStore } from "./store/slice/store-slice";
+import "@/config/i18next-config";
 
 // function to handle nested children route rendering
 const handleNestedRoutes = (childRoute: AppRouteType, index: number): JSX.Element => {
@@ -86,6 +89,19 @@ const renterRoute = (route: AppRouteType, index: number) => {
 };
 
 function App() {
+    const { i18n } = useTranslation();
+    const activeStore = useSelector(selectActiveStore);
+
+    useEffect(() => {
+        if (activeStore?.storeType) {
+            const currentLanguage = i18n.language;
+            const targetLanguage = activeStore.storeType;
+
+            if (currentLanguage !== targetLanguage) {
+                i18n.changeLanguage(targetLanguage);
+            }
+        }
+    }, [activeStore, i18n]);
     return (
         <ThemeProvider>
             <FullscreenProvider>

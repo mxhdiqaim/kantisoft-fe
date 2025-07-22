@@ -1,0 +1,15 @@
+{
+    "dashboard": "Dashboard",
+    "orderTracking": "Point of Sale",
+    "salesHistory": "Store Sales",
+    "viewSalesHistory": "View Sales History",
+    "menuItem": "Products",
+    "stores": "Stores",
+    "users": "Users Management",
+    "createUser": "Create User",
+    "createStore": "Create Stores",
+    "viewStore": "View Stores",
+    "editStore": "Edit Stores",
+    "login": "Login",
+    "notFound": "Not Found"
+}

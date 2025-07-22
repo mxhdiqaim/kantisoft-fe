@@ -25,6 +25,7 @@ import { type ComponentType, type ReactNode } from "react";
 
 export interface AppRouteType {
     to: string;
+    // pathKey: string;
     element: ComponentType;
     title?: string;
     icon?: ReactNode;
@@ -38,7 +39,8 @@ export interface AppRouteType {
 export const appRoutes: AppRouteType[] = [
     {
         to: "/dashboard",
-        title: "Dashboard",
+        // pathKey: "routes.dashboard",
+        title: "dashboard",
         element: DashboardScreen,
         icon: (
             <IconButton size={"medium"}>
@@ -48,7 +50,8 @@ export const appRoutes: AppRouteType[] = [
     },
     {
         to: "/order-tracking",
-        title: "nav.orderTracking",
+        // pathKey: "routes.orderTracking",
+        title: "orderTracking",
         element: OrderTrackingScreen,
         icon: (
             <IconButton size={"medium"}>
@@ -58,7 +61,8 @@ export const appRoutes: AppRouteType[] = [
     },
     {
         to: "/sales-history",
-        title: "nav.salesHistory",
+        // pathKey: "routes.salesHistory",
+        title: "salesHistory",
         element: SalesHistoryScreen,
         icon: (
             <IconButton size={"medium"}>
@@ -68,13 +72,15 @@ export const appRoutes: AppRouteType[] = [
     },
     {
         to: "/sales-history/:id/view",
-        title: "nav.salesHistory",
+        // pathKey: "routes.viewSale",
+        title: "viewSalesHistory",
         element: ViewSalesHistoryScreen,
         hidden: true,
     },
     {
         to: "/menu-item",
-        title: "nav.menuItem",
+        // pathKey: "routes.menuItem",
+        title: "menuItem",
         element: MenuItemScreen,
         icon: (
             <IconButton size={"medium"}>
@@ -85,7 +91,8 @@ export const appRoutes: AppRouteType[] = [
     // Users management
     {
         to: "/users",
-        title: "Users",
+        // pathKey: "routes.users",
+        title: "users",
         element: UsersScreen,
         icon: (
             <IconButton size={"medium"}>
@@ -95,7 +102,8 @@ export const appRoutes: AppRouteType[] = [
     },
     {
         to: "/users/new",
-        title: "Create User",
+        // pathKey: "routes.createUser",
+        title: "createUser",
         element: CreateUserScreen,
         hidden: true,
     },
@@ -103,7 +111,8 @@ export const appRoutes: AppRouteType[] = [
     // Store management
     {
         to: "/stores",
-        title: "Stores",
+        // pathKey: "routes.stores",
+        title: "stores",
         element: StoreScreen,
         icon: (
             <IconButton size={"medium"}>
@@ -113,19 +122,22 @@ export const appRoutes: AppRouteType[] = [
     },
     {
         to: "/stores/new",
-        title: "Create Store",
+        // pathKey: "routes.createStore",
+        title: "createStore",
         element: StoreFormScreen,
         hidden: true,
     },
     {
         to: "/stores/:id/view",
-        title: "View Store",
+        // pathKey: "routes.viewStore",
+        title: "viewStore",
         element: ViewStoreScreen,
         hidden: true,
     },
     {
         to: "/stores/:id/edit",
-        title: "Edit Store",
+        // pathKey: "routes.editStore",
+        title: "editStore",
         element: EditStoreScreen,
         hidden: true,
     },
@@ -133,7 +145,8 @@ export const appRoutes: AppRouteType[] = [
     // Auth pages
     {
         to: "/login",
-        title: "Login",
+        // pathKey: "routes.login",
+        title: "login",
         element: LoginScreen,
         useLayout: false,
         authGuard: false,
@@ -157,7 +170,8 @@ export const appRoutes: AppRouteType[] = [
     // Error Pages
     {
         to: "*",
-        title: "Not Found",
+        // pathKey: "routes.notFound",
+        title: "notFound",
         element: NotFoundScreen,
         hidden: true,
         useLayout: false,

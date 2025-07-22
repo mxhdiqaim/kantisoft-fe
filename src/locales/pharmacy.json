@@ -1,15 +1,15 @@
 {
     "dashboard": "Dashboard",
-    "orderTracking": "Order Tracking",
+    "orderTracking": "Prescription POS",
     "salesHistory": "Sales History",
     "viewSalesHistory": "View Sales History",
-    "menuItem": "Menu Items",
-    "stores": "Restaurants",
+    "menuItem": "Medication Stock",
+    "stores": "Pharmacies",
     "users": "Users Management",
     "createUser": "Create User",
-    "createStore": "Create Restaurants",
-    "viewStore": "View Restaurants",
-    "editStore": "Edit Restaurants",
+    "createStore": "Create Pharmacies",
+    "ViewStore": "View Pharmacies",
+    "editStore": "Edit Pharmacies",
     "login": "Login",
     "notFound": "Not Found"
 }

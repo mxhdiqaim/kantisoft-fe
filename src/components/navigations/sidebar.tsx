@@ -76,6 +76,8 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
         // Calculate the full path for this route
         const fullPath = parentPath + route.to;
 
+        // const dynamicPath = t(route.pathKey, { ns: "translation", defaultValue: route.to });
+
         const isActive = location.pathname.startsWith(fullPath);
         const isSelected = location.pathname === fullPath;
         const isExpanded = expandedItems.includes(route.to);
