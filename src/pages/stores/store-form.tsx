@@ -54,7 +54,7 @@ const StoreForm = () => {
         <Box>
             <Button variant="text" onClick={() => navigate(-1)} sx={{ mb: 2 }}>
                 <ArrowBackIosNewOutlined fontSize="small" sx={{ mr: 0.5 }} />
-                Back to Stores
+                Go back
             </Button>
             <Typography variant="h4" sx={{ mb: 3 }}>
                 Create New Store

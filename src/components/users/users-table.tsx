@@ -121,11 +121,11 @@ const UsersTable = ({ users, loading }: Props) => {
                     const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
 
                     const handleView = () => {
-                        navigate(`/sales-history/${params.row.id}/view`);
+                        navigate(`/user/${params.row.id}/view`);
                         handleMenuClose();
                     };
                     const handleEdit = () => {
-                        console.log(`Edit User: ${params.row.id}`);
+                        navigate(`/user/${params.row.id}/edit`);
                         handleMenuClose();
                     };
                     const handleDelete = () => {
@@ -145,7 +145,10 @@ const UsersTable = ({ users, loading }: Props) => {
                                     <VisibilityOutlined sx={{ mr: 1 }} />
                                     View
                                 </MenuItem>
-                                <MenuItem onClick={handleEdit}>
+                                <MenuItem
+                                    onClick={handleEdit}
+                                    disabled={params.row.status === "deleted" || params.row.status === "inactive"}
+                                >
                                     <EditOutlined sx={{ mr: 1 }} />
                                     Edit
                                 </MenuItem>

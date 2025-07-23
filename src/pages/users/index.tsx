@@ -26,7 +26,7 @@ const UsersPage = () => {
         <Box>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
                 <Typography variant="h4">User Management</Typography>
-                <Button variant="contained" startIcon={<AddOutlined />} onClick={() => navigate("/users/new")}>
+                <Button variant="contained" startIcon={<AddOutlined />} onClick={() => navigate("/user/new")}>
                     New User
                 </Button>
             </Box>

@@ -110,18 +110,15 @@ const StoresTable = ({ data, loading }: Props) => {
                     const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
 
                     const handleView = () => {
-                        console.log(`View Store: ${params.row.id}`);
                         navigate(`/stores/${params.row.id}/view`);
                         handleMenuClose();
                     };
                     const handleEdit = () => {
-                        console.log(`Edit Store: ${params.row.id}`);
                         navigate(`/stores/${params.row.id}/edit`);
                         handleMenuClose();
                     };
 
                     const handleDelete = () => {
-                        console.log(`Delete Store: ${params.row.id}`);
                         handleDeleteClick(params.row);
                         handleMenuClose();
                     };

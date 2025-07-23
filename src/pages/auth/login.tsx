@@ -20,7 +20,7 @@ const Login = () => {
     const [login, { isLoading: loading }] = useLoginMutation();
 
     // Get the path the user was trying to access before being redirected
-    const from = location.state?.from?.pathname || "/dashboard";
+    const from = location.state?.from?.pathname || "/";
 
     const {
         control,

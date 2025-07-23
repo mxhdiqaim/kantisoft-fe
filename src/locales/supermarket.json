@@ -7,6 +7,7 @@
     "stores": "Stores",
     "users": "Users Management",
     "createUser": "Create User",
+    "store": "Store",
     "createStore": "Create Stores",
     "viewStore": "View Stores",
     "editStore": "Edit Stores",

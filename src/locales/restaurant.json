@@ -7,6 +7,7 @@
     "stores": "Restaurants",
     "users": "Users Management",
     "createUser": "Create User",
+    "store": "Restaurant",
     "createStore": "Create Restaurants",
     "viewStore": "View Restaurants",
     "editStore": "Edit Restaurants",

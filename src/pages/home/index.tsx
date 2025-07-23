@@ -1,0 +1,42 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "@/store";
+import { selectCurrentUser } from "@/store/slice/auth-slice";
+import { appRoutes } from "@/routes";
+
+import AppSkeleton from "@/components/spinners/app-skeleton-loading";
+
+const HomeScreen = () => {
+    const navigate = useNavigate();
+    const currentUser = useAppSelector(selectCurrentUser);
+
+    useEffect(() => {
+        if (currentUser) {
+            // Find the first accessible, non-hidden, primary route for the user's role.
+            // We assume appRoutes is ordered by precedence (most important routes first).
+            const destinationRoute = appRoutes.find(
+                (route) =>
+                    !route.hidden &&
+                    route.icon && // A good indicator of a primary navigation item
+                    route.roles?.includes(currentUser.role),
+            );
+
+            if (destinationRoute) {
+                // If a suitable page is found, redirect the user there.
+                navigate(destinationRoute.to, { replace: true });
+            } else {
+                // As a fallback, if no specific page is found for the user's role,
+                // send them to the login page.
+                navigate("/login", { replace: true });
+            }
+        } else {
+            // If there's no authenticated user, they must log in.
+            navigate("/login", { replace: true });
+        }
+    }, [currentUser, navigate]);
+
+    // Render a loading spinner to provide feedback while the redirection logic runs.
+    return <AppSkeleton />;
+};
+
+export default HomeScreen;

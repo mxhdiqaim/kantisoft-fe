@@ -1,7 +1,8 @@
 import {
-    CreateUserScreen,
+    UserFormScreen,
     DashboardScreen,
     EditStoreScreen,
+    HomeScreen,
     LoginScreen,
     MenuItemScreen,
     NotFoundScreen,
@@ -12,6 +13,8 @@ import {
     UsersScreen,
     ViewSalesHistoryScreen,
     ViewStoreScreen,
+    ViewUserScreen,
+    EditUserScreen,
 } from "@/pages";
 import { DashboardOutlined } from "@mui/icons-material";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
@@ -40,6 +43,13 @@ export interface AppRouteType {
 // Application routes with layout
 export const appRoutes: AppRouteType[] = [
     {
+        to: "/home",
+        // pathKey: "routes.home",
+        title: "home",
+        element: HomeScreen,
+        roles: [UserRoleEnum.GUEST],
+    },
+    {
         to: "/dashboard",
         // pathKey: "routes.dashboard",
         title: "dashboard",
@@ -49,7 +59,7 @@ export const appRoutes: AppRouteType[] = [
                 <DashboardOutlined />
             </IconButton>
         ),
-        roles: [UserRoleEnum.MANAGER],
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
     },
     {
         to: "/order-tracking",
@@ -109,18 +119,30 @@ export const appRoutes: AppRouteType[] = [
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
     },
     {
-        to: "/users/new",
-        // pathKey: "routes.createUser",
-        title: "createUser",
-        element: CreateUserScreen,
+        to: "/user/:id/view",
+        title: "viewUser",
+        element: ViewUserScreen,
         hidden: true,
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+    },
+    {
+        to: "/user/new",
+        title: "createUser",
+        element: UserFormScreen,
+        hidden: true,
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+    },
+    {
+        to: "/user/:id/edit",
+        title: "editUser",
+        element: EditUserScreen,
+        hidden: true,
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
     },
 
     // Store management
     {
         to: "/stores",
-        // pathKey: "routes.stores",
         title: "stores",
         element: StoreScreen,
         icon: (

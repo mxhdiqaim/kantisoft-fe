@@ -234,6 +234,28 @@ export const apiSlice = createApi({
             }),
             invalidatesTags: [{ type: "User", id: "LIST" }],
         }),
+        getUserById: builder.query<UserType, string>({
+            query: (id) => `/users/${id}`,
+            providesTags: (_result, _error, id) => [{ type: "User", id }],
+        }),
+        deleteUser: builder.mutation<{ message: string }, string>({
+            query: (id) => ({
+                url: `/users/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: [{ type: "User", id: "LIST" }],
+        }),
+        updateUser: builder.mutation<UserType, Partial<UserType> & Pick<UserType, "id">>({
+            query: ({ id, ...patch }) => ({
+                url: `/users/${id}`,
+                method: "PATCH",
+                body: patch,
+            }),
+            invalidatesTags: (_result, _error, { id }) => [
+                { type: "User", id },
+                { type: "User", id: "LIST" },
+            ],
+        }),
 
         // Store Endpoints
         getAllStores: builder.query<StoreType[], void>({
@@ -278,23 +300,32 @@ export const apiSlice = createApi({
 
 // Export auto-generated hooks for use in your components
 export const {
-    useGetOrdersByPeriodQuery,
-    useGetOrderByIdQuery,
-    useCreateOrderMutation,
-    useGetMenuItemsQuery,
-    useCreateMenuItemMutation,
+    useHealthCheckQuery,
+    // auth hooks
     useLoginMutation,
     useLogoutMutation,
     useRegisterMutation,
-    useHealthCheckQuery,
+    // order hooks
+    useGetOrdersByPeriodQuery,
+    useGetOrderByIdQuery,
+    useCreateOrderMutation,
+    // menu item hooks
+    useGetMenuItemsQuery,
+    useCreateMenuItemMutation,
     useDeleteMenuItemMutation,
     useUpdateMenuItemMutation,
+    // Dashboard Hooks
     useGetSalesSummaryQuery,
     useGetTopSellsQuery,
     useGetInventorySummaryQuery,
     useGetSalesTrendQuery,
+    // User Management Hooks
     useGetAllUsersQuery,
+    useGetUserByIdQuery,
+    useDeleteUserMutation,
     useCreateUserMutation,
+    useUpdateUserMutation,
+    // Store Management Hooks
     useGetAllStoresQuery,
     useGetStoreByIdQuery,
     useCreateStoreMutation,

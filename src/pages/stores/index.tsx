@@ -4,10 +4,12 @@ import { AddOutlined } from "@mui/icons-material";
 import { Box, Button, Paper, Typography, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import StoresTable from "@/components/stores/stores-table";
+import { useTranslation } from "react-i18next";
 
 const StoresPage = () => {
     const theme = useTheme();
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const { data: storesData, isLoading, isError } = useGetAllStoresQuery();
 
@@ -24,9 +26,9 @@ const StoresPage = () => {
     return (
         <Box>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-                <Typography variant="h4">Store Management</Typography>
+                <Typography variant="h4">{t("store")} Management</Typography>
                 <Button variant="contained" startIcon={<AddOutlined />} onClick={() => navigate("/stores/new")}>
-                    New Store
+                    New {t("store")}
                 </Button>
             </Box>
             <Paper
@@ -39,13 +41,6 @@ const StoresPage = () => {
             >
                 <StoresTable data={storesData ?? []} loading={isLoading} />
             </Paper>
-            {/* <StoreDeleteConfirmation
-                open={isDeleteDialogOpen}
-                onClose={() => setDeleteDialogOpen(false)}
-                onConfirm={handleConfirmDelete}
-                storeName={storeToDelete?.name ?? ""}
-                isLoading={isDeleting}
-            /> */}
         </Box>
     );
 };

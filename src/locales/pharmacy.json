@@ -7,6 +7,7 @@
     "stores": "Pharmacies",
     "users": "Users Management",
     "createUser": "Create User",
+    "store": "Pharmacy",
     "createStore": "Create Pharmacies",
     "ViewStore": "View Pharmacies",
     "editStore": "Edit Pharmacies",

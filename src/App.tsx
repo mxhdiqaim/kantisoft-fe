@@ -109,7 +109,7 @@ function App() {
                     <ScrollToTop />
                     <ErrorBoundary FallbackComponent={ErrorFallback}>
                         <Routes>
-                            <Route path={"/"} element={<Navigate to={"/dashboard"} />} />
+                            <Route path={"/"} element={<Navigate to={"/home"} />} />
                             {appRoutes.map((route, index) => renterRoute(route, index))}
                         </Routes>
                     </ErrorBoundary>

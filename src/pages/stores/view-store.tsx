@@ -21,8 +21,8 @@ const ViewStore = () => {
                 <Typography variant="h6" color="error">
                     Store not found.
                 </Typography>
-                <Button variant="outlined" onClick={() => navigate("/stores")} sx={{ mt: 2 }}>
-                    Back to Stores
+                <Button variant="outlined" onClick={() => navigate(-1)} sx={{ mt: 2 }}>
+                    Go back
                 </Button>
             </Box>
         );
@@ -47,9 +47,9 @@ const ViewStore = () => {
 
     return (
         <Box>
-            <Button variant="text" onClick={() => navigate("/stores")} sx={{ mb: 2 }}>
+            <Button variant="text" onClick={() => navigate(-1)} sx={{ mb: 2 }}>
                 <ArrowBackIosNewOutlined fontSize="small" sx={{ mr: 0.5 }} />
-                Back to Stores
+                Go back
             </Button>
 
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
