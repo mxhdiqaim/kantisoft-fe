@@ -74,8 +74,6 @@ const UserForm = ({ userToEdit }: Props) => {
     } = useForm({
         defaultValues,
         mode: "onChange",
-        // eslint-disable-next-line
-        // @ts-ignore
         resolver: yupResolver(isEditMode ? updateUserSchema : createUserSchema),
     });
 

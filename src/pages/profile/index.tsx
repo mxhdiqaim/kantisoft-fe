@@ -14,10 +14,14 @@ import { useGetUserByIdQuery } from "@/store/slice";
 import ViewUserSkeleton from "@/components/profile/loading";
 import ApiErrorDisplay from "@/components/feedback/api-error-display";
 import { getApiError } from "@/helpers/get-api-error";
+import { selectActiveStore } from "@/store/slice/store-slice";
+import { useSelector } from "react-redux";
 
 const ProfilePage = () => {
     const navigate = useNavigate();
     const loggedInUser = useAppSelector(selectCurrentUser);
+
+    const activeStore = useSelector(selectActiveStore);
 
     // Fetch the latest user data to ensure it's up-to-date
     const {
@@ -124,9 +128,9 @@ const ProfilePage = () => {
                                         <StorefrontOutlined color="action" sx={{ mr: 1.5 }} />
                                         <Box>
                                             <Typography variant="caption" color="text.secondary">
-                                                Assigned Store
+                                                Store
                                             </Typography>
-                                            <Typography fontWeight="medium">{user.store?.name || "N/A"}</Typography>
+                                            <Typography fontWeight="medium">{activeStore?.name || "N/A"}</Typography>
                                         </Box>
                                     </Box>
                                 </Grid>

@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { extendBaseSchema } from "@/types";
-import { storeSchema } from "./store-types";
+// import { storeSchema } from "./store-types";
 
 // Password-specific validation rules
 const PASSWORD_RULES = {
@@ -64,7 +64,7 @@ export const baseUserSchema = yup.object().shape({
     role: yup.string().oneOf(USER_ROLES).default("user"),
     status: yup.string().oneOf(USER_STATUSES).default("active"),
     storeId: yup.string().uuid().required("Store must be selected"),
-    store: storeSchema.optional().nullable(), // Optional store object for user
+    // store: storeSchema.optional().nullable(), // Optional store object for user
 });
 
 export const createUserSchema = baseUserSchema;
