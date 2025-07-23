@@ -9,6 +9,8 @@ import type { MenuItemType } from "@/types/menu-item-type";
 import { useDeleteMenuItemMutation } from "@/store/slice";
 import useNotifier from "@/hooks/useNotifier";
 import TableStyledBox from "../ui/table-styled-box";
+import { useAppSelector } from "@/store";
+import { selectCurrentUser } from "@/store/slice/auth-slice";
 
 export interface Props {
     menuItems: MenuItemType[];
@@ -19,6 +21,8 @@ export interface Props {
 const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
     const theme = useTheme();
     const notify = useNotifier();
+    const currentUser = useAppSelector(selectCurrentUser);
+
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
     const [deleteMenuItem, { isLoading: isDeleting }] = useDeleteMenuItemMutation();
@@ -141,6 +145,13 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                         handleMenuClose();
                     };
 
+                    if (!currentUser || currentUser.role === "guest") {
+                        return null; // No actions for guests or logged-out users
+                    }
+
+                    const canEdit = ["manager", "admin", "user"].includes(currentUser.role);
+                    const canDelete = ["manager", "admin"].includes(currentUser.role);
+
                     return (
                         <>
                             <Tooltip title="More Actions">
@@ -149,25 +160,29 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                                 </IconButton>
                             </Tooltip>
                             <Menu anchorEl={anchorEl} open={isOpen} onClose={handleMenuClose}>
-                                <MuiMenuItem onClick={handleEdit}>
-                                    <EditOutlined sx={{ mr: 1 }} />
-                                    Edit
-                                </MuiMenuItem>
-                                <MuiMenuItem
-                                    onClick={() => handleDelete(params.row.id)}
-                                    sx={{ color: "error.main" }}
-                                    disabled={isDeleting && selectedRowId === params.row.id}
-                                >
-                                    <DeleteOutline sx={{ mr: 1 }} />
-                                    Delete
-                                </MuiMenuItem>
+                                {canEdit && (
+                                    <MuiMenuItem onClick={handleEdit}>
+                                        <EditOutlined sx={{ mr: 1 }} />
+                                        Edit
+                                    </MuiMenuItem>
+                                )}
+                                {canDelete && (
+                                    <MuiMenuItem
+                                        onClick={() => handleDelete(params.row.id)}
+                                        sx={{ color: "error.main" }}
+                                        disabled={isDeleting && selectedRowId === params.row.id}
+                                    >
+                                        <DeleteOutline sx={{ mr: 1 }} />
+                                        Delete
+                                    </MuiMenuItem>
+                                )}
                             </Menu>
                         </>
                     );
                 },
             },
         ],
-        [theme, anchorEl, selectedRowId],
+        [theme, anchorEl, selectedRowId, currentUser, onEdit],
     );
     return (
         <Box

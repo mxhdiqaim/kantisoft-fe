@@ -14,3 +14,4 @@ export { default as StoreFormScreen } from "./stores/store-form";
 export { default as ViewStoreScreen } from "./stores/view-store";
 export { default as EditStoreScreen } from "./stores/edit-store";
 export { default as HomeScreen } from "./home";
+export { default as ProfileScreen } from "./profile";

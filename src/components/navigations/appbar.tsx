@@ -12,6 +12,9 @@ import {
     Typography,
     Menu,
     MenuItem,
+    Tooltip,
+    Avatar,
+    Divider,
 } from "@mui/material";
 import { useEffect, useState, type FC, type MouseEvent } from "react";
 
@@ -19,10 +22,13 @@ import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNone
 import FullscreenOutlinedIcon from "@mui/icons-material/FullscreenOutlined";
 import FullscreenExitOutlinedIcon from "@mui/icons-material/FullscreenExitOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import { useGetAllStoresQuery } from "@/store/slice";
+import { useGetAllStoresQuery, useLogoutMutation } from "@/store/slice";
 import { selectActiveStore, setActiveStore } from "@/store/slice/store-slice";
-import { ExpandMoreOutlined, StorefrontOutlined } from "@mui/icons-material";
+import { ExpandMoreOutlined, LogoutOutlined, PersonOutline, StorefrontOutlined } from "@mui/icons-material";
 import type { StoreType } from "@/types/store-types";
+import { selectCurrentUser } from "@/store/slice/auth-slice";
+import { useNavigate } from "react-router-dom";
+import useNotifier from "@/hooks/useNotifier";
 
 export interface Props {
     toggleDrawer?: (open: boolean) => void;
@@ -32,16 +38,65 @@ export interface Props {
 const AppbarComponent: FC<Props> = ({ toggleDrawer, drawerState }) => {
     const theme = useTheme();
     const { isFullscreen, toggleFullscreen } = useFullscreen();
-
+    const navigate = useNavigate();
+    const notify = useNotifier();
     const dispatch = useDispatch();
 
     // Fetch all available stores from the API
     const { data: stores, isLoading: isLoadingStores } = useGetAllStoresQuery();
-
     const activeStore = useSelector(selectActiveStore);
 
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
+    const currentUser = useSelector(selectCurrentUser);
+    const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
+
+    const [storeMenuAnchorEl, setStoreMenuAnchorEl] = useState<null | HTMLElement>(null);
+    const isStoreMenuOpen = Boolean(storeMenuAnchorEl);
+
+    const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState<null | HTMLElement>(null);
+    const isProfileMenuOpen = Boolean(profileMenuAnchorEl);
+
+    const handleStoreMenuClick = (event: MouseEvent<HTMLElement>) => {
+        setStoreMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleStoreMenuClose = () => {
+        setStoreMenuAnchorEl(null);
+    };
+
+    // 4. Handlers for the profile menu
+    const handleProfileMenuClick = (event: MouseEvent<HTMLElement>) => {
+        setProfileMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleProfileMenuClose = () => {
+        setProfileMenuAnchorEl(null);
+    };
+
+    const handleLogout = async () => {
+        try {
+            await logout({}).unwrap();
+        } catch (error) {
+            console.error("Server logout failed, proceeding with client-side logout:", error);
+        } finally {
+            navigate("/login");
+            notify("You have been logged out successfully.", "success");
+        }
+    };
+
+    // const handleMenuClick = (event: MouseEvent<HTMLElement>) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
+
+    // const handleMenuClose = () => {
+    //     setAnchorEl(null);
+    // };
+
+    const handleStoreSelect = (store: StoreType) => {
+        // Dispatch the action to update the active store
+        dispatch(setActiveStore(store));
+        // handleMenuClose();
+        handleStoreMenuClose();
+    };
 
     // Effect to automatically set the first store as active if none is selected
     useEffect(() => {
@@ -49,20 +104,6 @@ const AppbarComponent: FC<Props> = ({ toggleDrawer, drawerState }) => {
             dispatch(setActiveStore(stores[0]));
         }
     }, [activeStore, stores, dispatch]);
-
-    const handleMenuClick = (event: MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleStoreSelect = (store: StoreType) => {
-        // Dispatch the action to update the active store
-        dispatch(setActiveStore(store));
-        handleMenuClose();
-    };
 
     return (
         <AppBar
@@ -97,7 +138,7 @@ const AppbarComponent: FC<Props> = ({ toggleDrawer, drawerState }) => {
                         ) : (
                             <Button
                                 id="store-selector-button"
-                                onClick={handleMenuClick}
+                                onClick={handleStoreMenuClick}
                                 startIcon={<StorefrontOutlined />}
                                 endIcon={<ExpandMoreOutlined />}
                                 sx={{ color: "text.primary", textTransform: "none" }}
@@ -107,7 +148,7 @@ const AppbarComponent: FC<Props> = ({ toggleDrawer, drawerState }) => {
                                 </Typography>
                             </Button>
                         )}
-                        <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
+                        <Menu anchorEl={storeMenuAnchorEl} open={isStoreMenuOpen} onClose={handleStoreMenuClose}>
                             {stores?.map((store) => (
                                 <MenuItem
                                     key={store.id}
@@ -137,6 +178,47 @@ const AppbarComponent: FC<Props> = ({ toggleDrawer, drawerState }) => {
                     >
                         <NotificationsNoneOutlinedIcon />
                     </IconButton>
+                    <Tooltip title="Account settings">
+                        <IconButton onClick={handleProfileMenuClick} size="small">
+                            <Avatar sx={{ width: 36, height: 36, bgcolor: "primary.main" }}>
+                                {currentUser?.firstName?.charAt(0).toUpperCase()}
+                            </Avatar>
+                        </IconButton>
+                    </Tooltip>
+                    <Menu
+                        anchorEl={profileMenuAnchorEl}
+                        open={isProfileMenuOpen}
+                        onClose={handleProfileMenuClose}
+                        PaperProps={{
+                            elevation: 0,
+                            sx: {
+                                overflow: "visible",
+                                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.15))",
+                                mt: 1.5,
+                                "& .MuiAvatar-root": {
+                                    width: 32,
+                                    height: 32,
+                                    ml: -0.5,
+                                    mr: 1,
+                                },
+                            },
+                        }}
+                        transformOrigin={{ horizontal: "right", vertical: "top" }}
+                        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                    >
+                        <MenuItem onClick={() => navigate("/profile")}>
+                            <PersonOutline sx={{ mr: 1 }} /> Profile
+                        </MenuItem>
+                        <Divider />
+                        <MenuItem onClick={handleLogout} sx={{ color: "error.main" }} disabled={isLoggingOut}>
+                            {isLoggingOut ? (
+                                <CircularProgress size={20} sx={{ mr: 1 }} color="inherit" />
+                            ) : (
+                                <LogoutOutlined sx={{ mr: 1 }} />
+                            )}
+                            {isLoggingOut ? "Logging out..." : "Logout"}
+                        </MenuItem>
+                    </Menu>
                 </Box>
             </Toolbar>
         </AppBar>

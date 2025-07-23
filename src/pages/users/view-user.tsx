@@ -1,22 +1,16 @@
+import ApiErrorDisplay from "@/components/feedback/api-error-display";
 import ViewUserSkeleton from "@/components/users/loading/view-user-skeleton";
 import { getApiError } from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
 import { useAppSelector } from "@/store";
 import { useDeleteUserMutation, useGetUserByIdQuery, useUpdateUserMutation } from "@/store/slice";
 import { selectCurrentUser } from "@/store/slice/auth-slice";
-import type { UserRoleType, UserStatus, UserType } from "@/types/user-types";
+import { roleHierarchy, type UserRoleType, type UserStatus, type UserType } from "@/types/user-types";
 import { EditOutlined, BlockOutlined, DeleteOutline, ArrowBackIosNewOutlined } from "@mui/icons-material";
 import { Avatar, Box, Button, Card, CardContent, Chip, Divider, Grid, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
-const roleHierarchy: Record<UserRoleType, number> = {
-    manager: 3,
-    admin: 2,
-    user: 1,
-    guest: 0,
-};
 
 const getRoleChipColor = (role: UserRoleType) => {
     const colors: Record<UserRoleType, "secondary" | "primary" | "info" | "default"> = {
@@ -107,9 +101,9 @@ const ViewUser = () => {
     if (isLoading) return <ViewUserSkeleton />;
 
     if (error || !user) {
-        notify("Failed to fetch user details or user not found.", "error");
-        console.error("Error fetching user details:", error);
-        return <Typography color="error">Failed to fetch user details.</Typography>;
+        const apiError = getApiError(error, "Failed to load user data for editing.");
+        notify(apiError.message, "error");
+        return <ApiErrorDisplay statusCode={apiError.type} message={apiError.message} />;
     }
 
     return (
@@ -163,7 +157,7 @@ const ViewUser = () => {
                                 </Button>
                             )}
                             {currentUser &&
-                                roleHierarchy[currentUser.role] >
+                                roleHierarchy[currentUser.role] <
                                     roleHierarchy[(user as UserType).role as UserRoleType] && (
                                     <>
                                         {deleteTimer ? (

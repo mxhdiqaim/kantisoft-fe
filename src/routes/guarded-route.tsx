@@ -1,6 +1,6 @@
-import ServerDown from "@/components/status-comp/server-down";
+import ServerDown from "@/components/feedback/server-down";
 
-import Spinner from "@/components/status-comp/spinner";
+import Spinner from "@/components/feedback/spinner";
 import { useAuthStatus } from "@/hooks/use-auth-status";
 import type { UserRole } from "@/types/user-types";
 import { memo, type ReactNode } from "react";

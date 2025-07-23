@@ -1,11 +1,13 @@
 import { useMemo, useState, type MouseEvent } from "react";
-import type { UserType } from "@/types/user-types";
+import { roleHierarchy, type UserType } from "@/types/user-types";
 import { Avatar, Chip, IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
 import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import CustomNoRowsOverlay from "../customs/custom-no-rows-overlay";
 import TableStyledBox from "../ui/table-styled-box";
-import { DeleteOutline, EditOutlined, MoreVert, VisibilityOutlined } from "@mui/icons-material";
+import { EditOutlined, MoreVert, VisibilityOutlined } from "@mui/icons-material";
+import { selectCurrentUser } from "@/store/slice/auth-slice";
+import { useAppSelector } from "@/store";
 
 export interface Props {
     users: UserType[];
@@ -14,11 +16,11 @@ export interface Props {
 
 const UsersTable = ({ users, loading }: Props) => {
     const navigate = useNavigate();
+    const currentUser = useAppSelector(selectCurrentUser);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
-        console.log(`Clicked row: ${rowId}`);
         setAnchorEl(event.currentTarget);
         setSelectedRowId(rowId);
     };
@@ -128,10 +130,28 @@ const UsersTable = ({ users, loading }: Props) => {
                         navigate(`/user/${params.row.id}/edit`);
                         handleMenuClose();
                     };
-                    const handleDelete = () => {
-                        console.log(`Delete User: ${params.row.id}`);
-                        handleMenuClose();
+
+                    const canEdit = () => {
+                        if (!currentUser) return false; // Cannot edit if not logged in
+
+                        const currentUserRoleLevel = roleHierarchy[currentUser.role];
+                        const rowUserRoleLevel = roleHierarchy[(params.row as UserType).role];
+                        const isSelf = currentUser.id === params.row.id;
+
+                        // Manager can edit anyone
+                        if (currentUser.role === "manager") return true;
+
+                        // Admin can edit admins and lower, but not managers
+                        if (currentUser.role === "admin") {
+                            return currentUserRoleLevel <= rowUserRoleLevel;
+                        }
+
+                        // Users and Guests can only edit themselves or roles below them
+                        return currentUserRoleLevel > rowUserRoleLevel || isSelf;
                     };
+
+                    const isEditDisabled =
+                        params.row.status === "deleted" || params.row.status === "inactive" || !canEdit();
 
                     return (
                         <>
@@ -141,20 +161,13 @@ const UsersTable = ({ users, loading }: Props) => {
                                 </IconButton>
                             </Tooltip>
                             <Menu anchorEl={anchorEl} open={isOpen} onClose={handleMenuClose}>
-                                <MenuItem onClick={handleView}>
+                                <MenuItem onClick={handleView} disabled={isEditDisabled}>
                                     <VisibilityOutlined sx={{ mr: 1 }} />
                                     View
                                 </MenuItem>
-                                <MenuItem
-                                    onClick={handleEdit}
-                                    disabled={params.row.status === "deleted" || params.row.status === "inactive"}
-                                >
+                                <MenuItem onClick={handleEdit} disabled={isEditDisabled}>
                                     <EditOutlined sx={{ mr: 1 }} />
                                     Edit
-                                </MenuItem>
-                                <MenuItem onClick={handleDelete}>
-                                    <DeleteOutline sx={{ mr: 1 }} />
-                                    Delete
                                 </MenuItem>
                             </Menu>
                         </>

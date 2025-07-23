@@ -15,6 +15,7 @@ import {
     ViewStoreScreen,
     ViewUserScreen,
     EditUserScreen,
+    ProfileScreen,
 } from "@/pages";
 import { DashboardOutlined } from "@mui/icons-material";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
@@ -48,6 +49,14 @@ export const appRoutes: AppRouteType[] = [
         title: "home",
         element: HomeScreen,
         roles: [UserRoleEnum.GUEST],
+    },
+    {
+        to: "/profile",
+        title: "Profile",
+        element: ProfileScreen,
+        hidden: true, // Hide from sidebar as it's accessed via app bar
+        authGuard: true,
+        useLayout: true,
     },
     {
         to: "/dashboard",

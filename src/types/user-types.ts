@@ -1,9 +1,10 @@
 import * as yup from "yup";
 import { extendBaseSchema } from "@/types";
+import { storeSchema } from "./store-types";
 
 // Password-specific validation rules
 const PASSWORD_RULES = {
-    min: 8,
+    min: 5,
     max: 100,
     requireUppercase: true,
     requireLowercase: true,
@@ -63,6 +64,7 @@ export const baseUserSchema = yup.object().shape({
     role: yup.string().oneOf(USER_ROLES).default("user"),
     status: yup.string().oneOf(USER_STATUSES).default("active"),
     storeId: yup.string().uuid().required("Store must be selected"),
+    store: storeSchema.optional().nullable(), // Optional store object for user
 });
 
 export const createUserSchema = baseUserSchema;
@@ -119,3 +121,10 @@ export type UserType = Omit<userType, "password" | "confirmPassword">;
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 export type UserRoleType = (typeof USER_ROLES)[number];
 export type UserStatus = (typeof USER_STATUSES)[number];
+
+export const roleHierarchy: Record<UserRoleType, number> = {
+    manager: 0,
+    admin: 1,
+    user: 2,
+    guest: 3,
+} as const;

@@ -4,6 +4,7 @@
     "salesHistory": "Store Sales",
     "viewSalesHistory": "View Sales History",
     "menuItem": "Products",
+    "item": "Product",
     "stores": "Stores",
     "users": "Users Management",
     "createUser": "Create User",

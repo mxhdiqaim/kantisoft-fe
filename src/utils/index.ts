@@ -1,5 +1,7 @@
 import type { AppRouteType } from "@/routes";
 import type { Period } from "@/types/order-types.ts";
+import type { UserRoleType } from "@/types/user-types";
+import type { ChipProps } from "@mui/material";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -38,4 +40,20 @@ export const getTitle = (period: Period) => {
         default:
             return "Sales History";
     }
+};
+
+/**
+ * Returns a specific MUI color for a user role to be used in Chips.
+ * @param {UserRoleType} role - The role of the user.
+ * @returns {ChipProps['color']} A MUI color prop for the Chip component.
+ */
+export const getRoleChipColor = (role: UserRoleType): ChipProps["color"] => {
+    const colors: Record<UserRoleType, ChipProps["color"]> = {
+        manager: "secondary",
+        admin: "primary",
+        user: "info",
+        guest: "default",
+    };
+
+    return colors[role] || "default";
 };

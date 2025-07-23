@@ -4,6 +4,7 @@
     "salesHistory": "Sales History",
     "viewSalesHistory": "View Sales History",
     "menuItem": "Medication Stock",
+    "item": "Medication",
     "stores": "Pharmacies",
     "users": "Users Management",
     "createUser": "Create User",
