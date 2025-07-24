@@ -4,7 +4,7 @@ import AppbarComponent from "./appbar";
 import SideBar from "./sidebar";
 import useScreenSize from "@/hooks/use-screen-size";
 import CustomDrawer from "@/components/customs/custom-drawer";
-import OfflineBanner from "@/pages/errors/offline-banner";
+import OfflineBanner from "@/components/feedback/offline-banner";
 
 const Layout: FC<{ children: ReactNode }> = ({ children }) => {
     const screenSize = useScreenSize();

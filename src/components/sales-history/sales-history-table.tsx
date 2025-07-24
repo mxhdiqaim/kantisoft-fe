@@ -9,6 +9,9 @@ import type { OrderType } from "@/types/order-types";
 import { ngnFormatter } from "@/utils";
 import { useNavigate } from "react-router-dom";
 import TableStyledBox from "../ui/table-styled-box";
+import { selectCurrentUser } from "@/store/slice/auth-slice";
+import { useAppSelector } from "@/store";
+import { UserRoleEnum } from "@/types/user-types";
 
 export interface Props {
     orders: OrderType[];
@@ -19,6 +22,7 @@ export interface Props {
 const SalesHistoryTable = ({ orders, loading, period }: Props) => {
     const theme = useTheme();
     const navigate = useNavigate();
+    const currentUser = useAppSelector(selectCurrentUser);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
     const [searchText, setSearchText] = useState("");
@@ -164,6 +168,9 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                         handleMenuClose();
                     };
 
+                    const isGuest = currentUser?.role === UserRoleEnum.GUEST;
+                    const canEdit = !isGuest;
+
                     return (
                         <>
                             <Tooltip title="More Actions">
@@ -176,10 +183,12 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                                     <VisibilityOutlined sx={{ mr: 1 }} />
                                     View
                                 </MenuItem>
-                                <MenuItem onClick={handleEdit}>
-                                    <EditOutlined sx={{ mr: 1 }} />
-                                    Edit
-                                </MenuItem>
+                                {canEdit && (
+                                    <MenuItem onClick={handleEdit}>
+                                        <EditOutlined sx={{ mr: 1 }} />
+                                        Edit
+                                    </MenuItem>
+                                )}
                                 <MenuItem onClick={handlePrint}>
                                     <PrintOutlined sx={{ mr: 1 }} />
                                     Print

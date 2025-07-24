@@ -1,6 +1,6 @@
 import { useGetUserByIdQuery } from "@/store/slice";
 import { useParams } from "react-router-dom";
-import UserForm from "./user-form";
+import UserForm from "../../components/users/user-form";
 import UserFormSkeleton from "@/components/users/loading/user-form-skeleton";
 import { getApiError } from "@/helpers/get-api-error";
 import ApiErrorDisplay from "@/components/feedback/api-error-display";

@@ -1,5 +1,5 @@
 import { loginUserType, type LoginUserType } from "@/types/user-types";
-import { Box, Button, TextField, Typography, Link, FormControl, FormHelperText, Grid } from "@mui/material";
+import { Box, Button, TextField, Typography, FormControl, FormHelperText, Grid, useTheme } from "@mui/material";
 
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -14,6 +14,7 @@ const defaultValues = {
 };
 
 const Login = () => {
+    const theme = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const notify = useNotifier();
@@ -70,13 +71,13 @@ const Login = () => {
                         width: "100%", // Ensure box takes up grid item width
                         maxWidth: {
                             xs: "100%",
-                            sm: "400px", // Set a max-width for better layout on larger screens
+                            sm: "400px", // Set a m ax-width for better layout on larger screens
                         },
                     }}
                 >
                     <Box sx={{ textAlign: "center", mb: 5 }}>
-                        <Typography variant={"h2"} sx={{ fontWeight: 500 }}>
-                            Restaurant POS
+                        <Typography variant={"h5"} sx={{ fontWeight: 500 }}>
+                            Welcome Back! Login to your account
                         </Typography>
                     </Box>
                     <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
@@ -94,6 +95,7 @@ const Login = () => {
                                         onChange={onChange}
                                         error={Boolean(errors.email)}
                                         placeholder="example@gmail.com"
+                                        sx={{ borderRadius: theme.borderRadius.small }}
                                     />
                                 )}
                             />
@@ -115,6 +117,7 @@ const Login = () => {
                                         id="auth-login-v2-password"
                                         error={Boolean(errors.password)}
                                         type={"password"}
+                                        sx={{ borderRadius: theme.borderRadius.small }}
                                     />
                                 )}
                             />
@@ -124,7 +127,7 @@ const Login = () => {
                                 </FormHelperText>
                             )}
                         </FormControl>
-                        <Box
+                        {/* <Box
                             sx={{
                                 display: "flex",
                                 justifyContent: "flex-end",
@@ -134,15 +137,15 @@ const Login = () => {
                             <Link href="/reset-password" style={{ textDecoration: "none" }}>
                                 Forgot Password?
                             </Link>
-                        </Box>
-                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        </Box> */}
+                        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
                             <Button
                                 type="submit"
                                 variant="contained"
                                 sx={{
                                     width: "100%", // Make button full width
                                     color: "#fff",
-                                    borderRadius: "48px",
+                                    borderRadius: theme.borderRadius.small,
                                     p: 2,
                                     mb: 2,
                                 }}
@@ -150,6 +153,14 @@ const Login = () => {
                             >
                                 {loading ? "Logging in..." : "Login"}
                             </Button>
+                        </Box>
+                        <Box sx={{ textAlign: "center", mt: 2 }}>
+                            <Typography variant="body1">
+                                Don&apos;t have an account?{" "}
+                                <Button variant="text" onClick={() => navigate("/register")}>
+                                    Register
+                                </Button>
+                            </Typography>
                         </Box>
                     </form>
                 </Box>

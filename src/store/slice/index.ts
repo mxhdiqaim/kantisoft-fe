@@ -16,7 +16,7 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import type { RootState } from "..";
 import { logOut, setCredentials } from "./auth-slice";
-import type { CreateUserType, UserType } from "@/types/user-types";
+import type { CreateUserType, RegisterUserType, UserType } from "@/types/user-types";
 import type { CreateStoreType, StoreType } from "@/types/store-types";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;
@@ -91,7 +91,7 @@ export const apiSlice = createApi({
         // Auth Endpoints
         login: builder.mutation({
             query: (credentials) => ({
-                url: "/users/login", // Your backend login route
+                url: "/api/login", // Your backend login route
                 method: "POST",
                 body: credentials,
             }),
@@ -110,7 +110,7 @@ export const apiSlice = createApi({
         // Logout Endpoint
         logout: builder.mutation({
             query: () => ({
-                url: "/users/logout",
+                url: "/api/logout",
                 method: "POST",
             }),
             async onQueryStarted(_args, { dispatch, queryFulfilled }) {
@@ -129,11 +129,14 @@ export const apiSlice = createApi({
             },
         }),
 
-        register: builder.mutation({
-            query: (user) => ({
-                url: "/users/register", // Your backend register route
+        registerManagerAndStore: builder.mutation<
+            { user: RegisterUserType; token: string },
+            Omit<RegisterUserType, "confirmPassword">
+        >({
+            query: (body) => ({
+                url: "/api/register",
                 method: "POST",
-                body: user,
+                body,
             }),
         }),
 
@@ -304,7 +307,7 @@ export const {
     // auth hooks
     useLoginMutation,
     useLogoutMutation,
-    useRegisterMutation,
+    useRegisterManagerAndStoreMutation,
     // order hooks
     useGetOrdersByPeriodQuery,
     useGetOrderByIdQuery,

@@ -1,5 +1,5 @@
 import {
-    UserFormScreen,
+    AddUserScreen,
     DashboardScreen,
     EditStoreScreen,
     HomeScreen,
@@ -16,6 +16,7 @@ import {
     ViewUserScreen,
     EditUserScreen,
     ProfileScreen,
+    RegisterScreen,
 } from "@/pages";
 import { DashboardOutlined } from "@mui/icons-material";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
@@ -48,6 +49,7 @@ export const appRoutes: AppRouteType[] = [
         // pathKey: "routes.home",
         title: "home",
         element: HomeScreen,
+        hidden: true, // Hide from sidebar
         roles: [UserRoleEnum.GUEST],
     },
     {
@@ -57,6 +59,7 @@ export const appRoutes: AppRouteType[] = [
         hidden: true, // Hide from sidebar as it's accessed via app bar
         authGuard: true,
         useLayout: true,
+        roles: [UserRoleEnum.GUEST],
     },
     {
         to: "/dashboard",
@@ -80,7 +83,7 @@ export const appRoutes: AppRouteType[] = [
                 <AddAlertOutlinedIcon />
             </IconButton>
         ),
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
     },
     {
         to: "/sales-history",
@@ -92,7 +95,7 @@ export const appRoutes: AppRouteType[] = [
                 <ManageAccountsOutlinedIcon />
             </IconButton>
         ),
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
     },
     {
         to: "/sales-history/:id/view",
@@ -114,6 +117,7 @@ export const appRoutes: AppRouteType[] = [
         ),
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
     },
+
     // Users management
     {
         to: "/users",
@@ -137,7 +141,7 @@ export const appRoutes: AppRouteType[] = [
     {
         to: "/user/new",
         title: "createUser",
-        element: UserFormScreen,
+        element: AddUserScreen,
         hidden: true,
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
     },
@@ -186,7 +190,7 @@ export const appRoutes: AppRouteType[] = [
         roles: [UserRoleEnum.MANAGER],
     },
 
-    // Auth pages
+    // Public Routes
     {
         to: "/login",
         // pathKey: "routes.login",
@@ -197,15 +201,15 @@ export const appRoutes: AppRouteType[] = [
         roles: [UserRoleEnum.GUEST],
     },
 
-    // {
-    //   to: "/register",
-    //   title: "Register Screen",
-    //   element: RegisterScreen,
-    //   useLayout: false,
-    //   authGuard: false,
-    //   hidden: true,
-    //   roles: [UserRoleEnum.GUEST],
-    // },
+    {
+        to: "/register",
+        title: "Register Screen",
+        element: RegisterScreen,
+        useLayout: false,
+        authGuard: false,
+        hidden: true,
+        roles: [UserRoleEnum.GUEST],
+    },
     // {
     //   to: "/reset-password",
     //   title: "Reset Password",
@@ -217,10 +221,10 @@ export const appRoutes: AppRouteType[] = [
     // Error Pages
     {
         to: "*",
-        // pathKey: "routes.notFound",
         title: "notFound",
         element: NotFoundScreen,
         hidden: true,
         useLayout: false,
+        roles: [UserRoleEnum.GUEST],
     },
 ];

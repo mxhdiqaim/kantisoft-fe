@@ -32,7 +32,7 @@ const UsersPage = () => {
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
                 <Typography variant="h4">User Management</Typography>
                 {currentUser && (currentUser.role === "manager" || currentUser.role === "admin") && (
-                    <Button variant="contained" startIcon={<AddOutlined />} onClick={() => navigate("/users/create")}>
+                    <Button variant="contained" startIcon={<AddOutlined />} onClick={() => navigate("/user/new")}>
                         New User
                     </Button>
                 )}

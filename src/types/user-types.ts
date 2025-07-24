@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import { extendBaseSchema } from "@/types";
+import { STORE_TYPES } from "./store-types";
 // import { storeSchema } from "./store-types";
 
 // Password-specific validation rules
@@ -69,9 +70,21 @@ export const baseUserSchema = yup.object().shape({
 
 export const createUserSchema = baseUserSchema;
 
-export const _baseUserSchema = baseUserSchema.omit(["status"]);
+export const createUserSchemaWithoutStatusStoreIDRole = createUserSchema.omit(["status", "storeId", "role"]);
 
-export const updateUserSchema = _baseUserSchema.concat(
+export const registerUserSchema = createUserSchemaWithoutStatusStoreIDRole.concat(
+    yup.object().shape({
+        storeName: yup.string().required("Store name is required"),
+        storeType: yup
+            .string()
+            .oneOf(STORE_TYPES as string[], "Select a valid store type")
+            .required("Store type is required"),
+    }),
+);
+
+export const createUserSchemaWithoutStatus = baseUserSchema.omit(["status"]);
+
+export const updateUserSchema = createUserSchemaWithoutStatus.concat(
     yup.object().shape({
         password: yup.string().when({
             // The 'is' condition checks if the password field is not empty.
@@ -113,6 +126,7 @@ export const userSchema = extendBaseSchema(baseUserSchema);
 // Types
 export type CreateUserType = yup.InferType<typeof createUserSchema>;
 export type UpdateUserType = yup.InferType<typeof updateUserSchema>;
+export type RegisterUserType = yup.InferType<typeof registerUserSchema>;
 export type LoginUserType = yup.InferType<typeof loginUserType>;
 export type userType = yup.InferType<typeof userSchema>;
 export type UserType = Omit<userType, "password" | "confirmPassword">;

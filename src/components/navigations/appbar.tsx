@@ -24,8 +24,7 @@ import FullscreenExitOutlinedIcon from "@mui/icons-material/FullscreenExitOutlin
 import { useDispatch, useSelector } from "react-redux";
 import { useGetAllStoresQuery, useLogoutMutation } from "@/store/slice";
 import { selectActiveStore, setActiveStore } from "@/store/slice/store-slice";
-import { ExpandMoreOutlined, LogoutOutlined, PersonOutline, StorefrontOutlined } from "@mui/icons-material";
-import type { StoreType } from "@/types/store-types";
+import { LogoutOutlined, PersonOutline, StorefrontOutlined } from "@mui/icons-material";
 import { selectCurrentUser } from "@/store/slice/auth-slice";
 import { useNavigate } from "react-router-dom";
 import useNotifier from "@/hooks/useNotifier";
@@ -49,19 +48,19 @@ const AppbarComponent: FC<Props> = ({ toggleDrawer, drawerState }) => {
     const currentUser = useSelector(selectCurrentUser);
     const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
 
-    const [storeMenuAnchorEl, setStoreMenuAnchorEl] = useState<null | HTMLElement>(null);
-    const isStoreMenuOpen = Boolean(storeMenuAnchorEl);
+    // const [storeMenuAnchorEl, setStoreMenuAnchorEl] = useState<null | HTMLElement>(null);
+    // const isStoreMenuOpen = Boolean(storeMenuAnchorEl);
 
     const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState<null | HTMLElement>(null);
     const isProfileMenuOpen = Boolean(profileMenuAnchorEl);
 
-    const handleStoreMenuClick = (event: MouseEvent<HTMLElement>) => {
-        setStoreMenuAnchorEl(event.currentTarget);
-    };
+    // const handleStoreMenuClick = (event: MouseEvent<HTMLElement>) => {
+    //     setStoreMenuAnchorEl(event.currentTarget);
+    // };
 
-    const handleStoreMenuClose = () => {
-        setStoreMenuAnchorEl(null);
-    };
+    // const handleStoreMenuClose = () => {
+    //     setStoreMenuAnchorEl(null);
+    // };
 
     // 4. Handlers for the profile menu
     const handleProfileMenuClick = (event: MouseEvent<HTMLElement>) => {
@@ -83,20 +82,12 @@ const AppbarComponent: FC<Props> = ({ toggleDrawer, drawerState }) => {
         }
     };
 
-    // const handleMenuClick = (event: MouseEvent<HTMLElement>) => {
-    //     setAnchorEl(event.currentTarget);
+    // const handleStoreSelect = (store: StoreType) => {
+    //     // Dispatch the action to update the active store
+    //     dispatch(setActiveStore(store));
+    //     // handleMenuClose();
+    //     handleStoreMenuClose();
     // };
-
-    // const handleMenuClose = () => {
-    //     setAnchorEl(null);
-    // };
-
-    const handleStoreSelect = (store: StoreType) => {
-        // Dispatch the action to update the active store
-        dispatch(setActiveStore(store));
-        // handleMenuClose();
-        handleStoreMenuClose();
-    };
 
     // Effect to automatically set the first store as active if none is selected
     useEffect(() => {
@@ -138,27 +129,15 @@ const AppbarComponent: FC<Props> = ({ toggleDrawer, drawerState }) => {
                         ) : (
                             <Button
                                 id="store-selector-button"
-                                onClick={handleStoreMenuClick}
+                                // onClick={handleStoreMenuClick}
                                 startIcon={<StorefrontOutlined />}
-                                endIcon={<ExpandMoreOutlined />}
                                 sx={{ color: "text.primary", textTransform: "none" }}
                             >
                                 <Typography variant="subtitle2" fontWeight="bold">
-                                    {activeStore ? activeStore.name : "Select Store"}
+                                    {activeStore && activeStore.name}
                                 </Typography>
                             </Button>
                         )}
-                        <Menu anchorEl={storeMenuAnchorEl} open={isStoreMenuOpen} onClose={handleStoreMenuClose}>
-                            {stores?.map((store) => (
-                                <MenuItem
-                                    key={store.id}
-                                    onClick={() => handleStoreSelect(store)}
-                                    selected={store.id === activeStore?.id}
-                                >
-                                    {store.name}
-                                </MenuItem>
-                            ))}
-                        </Menu>
                     </Box>
                     <IconButton
                         aria-label="toggle fullscreen"

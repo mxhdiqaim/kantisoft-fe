@@ -1,4 +1,4 @@
-import ServerDown from "@/components/feedback/server-down";
+import ServerDown from "@/pages/feedbacks/server-down";
 
 import Spinner from "@/components/feedback/spinner";
 import { useAuthStatus } from "@/hooks/use-auth-status";

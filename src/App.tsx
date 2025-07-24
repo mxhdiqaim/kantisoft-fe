@@ -2,7 +2,7 @@ import { useEffect, type JSX } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import GuardedRoute from "@/routes/guarded-route";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorFallback from "@/pages/errors/fallback";
+import ErrorFallback from "@/pages/feedbacks/fallback";
 import Layout from "@/components/navigations/layouts";
 import { ScrollToTop, resolveChildren } from "@/utils";
 import { appRoutes, type AppRouteType } from "@/routes";

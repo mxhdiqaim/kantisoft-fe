@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import { extendBaseSchema } from "@/types";
 
-export const STORE_TYPES = ["restaurant", "pharmacy", "supermarket"] as const;
+export const STORE_TYPES: readonly string[] = ["restaurant", "pharmacy", "supermarket"] as const;
 
 // Base schema for a store, matching the backend
 export const baseStoreSchema = yup.object({
