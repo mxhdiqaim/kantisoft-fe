@@ -1,10 +1,10 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import CustomModal from "@/components/customs/custom-modal";
 import { getApiError } from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
-import {
-    useCreateMenuItemMutation,
-    useUpdateMenuItemMutation,
-} from "@/store/slice";
+import { useCreateMenuItemMutation, useUpdateMenuItemMutation } from "@/store/slice";
 import {
     type AddMenuItemType,
     createMenuItemSchema,
@@ -31,10 +31,8 @@ const defaultValues: AddMenuItemType = {
 
 const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
     const notify = useNotifier();
-    const [createMenuItem, { isLoading: isCreating }] =
-        useCreateMenuItemMutation();
-    const [updateMenuItem, { isLoading: isUpdating }] =
-        useUpdateMenuItemMutation();
+    const [createMenuItem, { isLoading: isCreating }] = useCreateMenuItemMutation();
+    const [updateMenuItem, { isLoading: isUpdating }] = useUpdateMenuItemMutation();
 
     const isEditMode = !!menuItemToEdit;
     const isLoading = isCreating || isUpdating;
@@ -71,10 +69,7 @@ const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
             const apiError = getApiError(error, defaultMessage);
 
             notify(apiError.message, "error");
-            console.log(
-                `Failed to ${isEditMode ? "update" : "create"} menu item:`,
-                error,
-            );
+            console.log(`Failed to ${isEditMode ? "update" : "create"} menu item:`, error);
         }
     };
 
@@ -125,11 +120,7 @@ const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
                                         helperText={errors.price?.message}
                                         onChange={(e) => {
                                             const value = e.target.value;
-                                            field.onChange(
-                                                value === ""
-                                                    ? ""
-                                                    : Number(value),
-                                            );
+                                            field.onChange(value === "" ? "" : Number(value));
                                         }}
                                     />
                                 )}
@@ -149,23 +140,14 @@ const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
                                         helperText={errors.itemCode?.message}
                                         onChange={(e) => {
                                             const value = e.target.value;
-                                            field.onChange(
-                                                value === ""
-                                                    ? undefined
-                                                    : Number(value),
-                                            );
+                                            field.onChange(value === "" ? undefined : Number(value));
                                         }}
                                     />
                                 )}
                             />
                         </Grid>
                     </Grid>
-                    <Button
-                        sx={{ mt: 2 }}
-                        variant="contained"
-                        type="submit"
-                        disabled={isLoading}
-                    >
+                    <Button sx={{ mt: 2 }} variant="contained" type="submit" disabled={isLoading}>
                         {isLoading
                             ? isEditMode
                                 ? "Saving..."

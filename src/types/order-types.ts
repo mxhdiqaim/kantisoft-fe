@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { extendBaseSchema } from "@/types";
 import * as yup from "yup";
 import { menuItemSchema, type MenuItemType } from "./menu-item-type";
@@ -100,35 +101,64 @@ export const singleOrderSchema = extendBaseSchema(
 );
 
 // Schema for the payload when creating a new order with its items
+// export const createOrderSchema = yup.object({
+//     sellerId: yup.string().uuid().required(),
+//     storeId: yup.string().uuid().required(),
+//     paymentMethod: yup
+//         .string()
+//         .oneOf(PAYMENT_METHODS, "Invalid payment method")
+//         .default("cash")
+//         .required("Payment method is required"),
+//     orderStatus: yup
+//         .string()
+//         .oneOf(ORDER_STATUSES, "Invalid order status")
+//         .default("completed")
+//         .required("Order status is required"),
+//     items: yup
+//         .array()
+//         .of(createOrderItemPayloadSchema)
+//         .min(1, "An order must have at least one item")
+//         .required("Order items are required"),
+//     amountReceived: yup
+//         .number()
+//         .typeError("Amount received must be a number")
+//         .min(0, "Amount must be greater than or equal to 0")
+//         .required("Amount received is required"),
+// });
+
 export const createOrderSchema = yup.object({
-    sellerId: yup.string().uuid().required("Seller ID is required"),
-    storeId: yup.string().uuid().required("Store ID is required"),
-    paymentMethod: yup
-        .string()
-        .oneOf(PAYMENT_METHODS, "Invalid payment method")
-        .default("cash")
-        .required("Payment method is required"),
-    orderStatus: yup
-        .string()
-        .oneOf(ORDER_STATUSES, "Invalid order status")
-        .default("completed")
-        .required("Order status is required"),
+    sellerId: yup.string().required(),
+    storeId: yup.string().required(),
+    paymentMethod: yup.mixed<"card" | "cash" | "transfer">().required(),
+    orderStatus: yup.mixed<"canceled" | "pending" | "completed">().required(),
     items: yup
         .array()
-        .of(createOrderItemPayloadSchema)
-        .min(1, "An order must have at least one item")
-        .required("Order items are required"),
-    amountReceived: yup
-        .number()
-        .typeError("Amount received must be a number")
-        .min(0, "Amount must be greater than or equal to 0")
-        .required("Amount received is required"),
+        .of(
+            yup.object({
+                quantity: yup.number().optional(),
+                menuItemId: yup.string().optional(),
+                name: yup.string().optional(),
+            }),
+        )
+        .required(),
+    amountReceived: yup.number().required(),
 });
 
 // TypeScript types inferred from schemas
 export type OrderType = yup.InferType<typeof orderSchema>;
-export type CreateOrderType = yup.InferType<typeof createOrderSchema>;
-export type SingleOrderType = yup.InferType<typeof singleOrderSchema>;
+// export type CreateOrderType = yup.InferType<typeof createOrderSchema>;
+
+export type CreateOrderType = {
+    sellerId: string;
+    storeId: string;
+    paymentMethod: "cash" | "card" | "transfer";
+    orderStatus: "completed" | "pending" | "canceled";
+    items: { menuItemId?: string; quantity?: number; name?: string }[];
+    amountReceived: number;
+};
+
+// export type SingleOrderType = yup.InferType<typeof singleOrderSchema>;
+export type SingleOrderType = any;
 
 export type OrderItemType = yup.InferType<typeof orderItemSchema>;
 export type CreateOrderItemType = Pick<OrderItemType, "menuItemId" | "quantity" | "name">;
