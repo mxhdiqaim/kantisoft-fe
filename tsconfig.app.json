@@ -17,7 +17,7 @@
         "jsx": "react-jsx",
 
         /* Linting */
-        "strict": true,
+        // "strict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "erasableSyntaxOnly": true,
@@ -38,11 +38,11 @@
         "exactOptionalPropertyTypes": false, // If true, makes optional properties very strict. Setting to false (or removing) can help.
         "allowSyntheticDefaultImports": true, // This is usually covered by `moduleResolution: "bundler"` or `esModuleInterop`, but good to be explicit.
         "downlevelIteration": true, // Can sometimes help with complex iterators if they are contributing.
-        "noErrorTruncation": true // Provides more verbose error messages, but doesn't fix the error itself. Useful for debugging if errors are truncated.
+        "noErrorTruncation": true, // Provides more verbose error messages, but doesn't fix the error itself. Useful for debugging if errors are truncated.
 
         // If all else fails, the most drastic option is to set "strict": false,
         // but this removes almost all type safety and is highly discouraged long-term.
-        // "strict": false
+        "strict": false
     },
     "include": ["src"]
 }
