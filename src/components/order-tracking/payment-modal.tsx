@@ -64,7 +64,6 @@ const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: P
     const isCashPaymentInsufficient = paymentMethod === "cash" && amountReceived < total;
 
     const onSubmit = (data: CreateOrderType) => {
-        console.log("Form submitted with data:", data);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { amountReceived, ...orderData } = data;
         onCompleteSale(orderData);

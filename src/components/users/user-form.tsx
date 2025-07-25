@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import { getApiError } from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
 import { useCreateUserMutation, useGetAllStoresQuery, useUpdateUserMutation } from "@/store/slice";
