@@ -1,17 +1,9 @@
 import { getApiError } from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
-import { useCreateUserMutation, useGetAllStoresQuery, useUpdateUserMutation } from "@/store/slice";
+import { useCreateUserMutation, useGetAllStoresQuery } from "@/store/slice";
 import { selectCurrentUser } from "@/store/slice/auth-slice";
 import type { StoreType } from "@/types/store-types";
-import {
-    createUserSchema,
-    type CreateUserType,
-    updateUserSchema,
-    type UpdateUserType,
-    USER_ROLES,
-    UserRoleEnum,
-    type UserType,
-} from "@/types/user-types";
+import { createUserSchema, type CreateUserType, USER_ROLES, UserRoleEnum } from "@/types/user-types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ArrowBackIosNewOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
 import {
@@ -35,67 +27,50 @@ import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-interface Props {
-    userToEdit?: UserType;
-}
-
-const UserForm = ({ userToEdit }: Props) => {
+const CreateUserForm = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const notify = useNotifier();
     const currentUser = useSelector(selectCurrentUser);
     const [showPassword, setShowPassword] = useState(false);
 
-    const isEditMode = Boolean(userToEdit);
-
     const { data: stores, isLoading: isLoadingStores } = useGetAllStoresQuery();
 
-    const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
-    const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
-    const isLoading = isCreating || isUpdating;
+    const [createUser, { isLoading }] = useCreateUserMutation();
 
     const defaultValues = useMemo(
         () => ({
-            firstName: userToEdit?.firstName || "",
-            lastName: userToEdit?.lastName || "",
-            email: userToEdit?.email || "",
-            phone: userToEdit?.phone || "",
-            role: userToEdit?.role || UserRoleEnum.USER,
-            storeId: userToEdit?.storeId || currentUser?.storeId || "",
+            firstName: "",
+            lastName: "",
+            email: "",
+            phone: "",
+            role: UserRoleEnum.USER,
+            storeId: currentUser?.storeId || "",
             password: "",
             confirmPassword: "",
         }),
-        [userToEdit, currentUser],
+        [currentUser],
     );
 
     const {
         control,
         handleSubmit,
         formState: { errors },
-    } = useForm({
+    } = useForm<CreateUserType>({
         defaultValues,
         mode: "onChange",
-        resolver: yupResolver(isEditMode ? updateUserSchema : createUserSchema),
+        // eslint-disable-next-line
+        // @ts-ignore
+        resolver: yupResolver(createUserSchema),
     });
 
-    const onSubmit = async (data: CreateUserType | UpdateUserType) => {
-        console.log("first");
+    const onSubmit = async (data: CreateUserType) => {
         try {
-            if (isEditMode && userToEdit) {
-                // If password is not being changed, don't send it in the payload
-                const payload = { ...data };
-                if (!payload.password) {
-                    delete payload.password;
-                }
-                await updateUser({ id: userToEdit.id, ...payload }).unwrap();
-                notify("User updated successfully!", "success");
-            } else {
-                await createUser(data as CreateUserType).unwrap();
-                notify("User created successfully!", "success");
-            }
+            await createUser(data).unwrap();
+            notify("User created successfully!", "success");
             navigate("/users");
         } catch (error) {
-            const defaultMessage = `Failed to ${isEditMode ? "update" : "create"} user.`;
+            const defaultMessage = `Failed to create user.`;
             const apiError = getApiError(error, defaultMessage);
             notify(apiError.message, "error");
         }
@@ -108,7 +83,7 @@ const UserForm = ({ userToEdit }: Props) => {
                 Go back
             </Button>
             <Typography variant="h4" sx={{ mb: 3 }}>
-                {isEditMode ? "Edit User" : "Create New User"}
+                Create New User
             </Typography>
 
             <Paper
@@ -191,7 +166,7 @@ const UserForm = ({ userToEdit }: Props) => {
                                 <TextField
                                     {...field}
                                     fullWidth
-                                    label={isEditMode ? "New Password (Optional)" : "Password"}
+                                    label={"Password"}
                                     type={showPassword ? "text" : "password"}
                                     error={!!errors.password}
                                     helperText={errors.password?.message}
@@ -269,7 +244,7 @@ const UserForm = ({ userToEdit }: Props) => {
                     </Grid>
                     <Grid size={12}>
                         <Button variant="contained" type="submit" disabled={isLoading}>
-                            {isLoading ? "Saving..." : isEditMode ? "Save Changes" : "Create User"}
+                            {isLoading ? "Saving..." : "Create User"}
                         </Button>
                     </Grid>
                 </Grid>
@@ -278,4 +253,4 @@ const UserForm = ({ userToEdit }: Props) => {
     );
 };
 
-export default UserForm;
+export default CreateUserForm;
