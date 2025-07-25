@@ -7,10 +7,6 @@
         "lib": ["ES2022", "DOM", "DOM.Iterable"],
         "module": "ESNext",
         "skipLibCheck": true,
-        "noImplicitAny": false,
-        "strictNullChecks": false,
-        "downlevelIteration": true,
-        "noErrorTruncation": true,
 
         /* Bundler mode */
         "moduleResolution": "bundler",
@@ -32,7 +28,21 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"]
-        }
+        },
+
+        // =======================================================
+        // ADD / MODIFY THESE OPTIONS TO BYPASS DEEP TYPE ERRORS
+        // =======================================================
+        "noImplicitAny": false, // Allows parameters/variables to implicitly be 'any' if type can't be inferred. Fixes TS7006 directly and might help TS2589.
+        "strictNullChecks": false, // Disables strict null checking. Can sometimes alleviate deep inference issues involving null/undefined.
+        "exactOptionalPropertyTypes": false, // If true, makes optional properties very strict. Setting to false (or removing) can help.
+        "allowSyntheticDefaultImports": true, // This is usually covered by `moduleResolution: "bundler"` or `esModuleInterop`, but good to be explicit.
+        "downlevelIteration": true, // Can sometimes help with complex iterators if they are contributing.
+        "noErrorTruncation": true // Provides more verbose error messages, but doesn't fix the error itself. Useful for debugging if errors are truncated.
+
+        // If all else fails, the most drastic option is to set "strict": false,
+        // but this removes almost all type safety and is highly discouraged long-term.
+        // "strict": false
     },
     "include": ["src"]
 }
