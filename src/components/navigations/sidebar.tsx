@@ -1,7 +1,18 @@
-import { useState, Fragment, type FC } from "react";
+import { appRoutes, type AppRouteType } from "@/routes";
+import { useAppSelector } from "@/store";
+import { useGetAllStoresQuery, useLogoutMutation } from "@/store/slice";
+import { selectCurrentUser } from "@/store/slice/auth-slice";
+import { selectActiveStore, setActiveStore } from "@/store/slice/store-slice";
+import { LogoutOutlined, StorefrontOutlined } from "@mui/icons-material";
+
+import CancelIcon from "@mui/icons-material/Cancel";
+
+import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
+import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import {
     Box,
     Button,
+    CircularProgress,
     Collapse,
     Divider,
     Drawer,
@@ -12,21 +23,14 @@ import {
     ListItemText,
     type SxProps,
     type Theme,
+    Typography,
     useTheme,
 } from "@mui/material";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { appRoutes, type AppRouteType } from "@/routes";
-import type { Props as AppBarProps } from "./appbar";
-
-import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
-import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
-import { LogoutOutlined } from "@mui/icons-material";
-
-import CancelIcon from "@mui/icons-material/Cancel";
-import { useLogoutMutation } from "@/store/slice";
+import { type FC, Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { selectCurrentUser } from "@/store/slice/auth-slice";
-import { useAppSelector } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import type { Props as AppBarProps } from "./appbar";
 
 interface Props extends AppBarProps {
     sx?: SxProps<Theme>;
@@ -38,8 +42,12 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
     const theme = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [logout, { isLoading }] = useLogoutMutation();
     const currentUser = useAppSelector(selectCurrentUser);
+    // Fetch all available stores from the API
+    const { data: stores, isLoading: isLoadingStores } = useGetAllStoresQuery();
+    const activeStore = useSelector(selectActiveStore);
 
     const handleLogout = async () => {
         try {
@@ -153,6 +161,11 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
         );
     };
 
+    useEffect(() => {
+        if (!activeStore && stores && stores.length > 0) {
+            dispatch(setActiveStore(stores[0]));
+        }
+    }, [activeStore, stores, dispatch]);
     return (
         <Drawer
             variant="permanent"
@@ -184,34 +197,33 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                     </Button>
                 </Box>
                 <ListItem sx={{ width: "100%" }}>
-                    <ListItemButton
-                        component={Link}
-                        to={"/"}
-                        sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                        }}
-                    >
-                        <ListItemIcon>
-                            <img src="/images/SmartStock.svg" width={200} alt="Restaurant POS" />
-                        </ListItemIcon>
-                        <ListItemText />
-                    </ListItemButton>
+                    {isLoadingStores ? (
+                        <CircularProgress size={24} />
+                    ) : (
+                        <ListItemButton
+                            // component={Link}
+                            // to={"/home"}
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                color: "text.primary",
+                                textTransform: "none",
+                            }}
+                        >
+                            <StorefrontOutlined sx={{ mr: 1 }} />
+                            <Typography variant="subtitle2" fontWeight="bold">
+                                {activeStore && activeStore.name}
+                            </Typography>
+                            <ListItemText />
+                        </ListItemButton>
+                    )}
                 </ListItem>
 
                 <Divider sx={{ display: { xs: "none", md: "block" } }} />
 
                 {/* Routes rendering */}
                 <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
-                    {/* {appRoutes.map((route, index) => {
-                        const authGuard = route.authGuard ?? true;
-                        const withLayout = route.useLayout ?? true;
-
-                        if (route.hidden || !authGuard || !withLayout) return;
-
-                        return renderMenuItem(route, index);
-                    })} */}
                     {appRoutes
                         .filter((route) => {
                             // Basic filtering for hidden/auth routes

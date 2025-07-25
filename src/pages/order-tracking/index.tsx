@@ -1,28 +1,25 @@
-import { useMemo, useState } from "react";
-import MenuIteFormmModal from "@/components/order-tracking/menu-item-form-modal";
 import MenuItem from "@/components/order-tracking/menu-item";
+import MenuIteFormmModal from "@/components/order-tracking/menu-item-form-modal";
 import OrderCart from "@/components/order-tracking/order-cart";
 import PaymentModal from "@/components/order-tracking/payment-modal";
-import useNotifier from "@/hooks/useNotifier";
-import type { CartItem } from "@/types/cart-item-type";
-import type { MenuItemType } from "@/types/menu-item-type";
-import { Box, Grid, Skeleton, TextField, Typography } from "@mui/material";
-import { useCreateOrderMutation, useGetMenuItemsQuery } from "@/store/slice";
 import MenuItemSkeleton from "@/components/spinners/manu-item-skeleton";
 import OrderCartSkeleton from "@/components/spinners/order-cart-skeleton";
-import type { CreateOrderType } from "@/types/order-types";
 import { getApiError } from "@/helpers/get-api-error";
+import useNotifier from "@/hooks/useNotifier";
+import { useCreateOrderMutation, useGetMenuItemsQuery } from "@/store/slice";
+import type { CartItem } from "@/types/cart-item-type";
+import type { MenuItemType } from "@/types/menu-item-type";
+import type { CreateOrderType } from "@/types/order-types";
+import { Box, Grid, Skeleton, TextField, Typography } from "@mui/material";
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const OrderTracking = () => {
     const notify = useNotifier();
-    const {
-        data: menuItems,
-        isLoading: isLoadingMenuItems,
-        isError,
-    } = useGetMenuItemsQuery();
+    const { t } = useTranslation();
+    const { data: menuItems, isLoading: isLoadingMenuItems, isError } = useGetMenuItemsQuery();
 
-    const [createOrder, { isLoading: isCreatingOrder }] =
-        useCreateOrderMutation();
+    const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
 
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
@@ -31,14 +28,10 @@ const OrderTracking = () => {
 
     const handleAddToCart = (item: MenuItemType) => {
         setCartItems((prev) => {
-            const existingItem = prev.find(
-                (cartItem) => cartItem.id === item.id,
-            );
+            const existingItem = prev.find((cartItem) => cartItem.id === item.id);
             if (existingItem) {
                 return prev.map((cartItem) =>
-                    cartItem.id === item.id
-                        ? { ...cartItem, quantity: cartItem.quantity + 1 }
-                        : cartItem,
+                    cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem,
                 );
             }
             return [...prev, { ...item, quantity: 1 }];
@@ -49,11 +42,7 @@ const OrderTracking = () => {
         if (quantity === 0) {
             handleRemoveItem(itemId);
         } else {
-            setCartItems((prev) =>
-                prev.map((item) =>
-                    item.id === itemId ? { ...item, quantity } : item,
-                ),
-            );
+            setCartItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, quantity } : item)));
         }
     };
 
@@ -73,9 +62,7 @@ const OrderTracking = () => {
         setPaymentDialogOpen(false);
     };
 
-    const handleCompleteSale = async (
-        orderData: Omit<CreateOrderType, "amountReceived">,
-    ) => {
+    const handleCompleteSale = async (orderData: Omit<CreateOrderType, "amountReceived">) => {
         try {
             await createOrder(orderData).unwrap();
             notify("Order completed successfully!", "success");
@@ -90,9 +77,7 @@ const OrderTracking = () => {
     };
 
     const filteredMenuItems = useMemo(() => {
-        return (menuItems ?? []).filter((item) =>
-            item.name.toLowerCase().includes(searchQuery.toLowerCase()),
-        );
+        return (menuItems ?? []).filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
     }, [menuItems, searchQuery]);
 
     if (isLoadingMenuItems) {
@@ -105,10 +90,7 @@ const OrderTracking = () => {
                         </Grid>
                         <Grid container spacing={2}>
                             {Array.from(new Array(9)).map((_, index) => (
-                                <Grid
-                                    size={{ xs: 12, sm: 6, md: 4 }}
-                                    key={index}
-                                >
+                                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
                                     <MenuItemSkeleton />
                                 </Grid>
                             ))}
@@ -123,11 +105,7 @@ const OrderTracking = () => {
     }
 
     if (isError) {
-        return (
-            <Typography color="error">
-                Failed to load menu items. Please try again later.
-            </Typography>
-        );
+        return <Typography color="error">Failed to load menu items. Please try again later.</Typography>;
     }
 
     return (
@@ -144,14 +122,28 @@ const OrderTracking = () => {
                         />
                     </Grid>
                     <Grid container spacing={2} mt={2}>
-                        {filteredMenuItems.map((item) => (
-                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.id}>
-                                <MenuItem
-                                    item={item}
-                                    onAddToCart={handleAddToCart}
-                                />
-                            </Grid>
-                        ))}
+                        {filteredMenuItems.length > 0 ? (
+                            filteredMenuItems.map((item) => (
+                                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.id}>
+                                    <MenuItem item={item} onAddToCart={handleAddToCart} />
+                                </Grid>
+                            ))
+                        ) : (
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    background: "red",
+                                    height: "60vh",
+                                    width: "100%",
+                                }}
+                            >
+                                <Typography variant={"h4"}>
+                                    No {t("item")} found, Please add {t("item")}
+                                </Typography>
+                            </Box>
+                        )}
                     </Grid>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
@@ -170,10 +162,7 @@ const OrderTracking = () => {
                 cartItems={cartItems}
                 isLoading={isCreatingOrder}
             />
-            <MenuIteFormmModal
-                open={addMenuItemOpen}
-                onClose={() => setAddMenuItemOpen(false)}
-            />
+            <MenuIteFormmModal open={addMenuItemOpen} onClose={() => setAddMenuItemOpen(false)} />
         </Box>
     );
 };
