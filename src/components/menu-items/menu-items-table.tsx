@@ -1,16 +1,20 @@
-import { Box, IconButton, Menu, MenuItem as MuiMenuItem, Tooltip, Typography } from "@mui/material";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import { EditOutlined, MoreVert, DeleteOutline } from "@mui/icons-material";
 import CustomNoRowsOverlay from "@/components/customs/custom-no-rows-overlay";
-import { useTheme } from "@mui/material";
-import { useMemo, useState, type MouseEvent } from "react";
-import { ngnFormatter } from "@/utils";
-import type { MenuItemType } from "@/types/menu-item-type";
-import { useDeleteMenuItemMutation } from "@/store/slice";
 import useNotifier from "@/hooks/useNotifier";
-import TableStyledBox from "../ui/table-styled-box";
 import { useAppSelector } from "@/store";
+import { useDeleteMenuItemMutation } from "@/store/slice";
 import { selectCurrentUser } from "@/store/slice/auth-slice";
+import type { MenuItemType } from "@/types/menu-item-type";
+import { ngnFormatter } from "@/utils";
+
+import { getExportFormattedData } from "@/utils/table-export-utils";
+import { DeleteOutline, EditOutlined, FileDownloadOutlined, MoreVert } from "@mui/icons-material";
+import { Box, Button, IconButton, Menu, MenuItem as MuiMenuItem, Tooltip, Typography, useTheme } from "@mui/material";
+import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { saveAs } from "file-saver";
+import { type MouseEvent, useMemo, useState } from "react";
+
+import * as XLSX from "xlsx";
+import TableStyledBox from "../ui/table-styled-box";
 
 export interface Props {
     menuItems: MenuItemType[];
@@ -26,6 +30,9 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
     const [deleteMenuItem, { isLoading: isDeleting }] = useDeleteMenuItemMutation();
+
+    const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+    const isExportMenuOpen = Boolean(exportAnchorEl);
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
         setAnchorEl(event.currentTarget);
@@ -47,6 +54,66 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
         }
 
         handleMenuClose();
+    };
+
+    // Define custom formatters for MenuItemsTable
+    const menuItemsFieldFormatters = useMemo(
+        () => ({
+            itemCode: (row: MenuItemType) => row.itemCode,
+            name: (row: MenuItemType) => row.name,
+            price: (row: MenuItemType) => row.price, // Raw number
+            isAvailable: (row: MenuItemType) => (row.isAvailable ? "Yes" : "No"),
+        }),
+        [],
+    );
+
+    // Export to CSV function
+    const handleExportCsv = () => {
+        const dataToExport = getExportFormattedData(menuItems, columns, menuItemsFieldFormatters);
+
+        if (dataToExport.length === 0) {
+            notify("No data to export.", "error");
+            // alert('No data to export.');
+            setExportAnchorEl(null);
+            return;
+        }
+
+        const header = Object.keys(dataToExport[0]);
+        const csvContent = [
+            header.join(","),
+            ...dataToExport.map((row) =>
+                header.map((key) => `"${String(row[key] || "").replace(/"/g, '""')}"`).join(","),
+            ),
+        ].join("\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        saveAs(blob, `menu_items_data.csv`);
+        setExportAnchorEl(null);
+    };
+
+    // Export to XLSX function
+    const handleExportXlsx = () => {
+        const dataToExport = getExportFormattedData(menuItems, columns, menuItemsFieldFormatters);
+
+        if (dataToExport.length === 0) {
+            notify("No data to export.", "error");
+            // alert('No data to export.');
+            setExportAnchorEl(null);
+            return;
+        }
+
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Menu Items Data");
+
+        const colWidths = columns
+            .filter((col) => col.field !== "actions" && col.headerName)
+            .map((col) => ({ wch: (col.headerName?.toString().length || 15) + 5 }));
+
+        worksheet["!cols"] = colWidths;
+
+        XLSX.writeFile(workbook, `menu_items_data.xlsx`);
+        setExportAnchorEl(null);
     };
 
     const columns: GridColDef<MenuItemType>[] = useMemo(
@@ -194,6 +261,22 @@ const MenuItemsTable = ({ menuItems, loading, onEdit }: Props) => {
                 },
             }}
         >
+            <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+                {/* Export Button and Menu */}
+                <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<FileDownloadOutlined />}
+                    sx={{ height: 45, minWidth: 200 }}
+                    onClick={(event) => setExportAnchorEl(event.currentTarget)}
+                >
+                    Export
+                </Button>
+                <Menu anchorEl={exportAnchorEl} open={isExportMenuOpen} onClose={() => setExportAnchorEl(null)}>
+                    <MuiMenuItem onClick={handleExportCsv}>Export as CSV</MuiMenuItem>
+                    <MuiMenuItem onClick={handleExportXlsx}>Export as XLSX</MuiMenuItem>
+                </Menu>
+            </Box>
             <DataGrid
                 rows={menuItems}
                 columns={columns}

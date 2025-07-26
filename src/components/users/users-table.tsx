@@ -1,17 +1,19 @@
-import { useMemo, useState, type MouseEvent } from "react";
+import { useAppSelector } from "@/store";
+import { selectCurrentUser } from "@/store/slice/auth-slice";
 import { roleHierarchy, type UserType } from "@/types/user-types";
+
+import { EditOutlined, MoreVert, VisibilityOutlined } from "@mui/icons-material";
 import { Avatar, Chip, IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
 import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
+import { type MouseEvent, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomNoRowsOverlay from "../customs/custom-no-rows-overlay";
 import TableStyledBox from "../ui/table-styled-box";
-import { EditOutlined, MoreVert, VisibilityOutlined } from "@mui/icons-material";
-import { selectCurrentUser } from "@/store/slice/auth-slice";
-import { useAppSelector } from "@/store";
 
 export interface Props {
     users: UserType[];
     loading: boolean;
+    // columns: GridColDef[];
 }
 
 const UsersTable = ({ users, loading }: Props) => {
@@ -30,7 +32,7 @@ const UsersTable = ({ users, loading }: Props) => {
         setSelectedRowId(null);
     };
 
-    const columns: GridColDef[] = useMemo(
+    const internalColumns: GridColDef[] = useMemo(
         () => [
             {
                 field: "name",
@@ -175,12 +177,12 @@ const UsersTable = ({ users, loading }: Props) => {
                 },
             },
         ],
-        [anchorEl, selectedRowId, navigate],
+        [anchorEl, selectedRowId, navigate, currentUser],
     );
     return (
         <DataGrid
             rows={users ?? []}
-            columns={columns}
+            columns={internalColumns}
             loading={loading}
             slots={{
                 noRowsOverlay: CustomNoRowsOverlay,

@@ -134,7 +134,6 @@ const OrderTracking = () => {
                                     display: "flex",
                                     justifyContent: "center",
                                     alignItems: "center",
-                                    background: "red",
                                     height: "60vh",
                                     width: "100%",
                                 }}

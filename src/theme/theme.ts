@@ -1,5 +1,4 @@
-import { createTheme, responsiveFontSizes } from "@mui/material/styles";
-import { type ThemeOptions } from "@mui/material/styles";
+import { createTheme, responsiveFontSizes, type ThemeOptions } from "@mui/material/styles";
 import "@mui/x-data-grid/themeAugmentation";
 
 declare module "@mui/x-data-grid" {

@@ -1,17 +1,39 @@
-import { Box, IconButton, InputAdornment, Menu, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import { EditOutlined, MoreVert, PrintOutlined, VisibilityOutlined, Search as SearchIcon } from "@mui/icons-material";
 import CustomNoRowsOverlay from "@/components/customs/custom-no-rows-overlay";
-import { useTheme } from "@mui/material";
-import { useMemo, useState, type MouseEvent } from "react";
-import { relativeTime } from "@/utils/get-relative-time";
-import type { OrderType } from "@/types/order-types";
-import { ngnFormatter } from "@/utils";
-import { useNavigate } from "react-router-dom";
-import TableStyledBox from "../ui/table-styled-box";
-import { selectCurrentUser } from "@/store/slice/auth-slice";
+import useNotifier from "@/hooks/useNotifier.ts";
 import { useAppSelector } from "@/store";
+import { selectCurrentUser } from "@/store/slice/auth-slice";
+import type { OrderType } from "@/types/order-types";
 import { UserRoleEnum } from "@/types/user-types";
+import { ngnFormatter } from "@/utils";
+import { relativeTime } from "@/utils/get-relative-time";
+import { getExportFormattedData } from "@/utils/table-export-utils";
+import {
+    EditOutlined,
+    FileDownloadOutlined,
+    MoreVert,
+    PrintOutlined,
+    Search as SearchIcon,
+    VisibilityOutlined,
+} from "@mui/icons-material";
+import {
+    Box,
+    Button,
+    IconButton,
+    InputAdornment,
+    Menu,
+    MenuItem,
+    TextField,
+    Tooltip,
+    Typography,
+    useTheme,
+} from "@mui/material";
+import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { saveAs } from "file-saver";
+import { type MouseEvent, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import * as XLSX from "xlsx";
+import TableStyledBox from "../ui/table-styled-box";
 
 export interface Props {
     orders: OrderType[];
@@ -22,10 +44,14 @@ export interface Props {
 const SalesHistoryTable = ({ orders, loading, period }: Props) => {
     const theme = useTheme();
     const navigate = useNavigate();
+    const notify = useNotifier();
     const currentUser = useAppSelector(selectCurrentUser);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
     const [searchText, setSearchText] = useState("");
+
+    const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+    const isExportMenuOpen = Boolean(exportAnchorEl);
 
     const filteredOrders = useMemo(() => {
         if (!searchText) {
@@ -43,6 +69,70 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
     const handleMenuClose = () => {
         setAnchorEl(null);
         setSelectedRowId(null);
+    };
+
+    // Define custom formatters for SalesHistoryTable
+    const salesHistoryFieldFormatters = useMemo(
+        () => ({
+            reference: (row: OrderType) => row.reference || row.id,
+            seller: (row: OrderType) => `${row.seller.firstName} ${row.seller.lastName}`,
+            orderDate: (row: OrderType) => new Date(row.orderDate).toLocaleString(),
+            totalAmount: (row: OrderType) => row.totalAmount, // Keep as number for export calculations
+            paymentMethod: (row: OrderType) => row.paymentMethod,
+            orderStatus: (row: OrderType) => row.orderStatus,
+        }),
+        [],
+    );
+
+    // Export to CSV function
+    const handleExportCsv = () => {
+        // Use the generic utility function with specific formatters
+        const dataToExport = getExportFormattedData(filteredOrders, columns, salesHistoryFieldFormatters);
+
+        if (dataToExport.length === 0) {
+            notify("No data to export.", "error");
+            // alert('No data to export.');
+            setExportAnchorEl(null);
+            return;
+        }
+
+        const header = Object.keys(dataToExport[0]);
+        const csvContent = [
+            header.join(","),
+            ...dataToExport.map((row) =>
+                header.map((key) => `"${String(row[key] || "").replace(/"/g, '""')}"`).join(","),
+            ),
+        ].join("\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        saveAs(blob, `sales_history_${period.toLowerCase().replace(" ", "_")}.csv`);
+        setExportAnchorEl(null);
+    };
+
+    // Export to XLSX function
+    const handleExportXlsx = () => {
+        // Use the generic utility function with specific formatters
+        const dataToExport = getExportFormattedData(filteredOrders, columns, salesHistoryFieldFormatters);
+
+        if (dataToExport.length === 0) {
+            notify("No data to export.", "error");
+            // alert('No data to export.');
+            setExportAnchorEl(null);
+            return;
+        }
+
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sales History");
+
+        const colWidths = columns
+            .filter((col) => col.field !== "actions" && col.headerName)
+            .map((col) => ({ wch: (col.headerName?.toString().length || 15) + 5 }));
+
+        worksheet["!cols"] = colWidths;
+
+        XLSX.writeFile(workbook, `sales_history_${period.toLowerCase().replace(" ", "_")}.xlsx`);
+        setExportAnchorEl(null);
     };
 
     const columns: GridColDef[] = useMemo(
@@ -211,6 +301,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                     placeholder="Search by reference..."
                     value={searchText}
                     fullWidth
+                    sx={{ height: 45 }}
                     onChange={(e) => setSearchText(e.target.value)}
                     InputProps={{
                         startAdornment: (
@@ -220,6 +311,20 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                         ),
                     }}
                 />
+                {/* Export Button and Menu */}
+                <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<FileDownloadOutlined />}
+                    onClick={(event) => setExportAnchorEl(event.currentTarget)}
+                    sx={{ ml: 2, height: 45, minWidth: 200 }}
+                >
+                    Export
+                </Button>
+                <Menu anchorEl={exportAnchorEl} open={isExportMenuOpen} onClose={() => setExportAnchorEl(null)}>
+                    <MenuItem onClick={handleExportCsv}>Export as CSV</MenuItem>
+                    <MenuItem onClick={handleExportXlsx}>Export as XLSX</MenuItem>
+                </Menu>
             </Box>
             <DataGrid
                 rows={filteredOrders}
