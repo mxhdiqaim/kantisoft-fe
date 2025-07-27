@@ -1,5 +1,3 @@
-// src/components/sales-history/receipt.tsx
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { type OrderType } from "@/types/order-types"; // Assuming you have an OrderType
 import type { StoreType } from "@/types/store-types";
@@ -288,7 +286,7 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
                                 Price
                             </TableCell>
                             <TableCell align="right" sx={{ width: "30%" }}>
-                                Total
+                                Sub-Total
                             </TableCell>
                         </TableRow>
                     </TableHead>

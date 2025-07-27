@@ -25,7 +25,7 @@ const ViewSalesHistory = () => {
     const { data: stores, isLoading: isLoadingStores } = useGetAllStoresQuery();
     const activeStore = useSelector(selectActiveStore);
 
-    const loading = isOrdersLoading && isLoadingStores;
+    const loading = isOrdersLoading || isLoadingStores;
 
     const handlePrint = () => {
         window.print();
