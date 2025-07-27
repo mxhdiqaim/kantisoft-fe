@@ -245,7 +245,6 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                     const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
 
                     const handleView = () => {
-                        console.log(`View order: ${params.row.id}`);
                         navigate(`/sales-history/${params.row.id}/view`);
                         handleMenuClose();
                     };
@@ -259,7 +258,8 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                     };
 
                     const isGuest = currentUser?.role === UserRoleEnum.GUEST;
-                    const canEdit = !isGuest;
+                    const isPending = params.row.orderStatus === "pending";
+                    const canEdit = !isGuest && isPending;
 
                     return (
                         <>

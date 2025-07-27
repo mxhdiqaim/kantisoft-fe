@@ -11,6 +11,9 @@
     body * {
         visibility: hidden !important;
     }
+    .print-only {
+        display: none; /* Hide print-only elements by default on screen */
+    }
     .print-area,
     .print-area * {
         visibility: visible !important;
