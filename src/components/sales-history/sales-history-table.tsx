@@ -29,11 +29,16 @@ import {
 } from "@mui/material";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import { saveAs } from "file-saver";
-import { type MouseEvent, useMemo, useState } from "react";
+import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
 
 import * as XLSX from "xlsx";
 import TableStyledBox from "../ui/table-styled-box";
+import Receipt from "./receipt";
+import { useGetAllStoresQuery } from "@/store/slice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectActiveStore, setActiveStore } from "@/store/slice/store-slice";
 
 export interface Props {
     orders: OrderType[];
@@ -41,10 +46,11 @@ export interface Props {
     period: string;
 }
 
-const SalesHistoryTable = ({ orders, loading, period }: Props) => {
+const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const notify = useNotifier();
+    const dispatch = useDispatch();
     const currentUser = useAppSelector(selectCurrentUser);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -53,15 +59,36 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
     const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
     const isExportMenuOpen = Boolean(exportAnchorEl);
 
+    const [orderToPrint, setOrderToPrint] = useState<OrderType | null>(null);
+    const componentRef = useRef<HTMLDivElement>(null);
+
+    const { data: stores, isLoading: isLoadingStores } = useGetAllStoresQuery();
+    const activeStore = useSelector(selectActiveStore);
+
+    const loading = isLoadingOrders || isLoadingStores;
+
+    // Print hook
+    const handleReactToPrint = useReactToPrint({
+        contentRef: componentRef, // Specifies the component to print
+        documentTitle: `Receipt-${orderToPrint?.reference || orderToPrint?.id}`,
+        onAfterPrint: () => {
+            setOrderToPrint(null);
+            handleMenuClose();
+        },
+        // For thermal printers, adjust the page style, the Receipt component's internal CSS handles this
+        pageStyle: `
+            @page { size: 80mm auto; margin: 0; padding: 0; }
+            body { margin: 0; padding: 0; overflow: hidden; } /* Hide scrollbars during print preview */
+        `,
+    });
+
     const filteredOrders = useMemo(() => {
-        if (!searchText) {
-            return orders;
-        }
+        if (!searchText) return orders;
+
         return orders.filter((order) => (order.reference || order.id).toLowerCase().includes(searchText.toLowerCase()));
     }, [orders, searchText]);
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
-        console.log(`Clicked row: ${rowId}`);
         setAnchorEl(event.currentTarget);
         setSelectedRowId(rowId);
     };
@@ -252,9 +279,15 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                         console.log(`Edit order: ${params.row.id}`);
                         handleMenuClose();
                     };
-                    const handlePrint = () => {
-                        console.log(`Print receipt for order: ${params.row.id}`);
-                        handleMenuClose();
+
+                    const handlePrintReceipt = () => {
+                        const orderToFind = orders.find((order) => order.id === params.row.id);
+                        if (orderToFind) {
+                            setOrderToPrint(orderToFind);
+                        } else {
+                            notify("Order data not found for printing.", "error");
+                            handleMenuClose();
+                        }
                     };
 
                     const isGuest = currentUser?.role === UserRoleEnum.GUEST;
@@ -279,7 +312,7 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                                         Edit
                                     </MenuItem>
                                 )}
-                                <MenuItem onClick={handlePrint}>
+                                <MenuItem onClick={handlePrintReceipt}>
                                     <PrintOutlined sx={{ mr: 1 }} />
                                     Print
                                 </MenuItem>
@@ -289,11 +322,30 @@ const SalesHistoryTable = ({ orders, loading, period }: Props) => {
                 },
             },
         ],
-        [theme, anchorEl, selectedRowId],
+        [theme, anchorEl, selectedRowId, currentUser, orders, navigate, notify],
     );
+
+    useEffect(() => {
+        if (!activeStore && stores && stores.length > 0) {
+            dispatch(setActiveStore(stores[0]));
+        }
+    }, [activeStore, stores, dispatch]);
+
+    useEffect(() => {
+        if (orderToPrint) {
+            handleReactToPrint();
+        }
+    }, [orderToPrint, handleReactToPrint]);
 
     return (
         <Box>
+            <div style={{ display: "none" }}>
+                {orderToPrint && (
+                    <div ref={componentRef}>
+                        <Receipt order={orderToPrint} storeData={activeStore} />
+                    </div>
+                )}
+            </div>
             <Box sx={{ p: 2, display: "flex", justifyContent: "flex-start" }}>
                 <TextField
                     variant="outlined"
