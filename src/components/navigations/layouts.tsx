@@ -18,7 +18,7 @@ const Layout: FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: "flex", flexDirection: "row" }}>
             {/* Sidebar */}
             {showDrawer ? (
                 <CustomDrawer

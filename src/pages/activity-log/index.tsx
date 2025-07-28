@@ -1,5 +1,5 @@
 import { useGetActivitiesQuery } from "@/store/slice";
-import { Box, Paper, Typography, CircularProgress, Chip } from "@mui/material";
+import { Box, Paper, Typography, Chip } from "@mui/material";
 import { useAppSelector } from "@/store";
 import { selectCurrentUser } from "@/store/slice/auth-slice";
 import { UserRoleEnum } from "@/types/user-types";
@@ -8,6 +8,10 @@ import TableStyledBox from "@/components/ui/table-styled-box";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import CustomNoRowsOverlay from "@/components/customs/custom-no-rows-overlay";
 import { useTranslation } from "react-i18next";
+import ActivityLogSkeleton from "@/components/activity-log/loading";
+import ApiErrorDisplay from "@/components/feedback/api-error-display";
+import { getApiError } from "@/helpers/get-api-error";
+import useNotifier from "@/hooks/useNotifier";
 
 const getActionColor = (action: string) => {
     const lowerAction = action.toLowerCase();
@@ -22,34 +26,22 @@ const getActionColor = (action: string) => {
 
 const ActivityLogPage = () => {
     const { t } = useTranslation();
+    const notify = useNotifier();
     const currentUser = useAppSelector(selectCurrentUser);
 
     // Pagination state
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
 
-    const { data, isLoading, isError } = useGetActivitiesQuery({ limit: rowsPerPage, offset: page * rowsPerPage });
+    const { data, isLoading, isError, error } = useGetActivitiesQuery({
+        limit: rowsPerPage,
+        offset: page * rowsPerPage,
+    });
 
     if (!currentUser || ![UserRoleEnum.MANAGER, UserRoleEnum.ADMIN].includes(currentUser.role)) {
         return (
             <Box sx={{ p: 4 }}>
                 <Typography color="error">You do not have permission to view activity logs.</Typography>
-            </Box>
-        );
-    }
-
-    if (isLoading) {
-        return (
-            <Box sx={{ p: 4, textAlign: "center" }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
-
-    if (isError || !data) {
-        return (
-            <Box sx={{ p: 4 }}>
-                <Typography color="error">Failed to load activity logs. Please try again later.</Typography>
             </Box>
         );
     }
@@ -166,6 +158,16 @@ const ActivityLogPage = () => {
             id: entry.activityLog.id,
             ...entry,
         })) ?? [];
+
+    if (isLoading) {
+        return <ActivityLogSkeleton rows={10} columns={columns.length} />;
+    }
+
+    if (isError && !data) {
+        const apiError = getApiError(error, "Failed to load users. Please try again later.");
+        notify(apiError.message, "error");
+        return <ApiErrorDisplay statusCode={apiError.type} message={apiError.message} />;
+    }
 
     return (
         <Box sx={{ p: 2 }}>

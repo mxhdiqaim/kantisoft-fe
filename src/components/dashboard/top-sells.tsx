@@ -13,12 +13,14 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 interface Props {
     period: Period;
 }
 
 const TopSells = ({ period }: Props) => {
+    const { t } = useTranslation();
     const theme = useTheme();
     const { data: topSells, isLoading } = useGetTopSellsQuery({
         period,
@@ -34,7 +36,7 @@ const TopSells = ({ period }: Props) => {
 
     return (
         <Card sx={{ boxShadow: theme.customShadows.card, borderRadius: theme.borderRadius.small, height: "100%" }}>
-            <CardHeader title="Top Selling Products" subheader={`By revenue for this ${period}`} />
+            <CardHeader title={`Top Selling ${t("menuItems")}`} subheader={`By revenue for this ${period}`} />
             <Box sx={{ px: 2, mt: -2 }}>
                 <List disablePadding>
                     {topSells?.map((item, index) => {
