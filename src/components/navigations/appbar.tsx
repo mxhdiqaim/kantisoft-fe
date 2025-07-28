@@ -136,7 +136,7 @@ const AppbarComponent: FC<Props> = ({ toggleDrawer, drawerState }) => {
                         transformOrigin={{ horizontal: "right", vertical: "top" }}
                         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                     >
-                        <MenuItem onClick={() => navigate("/profile")}>
+                        <MenuItem onClick={() => navigate("/user/profile")}>
                             <PersonOutline sx={{ mr: 1 }} /> Profile
                         </MenuItem>
                         <Divider />
