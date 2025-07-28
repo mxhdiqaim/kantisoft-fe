@@ -18,6 +18,7 @@ import {
     ProfileScreen,
     RegisterScreen,
     ActivityLogScreen,
+    ChangePasswordScreen,
 } from "@/pages";
 import { DashboardOutlined } from "@mui/icons-material";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
@@ -55,9 +56,18 @@ export const appRoutes: AppRouteType[] = [
         roles: [UserRoleEnum.GUEST],
     },
     {
-        to: "/profile",
+        to: "/user/profile",
         title: "Profile",
         element: ProfileScreen,
+        hidden: true, // Hide from sidebar as it's accessed via app bar
+        authGuard: true,
+        useLayout: true,
+        roles: [UserRoleEnum.GUEST],
+    },
+    {
+        to: "/user/change-password",
+        title: "Change Password",
+        element: ChangePasswordScreen,
         hidden: true, // Hide from sidebar as it's accessed via app bar
         authGuard: true,
         useLayout: true,

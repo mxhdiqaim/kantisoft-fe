@@ -17,3 +17,4 @@ export { default as HomeScreen } from "./home";
 export { default as ProfileScreen } from "./profile";
 export { default as RegisterScreen } from "./auth/register";
 export { default as ActivityLogScreen } from "./activity-log";
+export { default as ChangePasswordScreen } from "./profile/change-password";
