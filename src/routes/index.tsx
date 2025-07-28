@@ -17,6 +17,7 @@ import {
     EditUserScreen,
     ProfileScreen,
     RegisterScreen,
+    ActivityLogScreen,
 } from "@/pages";
 import { DashboardOutlined } from "@mui/icons-material";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
@@ -24,6 +25,7 @@ import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlin
 import RestaurantMenuOutlinedIcon from "@mui/icons-material/RestaurantMenuOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import PlaylistAddCheckCircleOutlinedIcon from "@mui/icons-material/PlaylistAddCheckCircleOutlined";
 
 import { IconButton } from "@mui/material";
 import { type ComponentType, type ReactNode } from "react";
@@ -188,6 +190,18 @@ export const appRoutes: AppRouteType[] = [
         element: EditStoreScreen,
         hidden: true,
         roles: [UserRoleEnum.MANAGER],
+    },
+
+    {
+        to: "/activity-log",
+        title: "Activity Log",
+        element: ActivityLogScreen,
+        icon: (
+            <IconButton size={"medium"}>
+                <PlaylistAddCheckCircleOutlinedIcon />
+            </IconButton>
+        ),
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
     },
 
     // Public Routes

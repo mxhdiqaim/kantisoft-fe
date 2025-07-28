@@ -3,7 +3,8 @@
     "orderTracking": "Point of Sale",
     "salesHistory": "Store Sales",
     "viewSalesHistory": "View Sales History",
-    "menuItem": "Products",
+    "menuItem": "Product",
+    "menuItems": "Products",
     "item": "Product",
     "stores": "Stores",
     "users": "Users Management",
@@ -13,5 +14,15 @@
     "viewStore": "View Stores",
     "editStore": "Edit Stores",
     "login": "Login",
-    "notFound": "Not Found"
+    "notFound": "Not Found",
+    "settings": "Settings",
+    "profile": "Profile",
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "order": "Order",
+    "createOrder": "Create Order",
+    "viewOrder": "View Order",
+    "editOrder": "Edit Order",
+    "activityLog": "Activity Log",
+    "viewActivityLog": "View Activity Log"
 }
