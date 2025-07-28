@@ -3,7 +3,8 @@
     "orderTracking": "Prescription POS",
     "salesHistory": "Sales History",
     "viewSalesHistory": "View Sales History",
-    "menuItem": "Medication Stock",
+    "menuItem": "Medication",
+    "menuItems": "Medications",
     "item": "Medication",
     "stores": "Pharmacies",
     "users": "Users Management",
@@ -13,5 +14,15 @@
     "ViewStore": "View Pharmacies",
     "editStore": "Edit Pharmacies",
     "login": "Login",
-    "notFound": "Not Found"
+    "notFound": "Not Found",
+    "settings": "Settings",
+    "profile": "Profile",
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "order": "Order",
+    "createOrder": "Create Order",
+    "viewOrder": "View Order",
+    "editOrder": "Edit Order",
+    "activityLog": "Activity Log",
+    "viewActivityLog": "View Activity Log"
 }

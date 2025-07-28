@@ -1,5 +1,5 @@
 import { type FC, type ReactNode, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import AppbarComponent from "./appbar";
 import SideBar from "./sidebar";
 import useScreenSize from "@/hooks/use-screen-size";
@@ -8,6 +8,7 @@ import OfflineBanner from "@/components/feedback/offline-banner";
 
 const Layout: FC<{ children: ReactNode }> = ({ children }) => {
     const screenSize = useScreenSize();
+    const theme = useTheme();
     const [drawerState, setDrawerState] = useState(false);
 
     const showDrawer = screenSize === "mobile" || screenSize === "tablet";
@@ -39,7 +40,15 @@ const Layout: FC<{ children: ReactNode }> = ({ children }) => {
                 <AppbarComponent {...{ toggleDrawer, drawerState }} />
 
                 {/* Main content */}
-                <Box component="main" sx={{ flexGrow: 1, p: 2 }}>
+                <Box
+                    component="main"
+                    sx={{
+                        flexGrow: 1,
+                        p: 2,
+                        maxWidth: { xs: "100vw", md: `calc(100vw - ${theme.layout.sidebarWidth}px) !important` },
+                        // background: "red",
+                    }}
+                >
                     {children}
                 </Box>
             </Box>

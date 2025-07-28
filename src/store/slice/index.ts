@@ -18,6 +18,7 @@ import type { RootState } from "..";
 import { logOut, setCredentials } from "./auth-slice";
 import type { CreateUserType, RegisterUserType, UserType } from "@/types/user-types";
 import type { CreateStoreType, StoreType } from "@/types/store-types";
+import type { ActivityLogResponse } from "@/types";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -63,15 +64,7 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
             // Redirect to login page
             window.location.href = "/login";
         }
-        // // For subsequent calls that fail while logging out, we can return a custom error
-        // // or just the original error, but we prevent re-dispatching logout.
-        // return { error: { status: 401, data: "Session expired. Logging out." } };
     }
-
-    // // Reset the flag if a request succeeds after a login
-    // if (!result.error) {
-    //     isLoggingOut = false;
-    // }
 
     return result;
 };
@@ -81,7 +74,17 @@ export const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: baseQueryWithAuth,
     // Define tags for caching and automatic refetching
-    tagTypes: ["Order", "MenuItem", "User", "Summary", "TopSells", "InventorySummary", "SalesTrend", "Store"],
+    tagTypes: [
+        "Order",
+        "MenuItem",
+        "User",
+        "Summary",
+        "TopSells",
+        "InventorySummary",
+        "SalesTrend",
+        "Store",
+        "ActivityLog",
+    ],
     endpoints: (builder) => ({
         // Health Check Endpoint
         healthCheck: builder.query<{ status: string }, void>({
@@ -138,6 +141,14 @@ export const apiSlice = createApi({
                 method: "POST",
                 body,
             }),
+        }),
+
+        getActivities: builder.query<ActivityLogResponse, { limit?: number; offset?: number }>({
+            query: ({ limit = 20, offset = 0 } = {}) => ({
+                url: "/activities",
+                params: { limit, offset },
+            }),
+            providesTags: ["ActivityLog"],
         }),
 
         // Dashboard Endpoint
@@ -334,4 +345,7 @@ export const {
     useCreateStoreMutation,
     useUpdateStoreMutation,
     useDeleteStoreMutation,
+
+    // activity log hooks
+    useGetActivitiesQuery,
 } = apiSlice;
