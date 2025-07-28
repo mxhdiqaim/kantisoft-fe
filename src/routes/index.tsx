@@ -124,7 +124,7 @@ export const appRoutes: AppRouteType[] = [
     {
         to: "/users",
         // pathKey: "routes.users",
-        title: "users",
+        title: "usersManagement",
         element: UsersScreen,
         icon: (
             <IconButton size={"medium"}>

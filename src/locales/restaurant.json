@@ -7,7 +7,7 @@
     "menuItems": "Menu Items",
     "item": "Menu Item",
     "stores": "Restaurants",
-    "users": "Users Management",
+    "usersManagement": "Users Management",
     "createUser": "Create User",
     "store": "Restaurant",
     "createStore": "Create Restaurants",
@@ -24,5 +24,6 @@
     "viewOrder": "View Order",
     "editOrder": "Edit Order",
     "activityLog": "Activity Log",
-    "viewActivityLog": "View Activity Log"
+    "viewActivityLog": "View Activity Log",
+    "user": "User"
 }

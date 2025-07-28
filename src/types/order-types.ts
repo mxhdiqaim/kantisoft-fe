@@ -141,7 +141,11 @@ export const createOrderSchema = yup.object({
             }),
         )
         .required(),
-    amountReceived: yup.number().required(),
+    amountReceived: yup
+        .number()
+        .typeError("Amount received must be a number")
+        .min(0, "Amount must be greater than or equal to 0")
+        .required("Amount received is required"),
 });
 
 // TypeScript types inferred from schemas

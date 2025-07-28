@@ -7,7 +7,7 @@
     "menuItems": "Medications",
     "item": "Medication",
     "stores": "Pharmacies",
-    "users": "Users Management",
+    "usersManagement": "Users Management",
     "createUser": "Create User",
     "store": "Pharmacy",
     "createStore": "Create Pharmacies",
@@ -24,5 +24,6 @@
     "viewOrder": "View Order",
     "editOrder": "Edit Order",
     "activityLog": "Activity Log",
-    "viewActivityLog": "View Activity Log"
+    "viewActivityLog": "View Activity Log",
+    "user": "User"
 }

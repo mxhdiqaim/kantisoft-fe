@@ -7,7 +7,7 @@
     "menuItems": "Products",
     "item": "Product",
     "stores": "Stores",
-    "users": "Users Management",
+    "usersManagement": "Users Management",
     "createUser": "Create User",
     "store": "Store",
     "createStore": "Create Stores",
@@ -24,5 +24,6 @@
     "viewOrder": "View Order",
     "editOrder": "Edit Order",
     "activityLog": "Activity Log",
-    "viewActivityLog": "View Activity Log"
+    "viewActivityLog": "View Activity Log",
+    "user": "User"
 }
