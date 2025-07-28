@@ -3,7 +3,8 @@
     "orderTracking": "Order Tracking",
     "salesHistory": "Sales History",
     "viewSalesHistory": "View Sales History",
-    "menuItem": "Menu Items",
+    "menuItem": "Menu Item",
+    "menuItems": "Menu Items",
     "item": "Menu Item",
     "stores": "Restaurants",
     "users": "Users Management",
@@ -13,5 +14,15 @@
     "viewStore": "View Restaurants",
     "editStore": "Edit Restaurants",
     "login": "Login",
-    "notFound": "Not Found"
+    "notFound": "Not Found",
+    "settings": "Settings",
+    "profile": "Profile",
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "order": "Order",
+    "createOrder": "Create Order",
+    "viewOrder": "View Order",
+    "editOrder": "Edit Order",
+    "activityLog": "Activity Log",
+    "viewActivityLog": "View Activity Log"
 }

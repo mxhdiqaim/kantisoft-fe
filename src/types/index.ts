@@ -33,3 +33,38 @@ export const extendBaseSchema = <T extends yup.AnyObject>(fields: T): yup.Object
 };
 
 export type ErrCallbackType = (err: string) => void;
+
+export interface ActivityLogType {
+    id: string;
+    userId: string;
+    storeId: string;
+    action: string;
+    entityId?: string;
+    entityType?: string;
+    details: string;
+    isRead: boolean;
+    createdAt: string;
+}
+
+export interface ActivityLogUser {
+    firstName: string;
+    lastName: string;
+    role: string;
+}
+
+export interface ActivityLogStore {
+    name: string;
+}
+
+export interface ActivityLogEntry {
+    activityLog: ActivityLogType;
+    user?: ActivityLogUser;
+    store?: ActivityLogStore;
+}
+
+export interface ActivityLogResponse {
+    data: ActivityLogEntry[];
+    totalCount: number;
+    limit: number;
+    offset: number;
+}

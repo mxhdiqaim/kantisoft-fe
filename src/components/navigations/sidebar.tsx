@@ -170,10 +170,10 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
         <Drawer
             variant="permanent"
             sx={{
-                width: { xs: "100vw", md: theme.layout.sidebarWidth },
+                width: { xs: "100vw", md: `${theme.layout.sidebarWidth}px` },
                 flexShrink: 0,
                 "& .MuiDrawer-paper": {
-                    width: { xs: "100vw", md: theme.layout.sidebarWidth },
+                    width: { xs: "100vw", md: `${theme.layout.sidebarWidth}px` },
                     boxSizing: "border-box",
                 },
                 background: theme.palette.background.default,

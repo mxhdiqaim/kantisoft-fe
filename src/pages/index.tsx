@@ -16,3 +16,4 @@ export { default as EditStoreScreen } from "./stores/edit-store";
 export { default as HomeScreen } from "./home";
 export { default as ProfileScreen } from "./profile";
 export { default as RegisterScreen } from "./auth/register";
+export { default as ActivityLogScreen } from "./activity-log";

@@ -104,6 +104,11 @@ const UserForm = ({ userToEdit }: Props) => {
         }
     };
 
+    const availableRoles =
+        currentUser?.role === UserRoleEnum.ADMIN
+            ? USER_ROLES.filter((role) => role !== UserRoleEnum.ADMIN && role !== UserRoleEnum.MANAGER)
+            : USER_ROLES;
+
     return (
         <Box>
             <Button variant="text" onClick={() => navigate(-1)} sx={{ mb: 2 }}>
@@ -235,7 +240,7 @@ const UserForm = ({ userToEdit }: Props) => {
                                 control={control}
                                 render={({ field }) => (
                                     <Select {...field} labelId="role-select-label" label="Role">
-                                        {USER_ROLES.map((role) => (
+                                        {availableRoles.map((role) => (
                                             <MenuItem key={role} value={role} sx={{ textTransform: "capitalize" }}>
                                                 {role}
                                             </MenuItem>
