@@ -222,7 +222,7 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }} sx={{ my: 1 }}>
                     <Typography variant="body2" color="text.secondary">
-                        Seller
+                        Cashier
                     </Typography>
                     <Typography
                         variant="body1"

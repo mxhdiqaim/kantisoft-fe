@@ -143,6 +143,14 @@ export const apiSlice = createApi({
             }),
         }),
 
+        updatePassword: builder.mutation<{ message: string }, { oldPassword: string; newPassword: string }>({
+            query: (body) => ({
+                url: "/users/update-password",
+                method: "PATCH",
+                body,
+            }),
+        }),
+
         getActivities: builder.query<ActivityLogResponse, { limit?: number; offset?: number }>({
             query: ({ limit = 20, offset = 0 } = {}) => ({
                 url: "/activities",
@@ -339,6 +347,7 @@ export const {
     useDeleteUserMutation,
     useCreateUserMutation,
     useUpdateUserMutation,
+    useUpdatePasswordMutation,
     // Store Management Hooks
     useGetAllStoresQuery,
     useGetStoreByIdQuery,

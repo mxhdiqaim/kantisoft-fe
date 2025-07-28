@@ -104,10 +104,21 @@ const UserForm = ({ userToEdit }: Props) => {
         }
     };
 
-    const availableRoles =
-        currentUser?.role === UserRoleEnum.ADMIN
-            ? USER_ROLES.filter((role) => role !== UserRoleEnum.ADMIN && role !== UserRoleEnum.MANAGER)
-            : USER_ROLES;
+    let availableRoles: UserRoleEnum[] = [];
+    let canEditRole = true;
+
+    if (currentUser?.role === UserRoleEnum.MANAGER) {
+        availableRoles = USER_ROLES;
+        canEditRole = true;
+    } else if (currentUser?.role === UserRoleEnum.ADMIN) {
+        availableRoles = USER_ROLES.filter((role) => role === UserRoleEnum.USER || role === UserRoleEnum.GUEST);
+        // Admin cannot edit their own role
+        canEditRole = !isEditMode || (userToEdit && userToEdit.id !== currentUser.id);
+    } else {
+        // User and Guest cannot edit or select role
+        availableRoles = [];
+        canEditRole = false;
+    }
 
     return (
         <Box>
@@ -191,90 +202,115 @@ const UserForm = ({ userToEdit }: Props) => {
                             )}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <Controller
-                            name="password"
-                            control={control}
-                            render={({ field }) => (
+                    {!isEditMode && (
+                        <>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <Controller
+                                    name="password"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <TextField
+                                            {...field}
+                                            fullWidth
+                                            label={isEditMode ? "New Password (Optional)" : "Password"}
+                                            type={showPassword ? "text" : "password"}
+                                            error={!!errors.password}
+                                            helperText={errors.password?.message}
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <IconButton
+                                                            onClick={() => setShowPassword(!showPassword)}
+                                                            edge="end"
+                                                        >
+                                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <Controller
+                                    name="confirmPassword"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <TextField
+                                            {...field}
+                                            fullWidth
+                                            label="Confirm Password"
+                                            type={showPassword ? "text" : "password"}
+                                            error={!!errors.confirmPassword}
+                                            helperText={errors.confirmPassword?.message}
+                                        />
+                                    )}
+                                />
+                            </Grid>
+                        </>
+                    )}
+                    {canEditRole && (
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            {canEditRole ? (
+                                <FormControl fullWidth error={!!errors.role}>
+                                    <InputLabel id="role-select-label">Role</InputLabel>
+                                    <Controller
+                                        name="role"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select {...field} labelId="role-select-label" label="Role">
+                                                {availableRoles.map((role) => (
+                                                    <MenuItem
+                                                        key={role}
+                                                        value={role}
+                                                        sx={{ textTransform: "capitalize" }}
+                                                    >
+                                                        {role}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        )}
+                                    />
+                                    {errors.role && <FormHelperText>{errors.role.message}</FormHelperText>}
+                                </FormControl>
+                            ) : (
                                 <TextField
-                                    {...field}
+                                    label="Role"
+                                    value={userToEdit?.role || currentUser?.role}
                                     fullWidth
-                                    label={isEditMode ? "New Password (Optional)" : "Password"}
-                                    type={showPassword ? "text" : "password"}
-                                    error={!!errors.password}
-                                    helperText={errors.password?.message}
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                    }}
+                                    InputProps={{ readOnly: true }}
+                                    disabled
                                 />
                             )}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <Controller
-                            name="confirmPassword"
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    fullWidth
-                                    label="Confirm Password"
-                                    type={showPassword ? "text" : "password"}
-                                    error={!!errors.confirmPassword}
-                                    helperText={errors.confirmPassword?.message}
+                        </Grid>
+                    )}
+                    {currentUser?.role === UserRoleEnum.MANAGER && (
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <FormControl fullWidth error={!!errors.storeId}>
+                                <InputLabel id="store-select-label">Assigned Store</InputLabel>
+                                <Controller
+                                    name="storeId"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            {...field}
+                                            labelId="store-select-label"
+                                            label="Assigned Store"
+                                            disabled={isLoadingStores || currentUser?.role !== UserRoleEnum.MANAGER}
+                                        >
+                                            {stores?.map((store: StoreType) => (
+                                                <MenuItem key={store.id} value={store.id}>
+                                                    {store.name}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    )}
                                 />
-                            )}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <FormControl fullWidth error={!!errors.role}>
-                            <InputLabel id="role-select-label">Role</InputLabel>
-                            <Controller
-                                name="role"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select {...field} labelId="role-select-label" label="Role">
-                                        {availableRoles.map((role) => (
-                                            <MenuItem key={role} value={role} sx={{ textTransform: "capitalize" }}>
-                                                {role}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                )}
-                            />
-                            {errors.role && <FormHelperText>{errors.role.message}</FormHelperText>}
-                        </FormControl>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <FormControl fullWidth error={!!errors.storeId}>
-                            <InputLabel id="store-select-label">Assigned Store</InputLabel>
-                            <Controller
-                                name="storeId"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        {...field}
-                                        labelId="store-select-label"
-                                        label="Assigned Store"
-                                        disabled={isLoadingStores}
-                                    >
-                                        {stores?.map((store: StoreType) => (
-                                            <MenuItem key={store.id} value={store.id}>
-                                                {store.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                )}
-                            />
-                            {errors.storeId && <FormHelperText>{errors.storeId.message}</FormHelperText>}
-                        </FormControl>
-                    </Grid>
+                                {errors.storeId && <FormHelperText>{errors.storeId.message}</FormHelperText>}
+                            </FormControl>
+                        </Grid>
+                    )}
                     <Grid size={12}>
                         <Button variant="contained" type="submit" disabled={isLoading}>
                             {isLoading ? "Saving..." : isEditMode ? "Save Changes" : "Create User"}

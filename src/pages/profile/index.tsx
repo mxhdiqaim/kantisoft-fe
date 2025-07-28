@@ -89,6 +89,16 @@ const ProfilePage = () => {
                                 Edit Profile
                             </Button>
                         </Box>
+                        <Box sx={{ px: 2, pb: 2 }}>
+                            <Button
+                                fullWidth
+                                variant="outlined"
+                                startIcon={<EditOutlined />}
+                                onClick={() => navigate(`/user/change-password`)}
+                            >
+                                Change Password
+                            </Button>
+                        </Box>
                     </Card>
                 </Grid>
 
@@ -97,7 +107,7 @@ const ProfilePage = () => {
                     <Card>
                         <CardContent sx={{ p: 3 }}>
                             <Typography variant="h6" gutterBottom>
-                                Account Details
+                                Profile Details
                             </Typography>
                             <Divider sx={{ mb: 3 }} />
                             <Grid container spacing={3}>
