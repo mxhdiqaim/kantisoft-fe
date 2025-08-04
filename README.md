@@ -1,6 +1,14 @@
-# Store POS Frontend
+# Kantiga Frontend
 
 A modern Point of Sale (POS) frontend for stores & restaurants, built with React and TypeScript.
+
+## About Kantiga
+
+**Kantiga** is a name rooted in Hausa, one of Nigeria's major languages. It's a short, modern blend derived from **"Kantin Kirga"**, which translates to **"Counting Shop"** or **"Shop of Counting."**
+
+- **Pronunciation:** "Kahn-tee-gah" (with 'a' as in "car", and 'g' as in "go").
+
+Don't stress over it, it easy to pronouce.
 
 ## Features
 
