@@ -1,26 +1,26 @@
+import {getApiError} from "@/helpers/get-api-error";
+import useNotifier from "@/hooks/useNotifier";
+import {useRegisterManagerAndStoreMutation} from "@/store/slice";
+import {STORE_TYPES} from "@/types/store-types";
+import {createUserSchemaWithoutStatusStoreIDRole, type RegisterUserType} from "@/types/user-types";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {Visibility, VisibilityOff} from "@mui/icons-material";
 import {
     Box,
     Button,
-    TextField,
-    Typography,
     FormControl,
     FormHelperText,
     Grid,
-    MenuItem,
-    useTheme,
-    InputAdornment,
     IconButton,
+    InputAdornment,
+    MenuItem,
+    TextField,
+    Typography,
+    useTheme,
 } from "@mui/material";
-import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigate } from "react-router-dom";
-import { STORE_TYPES } from "@/types/store-types";
-import useNotifier from "@/hooks/useNotifier";
-import { createUserSchemaWithoutStatusStoreIDRole, type RegisterUserType } from "@/types/user-types";
-import { useRegisterManagerAndStoreMutation } from "@/store/slice";
-import { getApiError } from "@/helpers/get-api-error";
-import { useState } from "react";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import {useState} from "react";
+import {Controller, useForm} from "react-hook-form";
+import {useNavigate} from "react-router-dom";
 
 const defaultValues: RegisterUserType = {
     firstName: "",
@@ -38,14 +38,16 @@ const Register = () => {
     const notify = useNotifier();
     const theme = useTheme();
 
-    const [registerManagerAndStore, { isLoading }] = useRegisterManagerAndStoreMutation();
+    // const currentUser = useAppSelector(selectCurrentUser);
+
+    const [registerManagerAndStore, {isLoading}] = useRegisterManagerAndStoreMutation();
 
     const [showPassword, setShowPassword] = useState(false);
 
     const {
         control,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm<RegisterUserType>({
         defaultValues,
         mode: "onBlur",
@@ -55,11 +57,9 @@ const Register = () => {
     });
 
     const onSubmit = async (data: RegisterUserType) => {
-        console.log("Form Data:", data);
-        // TODO: Replace with your registration API call
         try {
             // eslint-disable-next-line
-            const { confirmPassword, ...rest } = data;
+            const {confirmPassword, ...rest} = data;
             await registerManagerAndStore(rest).unwrap();
             notify("Registration successful!", "success");
             navigate("/login");
@@ -69,6 +69,31 @@ const Register = () => {
             notify(apiMessage.message, "error");
         }
     };
+    //
+    // useEffect(() => {
+    //     if (currentUser) {
+    //         // Find the first accessible, non-hidden, primary route for the user's role.
+    //         // The appRoutes supposed to be ordered by precedence (most important routes first), for now they are just
+    //         const destinationRoute = appRoutes.find(
+    //             (route) =>
+    //                 !route.authGuard &&
+    //                 route.icon && // A good indicator of a primary navigation item
+    //                 route.roles?.includes(currentUser.role),
+    //         );
+    //
+    //         if (destinationRoute) {
+    //             // If a suitable page is found, redirect the user there.
+    //             navigate(destinationRoute.to, {replace: true});
+    //         } else {
+    //             // As a fallback, if no specific page is found for the user's role,
+    //             // send them to the login page.
+    //             navigate("/login", {replace: true});
+    //         }
+    //     } else {
+    //         // If there's no authenticated user, they must log in.
+    //         navigate("/login", {replace: true});
+    //     }
+    // }, [currentUser, navigate]);
 
     return (
         <Grid container spacing={2}>
@@ -79,51 +104,51 @@ const Register = () => {
                     justifyContent: "center",
                     alignItems: "center",
                     minHeight: "100vh",
-                    m: { xs: 3, md: 0 },
+                    m: {xs: 3, md: 0},
                 }}
             >
                 <Box
                     sx={{
                         width: "100%",
-                        maxWidth: { xs: "100%", sm: "400px" },
+                        maxWidth: {xs: "100%", sm: "400px"},
                     }}
                 >
-                    <Box sx={{ textAlign: "center", mb: 5 }}>
-                        <Typography variant="h5" sx={{ fontWeight: 500 }}>
+                    <Box sx={{textAlign: "center", mb: 5}}>
+                        <Typography variant="h5" sx={{fontWeight: 500}}>
                             Create an Account
                         </Typography>
                     </Box>
                     {/* eslint-disable-next-line */}
                     <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit as any)}>
-                        <FormControl fullWidth sx={{ mb: 2 }}>
+                        <FormControl fullWidth sx={{mb: 2}}>
                             <Controller
                                 name="firstName"
                                 control={control}
-                                render={({ field }) => (
-                                    <TextField {...field} label="First Name" error={!!errors.firstName} />
+                                render={({field}) => (
+                                    <TextField {...field} label="First Name" error={!!errors.firstName}/>
                                 )}
                             />
                             {errors.firstName && (
-                                <FormHelperText sx={{ color: "error.main" }}>{errors.firstName.message}</FormHelperText>
+                                <FormHelperText sx={{color: "error.main"}}>{errors.firstName.message}</FormHelperText>
                             )}
                         </FormControl>
-                        <FormControl fullWidth sx={{ mb: 2 }}>
+                        <FormControl fullWidth sx={{mb: 2}}>
                             <Controller
                                 name="lastName"
                                 control={control}
-                                render={({ field }) => (
-                                    <TextField {...field} label="Last Name" error={!!errors.lastName} />
+                                render={({field}) => (
+                                    <TextField {...field} label="Last Name" error={!!errors.lastName}/>
                                 )}
                             />
                             {errors.lastName && (
-                                <FormHelperText sx={{ color: "error.main" }}>{errors.lastName.message}</FormHelperText>
+                                <FormHelperText sx={{color: "error.main"}}>{errors.lastName.message}</FormHelperText>
                             )}
                         </FormControl>
-                        <FormControl fullWidth sx={{ mb: 2 }}>
+                        <FormControl fullWidth sx={{mb: 2}}>
                             <Controller
                                 name="email"
                                 control={control}
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <TextField
                                         {...field}
                                         label="Email"
@@ -134,14 +159,14 @@ const Register = () => {
                                 )}
                             />
                             {errors.email && (
-                                <FormHelperText sx={{ color: "error.main" }}>{errors.email.message}</FormHelperText>
+                                <FormHelperText sx={{color: "error.main"}}>{errors.email.message}</FormHelperText>
                             )}
                         </FormControl>
-                        <FormControl fullWidth sx={{ mb: 2 }}>
+                        <FormControl fullWidth sx={{mb: 2}}>
                             <Controller
                                 name="password"
                                 control={control}
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <TextField
                                         {...field}
                                         label="Password"
@@ -155,7 +180,7 @@ const Register = () => {
                                                         edge="end"
                                                         aria-label="toggle password visibility"
                                                     >
-                                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                        {showPassword ? <VisibilityOff/> : <Visibility/>}
                                                     </IconButton>
                                                 </InputAdornment>
                                             ),
@@ -164,14 +189,14 @@ const Register = () => {
                                 )}
                             />
                             {errors.password && (
-                                <FormHelperText sx={{ color: "error.main" }}>{errors.password.message}</FormHelperText>
+                                <FormHelperText sx={{color: "error.main"}}>{errors.password.message}</FormHelperText>
                             )}
                         </FormControl>
-                        <FormControl fullWidth sx={{ mb: 2 }}>
+                        <FormControl fullWidth sx={{mb: 2}}>
                             <Controller
                                 name="confirmPassword"
                                 control={control}
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <TextField
                                         {...field}
                                         label="Confirm Password"
@@ -185,7 +210,7 @@ const Register = () => {
                                                         edge="end"
                                                         aria-label="toggle confirm password visibility"
                                                     >
-                                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                        {showPassword ? <VisibilityOff/> : <Visibility/>}
                                                     </IconButton>
                                                 </InputAdornment>
                                             ),
@@ -194,16 +219,16 @@ const Register = () => {
                                 )}
                             />
                             {errors.confirmPassword && (
-                                <FormHelperText sx={{ color: "error.main" }}>
+                                <FormHelperText sx={{color: "error.main"}}>
                                     {errors.confirmPassword.message}
                                 </FormHelperText>
                             )}
                         </FormControl>
-                        <FormControl fullWidth sx={{ mb: 2 }}>
+                        <FormControl fullWidth sx={{mb: 2}}>
                             <Controller
                                 name="phone"
                                 control={control}
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <TextField
                                         {...field}
                                         label="Phone (optional)"
@@ -213,26 +238,26 @@ const Register = () => {
                                 )}
                             />
                             {errors.phone && (
-                                <FormHelperText sx={{ color: "error.main" }}>{errors.phone.message}</FormHelperText>
+                                <FormHelperText sx={{color: "error.main"}}>{errors.phone.message}</FormHelperText>
                             )}
                         </FormControl>
-                        <FormControl fullWidth sx={{ mb: 2 }}>
+                        <FormControl fullWidth sx={{mb: 2}}>
                             <Controller
                                 name="storeName"
                                 control={control}
-                                render={({ field }) => (
-                                    <TextField {...field} label="Store Name" error={!!errors.storeName} />
+                                render={({field}) => (
+                                    <TextField {...field} label="Store Name" error={!!errors.storeName}/>
                                 )}
                             />
                             {errors.storeName && (
-                                <FormHelperText sx={{ color: "error.main" }}>{errors.storeName.message}</FormHelperText>
+                                <FormHelperText sx={{color: "error.main"}}>{errors.storeName.message}</FormHelperText>
                             )}
                         </FormControl>
-                        <FormControl fullWidth sx={{ mb: 2 }}>
+                        <FormControl fullWidth sx={{mb: 2}}>
                             <Controller
                                 name="storeType"
                                 control={control}
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <TextField {...field} select label="Store Type" error={!!errors.storeType}>
                                         {STORE_TYPES.map((type) => (
                                             <MenuItem key={type} value={type}>
@@ -243,10 +268,10 @@ const Register = () => {
                                 )}
                             />
                             {errors.storeType && (
-                                <FormHelperText sx={{ color: "error.main" }}>{errors.storeType.message}</FormHelperText>
+                                <FormHelperText sx={{color: "error.main"}}>{errors.storeType.message}</FormHelperText>
                             )}
                         </FormControl>
-                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <Box sx={{display: "flex", justifyContent: "center"}}>
                             <Button
                                 type="submit"
                                 variant="contained"
@@ -263,7 +288,7 @@ const Register = () => {
                                 {isLoading ? "Registering..." : "Register"}
                             </Button>
                         </Box>
-                        <Box sx={{ textAlign: "center" }}>
+                        <Box sx={{textAlign: "center"}}>
                             <Typography variant="body1">
                                 Already have an account?{" "}
                                 <Button variant="text" onClick={() => navigate("/login")}>

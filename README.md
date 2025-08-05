@@ -1,18 +1,17 @@
-# Kantiga Frontend
+# Kantisoft Frontend
 
 A modern Point of Sale (POS) frontend for stores & restaurants, built with React and TypeScript.
 
-## About Kantiga
+## About Kantisoft
 
-**Kantiga** is a name rooted in Hausa, one of Nigeria's major languages. It's a short, modern blend derived from **"Kantin Kirga"**, which translates to **"Counting Shop"** or **"Shop of Counting."**
+**Kanti** is a name rooted in Hausa, one of Nigeria's major languages. It means **"Store"**, **Mart**, **Supermarket**
+or **"Shop"**
 
-- **Pronunciation:** "Kahn-tee-gah" (with 'a' as in "car", and 'g' as in "go").
-
-Don't stress over it, it easy to pronouce.
+- **Pronunciation:** "Kahn-tee" (with 'a' as in "car", and 't' as in "to").
 
 ## Features
 
-- **Order Management:** Track, create, and manage restaurant orders.
+- **Order Management:** Track, create, and manage store or restaurant orders.
 - **Sales History:** View and export sales data by day, week, month, or all time.
 - **Menu Management/Products:** Add, edit, and remove menu items.
 - **User Management:** Manage staff and guest accounts with role-based permissions.
@@ -39,7 +38,7 @@ src/
 
     ```bash
     git clone <repository-url>
-    cd <respository-name>
+    cd <repository-name>
     ```
 
 2. **Install dependencies:**

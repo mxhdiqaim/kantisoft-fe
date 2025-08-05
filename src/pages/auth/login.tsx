@@ -1,12 +1,26 @@
-import { loginUserType, type LoginUserType } from "@/types/user-types";
-import { Box, Button, TextField, Typography, FormControl, FormHelperText, Grid, useTheme } from "@mui/material";
-
-import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useLoginMutation } from "@/store/slice";
-import { getApiError } from "@/helpers/get-api-error";
+import {getApiError} from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
+import {appRoutes} from "@/routes";
+import {useAppSelector} from "@/store";
+import {useLoginMutation} from "@/store/slice";
+import {selectCurrentUser} from "@/store/slice/auth-slice.ts";
+import {loginUserType, type LoginUserType} from "@/types/user-types";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {
+    Box,
+    Button,
+    FormControl,
+    FormHelperText,
+    Grid,
+    Link as MuiLink,
+    TextField,
+    Typography,
+    useTheme
+} from "@mui/material";
+import {useEffect} from "react";
+
+import {Controller, useForm} from "react-hook-form";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 
 const defaultValues = {
     password: "",
@@ -18,7 +32,8 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const notify = useNotifier();
-    const [login, { isLoading: loading }] = useLoginMutation();
+    const [login, {isLoading: loading}] = useLoginMutation();
+    const currentUser = useAppSelector(selectCurrentUser);
 
     // Get the path the user was trying to access before being redirected
     const from = location.state?.from?.pathname || "/";
@@ -27,7 +42,7 @@ const Login = () => {
         control,
         setError,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm({
         defaultValues,
         mode: "onBlur",
@@ -41,7 +56,7 @@ const Login = () => {
             await login(data).unwrap();
 
             // On successful login, navigate to the intended page or a default.
-            navigate(from, { replace: true });
+            navigate(from, {replace: true});
         } catch (err) {
             // 2. Use the getApiError helper for clean, consistent error parsing
             const defaultMessage = "Invalid email or password.";
@@ -49,10 +64,35 @@ const Login = () => {
 
             notify(apiError.message, "error");
 
-            setError("email", { type: "manual" });
-            setError("password", { type: "manual" });
+            setError("email", {type: "manual"});
+            setError("password", {type: "manual"});
         }
     };
+
+    useEffect(() => {
+        if (currentUser) {
+            // Find the first accessible, non-hidden, primary route for the user's role.
+            // The appRoutes supposed to be ordered by precedence (most important routes first), for now they are just
+            const destinationRoute = appRoutes.find(
+                (route) =>
+                    !route.authGuard &&
+                    route.icon && // A good indicator of a primary navigation item
+                    route.roles?.includes(currentUser.role),
+            );
+
+            if (destinationRoute) {
+                // If a suitable page is found, redirect the user there.
+                navigate(destinationRoute.to, {replace: true});
+            } else {
+                // As a fallback, if no specific page is found for the user's role,
+                // send them to the login page.
+                navigate("/login", {replace: true});
+            }
+        } else {
+            // If there's no authenticated user, they must log in.
+            navigate("/login", {replace: true});
+        }
+    }, [currentUser, navigate]);
 
     return (
         <Grid container spacing={2}>
@@ -63,7 +103,7 @@ const Login = () => {
                     justifyContent: "center",
                     alignItems: "center",
                     minHeight: "100vh",
-                    m: { xs: 3, md: 0 },
+                    m: {xs: 3, md: 0},
                 }}
             >
                 <Box
@@ -75,8 +115,8 @@ const Login = () => {
                         },
                     }}
                 >
-                    <Box sx={{ textAlign: "center", mb: 5 }}>
-                        <Typography variant={"h5"} sx={{ fontWeight: 500 }}>
+                    <Box sx={{textAlign: "center", mb: 5}}>
+                        <Typography variant={"h5"} sx={{fontWeight: 500}}>
                             Welcome Back! Login to your account
                         </Typography>
                     </Box>
@@ -85,8 +125,8 @@ const Login = () => {
                             <Controller
                                 name="email"
                                 control={control}
-                                rules={{ required: true }}
-                                render={({ field: { value, onChange, onBlur } }) => (
+                                rules={{required: true}}
+                                render={({field: {value, onChange, onBlur}}) => (
                                     <TextField
                                         autoFocus
                                         label="Email"
@@ -95,20 +135,20 @@ const Login = () => {
                                         onChange={onChange}
                                         error={Boolean(errors.email)}
                                         placeholder="example@gmail.com"
-                                        sx={{ borderRadius: theme.borderRadius.small }}
+                                        sx={{borderRadius: theme.borderRadius.small}}
                                     />
                                 )}
                             />
                             {errors.email && (
-                                <FormHelperText sx={{ color: "error.main" }}>{errors.email.message}</FormHelperText>
+                                <FormHelperText sx={{color: "error.main"}}>{errors.email.message}</FormHelperText>
                             )}
                         </FormControl>
-                        <FormControl fullWidth sx={{ mt: 3 }}>
+                        <FormControl fullWidth sx={{mt: 3}}>
                             <Controller
                                 name="password"
                                 control={control}
-                                rules={{ required: true }}
-                                render={({ field: { value, onChange, onBlur } }) => (
+                                rules={{required: true}}
+                                render={({field: {value, onChange, onBlur}}) => (
                                     <TextField
                                         value={value}
                                         onBlur={onBlur}
@@ -117,33 +157,33 @@ const Login = () => {
                                         id="auth-login-v2-password"
                                         error={Boolean(errors.password)}
                                         type={"password"}
-                                        sx={{ borderRadius: theme.borderRadius.small }}
+                                        sx={{borderRadius: theme.borderRadius.small}}
                                     />
                                 )}
                             />
                             {errors.password && (
-                                <FormHelperText sx={{ color: "error.main" }} id="">
+                                <FormHelperText sx={{color: "error.main"}} id="">
                                     {errors.password.message}
                                 </FormHelperText>
                             )}
                         </FormControl>
-                        {/* <Box
+                        <Box
                             sx={{
                                 display: "flex",
                                 justifyContent: "flex-end",
                                 my: 3,
                             }}
                         >
-                            <Link href="/reset-password" style={{ textDecoration: "none" }}>
+                            <MuiLink component={Link} to="/forget-password" sx={{textDecoration: "none"}}>
                                 Forgot Password?
-                            </Link>
-                        </Box> */}
-                        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+                            </MuiLink>
+                        </Box>
+                        <Box sx={{display: "flex", justifyContent: "center", mt: 3}}>
                             <Button
                                 type="submit"
                                 variant="contained"
                                 sx={{
-                                    width: "100%", // Make button full width
+                                    width: "100%", // Make the button full width
                                     color: "#fff",
                                     borderRadius: theme.borderRadius.small,
                                     p: 2,
@@ -154,7 +194,7 @@ const Login = () => {
                                 {loading ? "Logging in..." : "Login"}
                             </Button>
                         </Box>
-                        <Box sx={{ textAlign: "center", mt: 2 }}>
+                        <Box sx={{textAlign: "center", mt: 2}}>
                             <Typography variant="body1">
                                 Don&apos;t have an account?{" "}
                                 <Button variant="text" onClick={() => navigate("/register")}>
