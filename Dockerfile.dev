@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+# Working directory
+WORKDIR /app
+
+# Enable Corepack
+RUN corepack enable
+
+# Copy package.json and lock file
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies, don't use --frozen-lockfile here
+RUN pnpm install
+
+# Expose the Vite dev server port
+EXPOSE 3000
+
+CMD ["pnpm", "dev"]

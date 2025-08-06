@@ -1,9 +1,9 @@
-import { appRoutes, type AppRouteType } from "@/routes";
-import { useAppSelector } from "@/store";
-import { useGetAllStoresQuery, useLogoutMutation } from "@/store/slice";
-import { selectCurrentUser } from "@/store/slice/auth-slice";
-import { selectActiveStore, setActiveStore } from "@/store/slice/store-slice";
-import { LogoutOutlined, StorefrontOutlined } from "@mui/icons-material";
+import {appRoutes, type AppRouteType} from "@/routes";
+import {useAppSelector} from "@/store";
+import {useGetAllStoresQuery, useLogoutMutation} from "@/store/slice";
+import {selectCurrentUser} from "@/store/slice/auth-slice";
+import {selectActiveStore, setActiveStore} from "@/store/slice/store-slice";
+import {LogoutOutlined, StorefrontOutlined} from "@mui/icons-material";
 
 import CancelIcon from "@mui/icons-material/Cancel";
 
@@ -26,27 +26,27 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import { type FC, Fragment, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import type { Props as AppBarProps } from "./appbar";
+import {type FC, Fragment, useEffect, useState} from "react";
+import {useTranslation} from "react-i18next";
+import {useDispatch, useSelector} from "react-redux";
+import {Link, useLocation, useNavigate} from "react-router-dom";
+import type {Props as AppBarProps} from "./appbar";
 
 interface Props extends AppBarProps {
     sx?: SxProps<Theme>;
     showDrawer?: boolean;
 }
 
-const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
-    const { t } = useTranslation();
+const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
+    const {t} = useTranslation();
     const theme = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [logout, { isLoading }] = useLogoutMutation();
+    const [logout, {isLoading}] = useLogoutMutation();
     const currentUser = useAppSelector(selectCurrentUser);
     // Fetch all available stores from the API
-    const { data: stores, isLoading: isLoadingStores } = useGetAllStoresQuery();
+    const {data: stores, isLoading: isLoadingStores} = useGetAllStoresQuery();
     const activeStore = useSelector(selectActiveStore);
 
     const handleLogout = async () => {
@@ -57,14 +57,12 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
             // The console will show if the server call failed, but we proceed.
             console.error("Server logout failed, proceeding with client-side logout:", error);
         } finally {
-            // This block runs whether the try succeeded or failed.
             // Since the apiSlice always clears local credentials,
             // we can safely navigate the user away.
             navigate("/login");
         }
     };
 
-    // Add state to track which menu items are expanded
     const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
     // function to handle both drawer close and menu expand
@@ -96,7 +94,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
 
         return (
             <Fragment key={index}>
-                <ListItem disablePadding sx={{ px: 2, py: 0.5 }}>
+                <ListItem disablePadding sx={{px: 2, py: 0.5}}>
                     <ListItemButton
                         component={Link}
                         to={fullPath}
@@ -127,7 +125,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                             },
                         }}
                     >
-                        <ListItemIcon sx={{ minWidth: 40, color: "inherit" }}>{route?.icon}</ListItemIcon>
+                        <ListItemIcon sx={{minWidth: 40, color: "inherit"}}>{route?.icon}</ListItemIcon>
                         <ListItemText
                             primary={t(route.title as string)}
                             primaryTypographyProps={{
@@ -150,7 +148,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                 {/* Render children if expanded */}
                 {hasChildren && (
                     <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding sx={{ pl: 2 }}>
+                        <List component="div" disablePadding sx={{pl: 2}}>
                             {route.children?.map((childRoute, childIndex) =>
                                 renderMenuItem(childRoute, childIndex, level + 1, fullPath + "/"),
                             )}
@@ -170,35 +168,35 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
         <Drawer
             variant="permanent"
             sx={{
-                width: { xs: "100vw", md: `${theme.layout.sidebarWidth}px` },
+                width: {xs: "100vw", md: `${theme.layout.sidebarWidth}px`},
                 flexShrink: 0,
                 "& .MuiDrawer-paper": {
-                    width: { xs: "100vw", md: `${theme.layout.sidebarWidth}px` },
+                    width: {xs: "100vw", md: `${theme.layout.sidebarWidth}px`},
                     boxSizing: "border-box",
                 },
                 background: theme.palette.background.default,
-                position: { xs: "absolute", md: "relative" },
+                position: {xs: "absolute", md: "relative"},
                 zIndex: 10,
                 ...sx,
             }}
         >
-            <List sx={{ height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+            <List sx={{height: "100%", display: "flex", flexDirection: "column", overflowY: "auto"}}>
                 <Box
                     sx={{
-                        display: { xs: "flex", md: "none" },
+                        display: {xs: "flex", md: "none"},
                         justifyContent: "flex-end",
                     }}
                 >
                     <Button
                         onClick={() => toggleDrawer && toggleDrawer(!drawerState)}
-                        sx={{ width: "fit-content", mt: 1, mr: 0.5 }}
+                        sx={{width: "fit-content", mt: 1, mr: 0.5}}
                     >
-                        <CancelIcon sx={{ color: theme.palette.alternate.dark }} />
+                        <CancelIcon sx={{color: theme.palette.alternate.dark}}/>
                     </Button>
                 </Box>
-                <ListItem sx={{ width: "100%" }}>
+                <ListItem sx={{width: "100%"}}>
                     {isLoadingStores ? (
-                        <CircularProgress size={24} />
+                        <CircularProgress size={24}/>
                     ) : (
                         <ListItemButton
                             // component={Link}
@@ -211,19 +209,19 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                                 textTransform: "none",
                             }}
                         >
-                            <StorefrontOutlined sx={{ mr: 1 }} />
+                            <StorefrontOutlined sx={{mr: 1}}/>
                             <Typography variant="subtitle2" fontWeight="bold">
                                 {activeStore && activeStore.name}
                             </Typography>
-                            <ListItemText />
+                            <ListItemText/>
                         </ListItemButton>
                     )}
                 </ListItem>
 
-                <Divider sx={{ display: { xs: "none", md: "block" } }} />
+                <Divider sx={{display: {xs: "none", md: "block"}}}/>
 
                 {/* Routes rendering */}
-                <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
+                <Box sx={{flexGrow: 1, overflowY: "auto"}}>
                     {appRoutes
                         .filter((route) => {
                             // Basic filtering for hidden/auth routes
@@ -246,7 +244,7 @@ const SideBar: FC<Props> = ({ sx, drawerState, toggleDrawer, showDrawer }) => {
                         onClick={handleLogout}
                         disabled={isLoading}
                         variant="contained"
-                        startIcon={<LogoutOutlined />}
+                        startIcon={<LogoutOutlined/>}
                         sx={{
                             backgroundColor: theme.palette.error.main,
                             color: theme.palette.error.contrastText,

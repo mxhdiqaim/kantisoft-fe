@@ -1,98 +1,65 @@
-# Restaurant POS Frontend
+# Kantisoft Frontend
 
-This project is a Restaurant Point of Sale (POS) frontend application built with React and TypeScript. It provides
-functionalities for managing orders, tracking sales history, and handling menu items.
+A modern Point of Sale (POS) frontend for stores and restaurants, built with React and TypeScript.
+
+## About Kantisoft
+
+**Kanti** is a name rooted in Hausa, one of Nigeria's major languages. It means **"Store"**, **Mart**, **Supermarket**
+or **"Shop"**
+
+- **Pronunciation:** "Kahn-tee" (with 'a' as in "car", and 't' as in "to").
 
 ## Features
 
-- **Order Tracking**: Users can view and manage current orders, add items to the cart, and process payments.
-- **Sales History**: Users can view sales metrics and detailed order history over different periods (daily, weekly,
-  monthly).
-- **Menu Management**: Users can view, add, edit, and delete menu items.
+- **Order Management:** Track, create, and manage store or restaurant orders.
+- **Sales History:** View and export sales data by day, week, month, or all time.
+- **Menu Management/Products:** Add, edit, and remove menu items.
+- **User Management:** Manage staff and guest accounts with role-based permissions.
+- **Activity Log:** Audit user actions (manager/admin only).
+- **Store Management:** Manage multiple restaurant locations.
+- **Authentication:** Secure login and password management.
 
 ## Project Structure
 
 ```
-restaurant-pos-fe
-├── src
-│   ├── components
-│   │   ├── menu-items
-│   │   │   └── menu-items-table.tsx
-│   │   ├── order-tracking
-│   │   │   ├── add-menu-item.tsx
-│   │   │   ├── menu-item.tsx
-│   │   │   ├── order-cart.tsx
-│   │   │   └── payment-modal.tsx
-│   │   ├── sales-history
-│   │   │   ├── sales-history-overview-card.tsx
-│   │   │   └── sales-history-table.tsx
-│   │   └── spinners
-│   │       ├── manu-item-skeleton.tsx
-│   │       └── order-cart-skeleton.tsx
-│   ├── hooks
-│   │   └── useNotifier.ts
-│   ├── pages
-│   │   ├── login
-│   │   │   └── index.tsx
-│   │   ├── menu-items
-│   │   │   └── index.tsx
-│   │   ├── not-found
-│   │   │   └── index.tsx
-│   │   ├── order-tracking
-│   │   │   └── index.tsx
-│   │   ├── sales-history
-│   │   │   └── index.tsx
-│   │   ├── view-sales-history
-│   │   │   └── index.tsx
-│   │   └── index.ts
-│   ├── routes
-│   │   └── index.tsx
-│   ├── store
-│   │   ├── slice
-│   │   │   ├── auth-slice.ts
-│   │   │   └── index.ts
-│   │   └── index.ts
-│   ├── types
-│   │   ├── cart-item-type.ts
-│   │   ├── menu-item-type.ts
-│   │   └── order-types.ts
-│   └── utils
-│       ├── get-relative-time.ts
-│       └── index.ts
-├── package.json
-├── tsconfig.json
-└── README.md
+src/
+  components/      # Reusable UI and feature components
+  hooks/           # Custom React hooks
+  pages/           # Page-level components (routes)
+  routes/          # App routing
+  store/           # Redux store and slices (RTK Query)
+  types/           # TypeScript types and enums
+  utils/           # Utility functions
 ```
 
-## Installation
+## Getting Started
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd restaurant-pos-fe
-   ```
-3. Install dependencies:
-   ```bash
-   pnpm install
-   ```
+1. **Clone the repository:**
 
-## Usage
+    ```bash
+    git clone <repository-url>
+    cd <repository-name>
+    ```
 
-To start the development server, run:
+2. **Install dependencies:**
 
-```bash
-pnpm start
-```
+    ```bash
+    pnpm install
+    ```
 
-The application will be available at `http://localhost:3000`.
+3. **Start the development server:**
 
-## Contributing
+    ```bash
+    pnpm start
+    ```
 
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
+4. **Open your browser:**  
+   Visit [http://localhost:3000](http://localhost:3000)
+
+<!-- ## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
 
-This project is licensed under the MIT Licence.
+MIT License -->

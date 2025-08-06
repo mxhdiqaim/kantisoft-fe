@@ -1,10 +1,9 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "@/store";
-import { selectCurrentUser } from "@/store/slice/auth-slice";
-import { appRoutes } from "@/routes";
-
 import AppSkeleton from "@/components/spinners/app-skeleton-loading";
+import {appRoutes} from "@/routes";
+import {useAppSelector} from "@/store";
+import {selectCurrentUser} from "@/store/slice/auth-slice";
+import {useEffect} from "react";
+import {useNavigate} from "react-router-dom";
 
 const HomeScreen = () => {
     const navigate = useNavigate();
@@ -13,7 +12,7 @@ const HomeScreen = () => {
     useEffect(() => {
         if (currentUser) {
             // Find the first accessible, non-hidden, primary route for the user's role.
-            // We assume appRoutes is ordered by precedence (most important routes first).
+            // The appRoutes supposed to be ordered by precedence (most important routes first), but for now they are not
             const destinationRoute = appRoutes.find(
                 (route) =>
                     !route.hidden &&
@@ -23,20 +22,20 @@ const HomeScreen = () => {
 
             if (destinationRoute) {
                 // If a suitable page is found, redirect the user there.
-                navigate(destinationRoute.to, { replace: true });
+                navigate(destinationRoute.to, {replace: true});
             } else {
                 // As a fallback, if no specific page is found for the user's role,
                 // send them to the login page.
-                navigate("/login", { replace: true });
+                navigate("/login", {replace: true});
             }
         } else {
             // If there's no authenticated user, they must log in.
-            navigate("/login", { replace: true });
+            navigate("/login", {replace: true});
         }
     }, [currentUser, navigate]);
 
     // Render a loading spinner to provide feedback while the redirection logic runs.
-    return <AppSkeleton />;
+    return <AppSkeleton/>;
 };
 
 export default HomeScreen;

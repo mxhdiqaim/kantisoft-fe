@@ -1,18 +1,21 @@
-import { useEffect, type JSX } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import GuardedRoute from "@/routes/guarded-route";
-import { ErrorBoundary } from "react-error-boundary";
-import ErrorFallback from "@/pages/feedbacks/fallback";
+import AuthGuard from "@/components/auth/auth-guard.tsx";
 import Layout from "@/components/navigations/layouts";
-import { ScrollToTop, resolveChildren } from "@/utils";
-import { appRoutes, type AppRouteType } from "@/routes";
+import ErrorFallback from "@/pages/feedbacks/fallback";
+import {appRoutes, type AppRouteType} from "@/routes";
+import GuardedRoute from "@/routes/guarded-route";
+import {useAppSelector} from "@/store";
+import {selectCurrentUser} from "@/store/slice/auth-slice.ts";
 
-import { ThemeProvider } from "@/theme";
+import {ThemeProvider} from "@/theme";
+import {resolveChildren, ScrollToTop} from "@/utils";
+import {type JSX, useEffect} from "react";
+import {ErrorBoundary} from "react-error-boundary";
+import {useTranslation} from "react-i18next";
+import {useSelector} from "react-redux";
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 
-import { FullscreenProvider } from "./context/fullscreen-context";
-import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
-import { selectActiveStore } from "./store/slice/store-slice";
+import {FullscreenProvider} from "./context/fullscreen-context";
+import {selectActiveStore} from "./store/slice/store-slice";
 import "@/config/i18next-config";
 
 // function to handle nested children route rendering
@@ -32,7 +35,7 @@ const handleNestedRoutes = (childRoute: AppRouteType, index: number): JSX.Elemen
                     element={
                         <GuardedRoute authGuard={authGuard}>
                             <Layout>
-                                <childRoute.element />
+                                <childRoute.element/>
                             </Layout>
                         </GuardedRoute>
                     }
@@ -47,7 +50,7 @@ const handleNestedRoutes = (childRoute: AppRouteType, index: number): JSX.Elemen
                         element={
                             <GuardedRoute authGuard={authGuard}>
                                 <Layout>
-                                    <route.element />
+                                    <route.element/>
                                 </Layout>
                             </GuardedRoute>
                         }
@@ -59,7 +62,7 @@ const handleNestedRoutes = (childRoute: AppRouteType, index: number): JSX.Elemen
 
     // Handle routes that don't need layout or authentication
     // Typically used for authentication pages (login/register) or error pages
-    return <Route key={index} path={childRoute.to} element={<childRoute.element />} />;
+    return <Route key={index} path={childRoute.to} element={<childRoute.element/>}/>;
 };
 
 const renterRoute = (route: AppRouteType, index: number) => {
@@ -77,7 +80,7 @@ const renterRoute = (route: AppRouteType, index: number) => {
                 element={
                     <GuardedRoute authGuard={authGuard}>
                         <Layout>
-                            <route.element />
+                            <route.element/>
                         </Layout>
                     </GuardedRoute>
                 }
@@ -85,12 +88,13 @@ const renterRoute = (route: AppRouteType, index: number) => {
         );
     }
 
-    return <Route key={index} path={route.to} element={<route.element />} />;
+    return <Route key={index} path={route.to} element={<route.element/>}/>;
 };
 
 function App() {
-    const { i18n } = useTranslation();
+    const {i18n} = useTranslation();
     const activeStore = useSelector(selectActiveStore);
+    const currentUser = useAppSelector(selectCurrentUser);
 
     useEffect(() => {
         if (activeStore?.storeType) {
@@ -106,10 +110,10 @@ function App() {
         <ThemeProvider>
             <FullscreenProvider>
                 <Router>
-                    <ScrollToTop />
+                    <ScrollToTop/>
                     <ErrorBoundary FallbackComponent={ErrorFallback}>
+                        <AuthGuard currentUser={currentUser}/>
                         <Routes>
-                            <Route path={"/"} element={<Navigate to={"/home"} />} />
                             {appRoutes.map((route, index) => renterRoute(route, index))}
                         </Routes>
                     </ErrorBoundary>
