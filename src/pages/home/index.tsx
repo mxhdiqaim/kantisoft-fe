@@ -12,7 +12,7 @@ const HomeScreen = () => {
     useEffect(() => {
         if (currentUser) {
             // Find the first accessible, non-hidden, primary route for the user's role.
-            // The appRoutes supposed to be ordered by precedence (most important routes first), for now they are just 
+            // The appRoutes supposed to be ordered by precedence (most important routes first), but for now they are not
             const destinationRoute = appRoutes.find(
                 (route) =>
                     !route.hidden &&

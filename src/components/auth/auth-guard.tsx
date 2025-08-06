@@ -39,7 +39,6 @@ const AuthGuard = ({currentUser}: Props) => {
         }
 
         // If a user is NOT logged in and tries to access a protected route, redirect to log in.
-        // This part is the standard auth guard logic for protected pages.
         const currentRoute = appRoutes.find(route => route.to === location.pathname);
         if (currentRoute?.authGuard && !currentUser) {
             navigate("/login", {replace: true});

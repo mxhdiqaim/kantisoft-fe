@@ -35,7 +35,6 @@ import {type ComponentType, type ReactNode} from "react";
 
 export interface AppRouteType {
     to: string;
-    // pathKey: string;
     element: ComponentType;
     title?: string;
     icon?: ReactNode;

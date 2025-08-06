@@ -1,9 +1,6 @@
 import {getApiError} from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
-import {appRoutes} from "@/routes";
-import {useAppSelector} from "@/store";
 import {useLoginMutation} from "@/store/slice";
-import {selectCurrentUser} from "@/store/slice/auth-slice.ts";
 import {loginUserType, type LoginUserType} from "@/types/user-types";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {
@@ -17,7 +14,6 @@ import {
     Typography,
     useTheme
 } from "@mui/material";
-import {useEffect} from "react";
 
 import {Controller, useForm} from "react-hook-form";
 import {Link, useLocation, useNavigate} from "react-router-dom";
@@ -33,7 +29,6 @@ const Login = () => {
     const location = useLocation();
     const notify = useNotifier();
     const [login, {isLoading: loading}] = useLoginMutation();
-    const currentUser = useAppSelector(selectCurrentUser);
 
     // Get the path the user was trying to access before being redirected
     const from = location.state?.from?.pathname || "/";
@@ -68,31 +63,6 @@ const Login = () => {
             setError("password", {type: "manual"});
         }
     };
-
-    useEffect(() => {
-        if (currentUser) {
-            // Find the first accessible, non-hidden, primary route for the user's role.
-            // The appRoutes supposed to be ordered by precedence (most important routes first), for now they are just
-            const destinationRoute = appRoutes.find(
-                (route) =>
-                    !route.authGuard &&
-                    route.icon && // A good indicator of a primary navigation item
-                    route.roles?.includes(currentUser.role),
-            );
-
-            if (destinationRoute) {
-                // If a suitable page is found, redirect the user there.
-                navigate(destinationRoute.to, {replace: true});
-            } else {
-                // As a fallback, if no specific page is found for the user's role,
-                // send them to the login page.
-                navigate("/login", {replace: true});
-            }
-        } else {
-            // If there's no authenticated user, they must log in.
-            navigate("/login", {replace: true});
-        }
-    }, [currentUser, navigate]);
 
     return (
         <Grid container spacing={2}>

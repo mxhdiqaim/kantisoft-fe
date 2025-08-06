@@ -1,6 +1,6 @@
 # Kantisoft Frontend
 
-A modern Point of Sale (POS) frontend for stores & restaurants, built with React and TypeScript.
+A modern Point of Sale (POS) frontend for stores and restaurants, built with React and TypeScript.
 
 ## About Kantisoft
 
