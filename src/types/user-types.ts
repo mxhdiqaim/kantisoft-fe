@@ -1,6 +1,6 @@
+import {extendBaseSchema} from "@/types";
 import * as yup from "yup";
-import { extendBaseSchema } from "@/types";
-import { STORE_TYPES } from "./store-types";
+import {STORE_TYPES} from "./store-types";
 // import { storeSchema } from "./store-types";
 
 // Password-specific validation rules

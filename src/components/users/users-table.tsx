@@ -1,12 +1,12 @@
-import { useAppSelector } from "@/store";
-import { selectCurrentUser } from "@/store/slice/auth-slice";
-import { roleHierarchy, type UserType } from "@/types/user-types";
+import {useAppSelector} from "@/store";
+import {selectCurrentUser} from "@/store/slice/auth-slice";
+import {roleHierarchy, type UserType} from "@/types/user-types";
 
-import { EditOutlined, MoreVert, VisibilityOutlined } from "@mui/icons-material";
-import { Avatar, Chip, IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
-import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
-import { type MouseEvent, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {EditOutlined, MoreVert, VisibilityOutlined} from "@mui/icons-material";
+import {Avatar, Chip, IconButton, Menu, MenuItem, Tooltip, Typography} from "@mui/material";
+import {DataGrid, type GridColDef, type GridRenderCellParams} from "@mui/x-data-grid";
+import {type MouseEvent, useMemo, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import CustomNoRowsOverlay from "../customs/custom-no-rows-overlay";
 import TableStyledBox from "../ui/table-styled-box";
 
@@ -16,7 +16,7 @@ export interface Props {
     // columns: GridColDef[];
 }
 
-const UsersTable = ({ users, loading }: Props) => {
+const UsersTable = ({users, loading}: Props) => {
     const navigate = useNavigate();
     const currentUser = useAppSelector(selectCurrentUser);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -44,7 +44,7 @@ const UsersTable = ({ users, loading }: Props) => {
                     const initials =
                         `${params.row.firstName?.[0] ?? ""}${params.row.lastName?.[0] ?? ""}`.toUpperCase();
                     return (
-                        <TableStyledBox sx={{ display: "flex", alignItems: "center", py: 1 }}>
+                        <TableStyledBox sx={{display: "flex", alignItems: "center", py: 1}}>
                             <Avatar
                                 sx={{
                                     bgcolor: "primary.light",
@@ -90,7 +90,7 @@ const UsersTable = ({ users, loading }: Props) => {
                         label={params.value}
                         color={params.value === "active" ? "success" : "error"}
                         size="medium"
-                        sx={{ textTransform: "capitalize", fontWeight: "bold" }}
+                        sx={{textTransform: "capitalize", fontWeight: "bold"}}
                     />
                 ),
             },
@@ -106,7 +106,7 @@ const UsersTable = ({ users, loading }: Props) => {
                         return "Invalid Date";
                     }
                     return (
-                        <TableStyledBox sx={{ alignItems: "center", justifyContent: "center" }}>
+                        <TableStyledBox sx={{alignItems: "center", justifyContent: "center"}}>
                             <Typography variant="body2" fontWeight="500">
                                 {date.toLocaleDateString()}
                             </Typography>
@@ -159,16 +159,16 @@ const UsersTable = ({ users, loading }: Props) => {
                         <>
                             <Tooltip title="More Actions">
                                 <IconButton onClick={(e) => handleMenuClick(e, params.row.id)}>
-                                    <MoreVert />
+                                    <MoreVert/>
                                 </IconButton>
                             </Tooltip>
                             <Menu anchorEl={anchorEl} open={isOpen} onClose={handleMenuClose}>
                                 <MenuItem onClick={handleView} disabled={isEditDisabled}>
-                                    <VisibilityOutlined sx={{ mr: 1 }} />
+                                    <VisibilityOutlined sx={{mr: 1}}/>
                                     View
                                 </MenuItem>
                                 <MenuItem onClick={handleEdit} disabled={isEditDisabled}>
-                                    <EditOutlined sx={{ mr: 1 }} />
+                                    <EditOutlined sx={{mr: 1}}/>
                                     Edit
                                 </MenuItem>
                             </Menu>
@@ -195,7 +195,7 @@ const UsersTable = ({ users, loading }: Props) => {
             }}
             initialState={{
                 pagination: {
-                    paginationModel: { pageSize: 10 },
+                    paginationModel: {pageSize: 10},
                 },
             }}
             disableColumnResize
