@@ -59,7 +59,7 @@ Or install it without Docker (pnpm) highly discouraged
 4. **Start the development server:**
 
     ```bash
-    pnpm start
+    pnpm dev
     ```
 
 4. **Open your browser:**
