@@ -1,6 +1,6 @@
-import { type StoreType } from "@/types/store-types";
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "..";
+import {type StoreType} from "@/types/store-types";
+import {createSlice, type PayloadAction} from "@reduxjs/toolkit";
+import type {RootState} from "..";
 
 interface StoreState {
     activeStore: StoreType | null;
@@ -11,14 +11,14 @@ const loadState = (): StoreState => {
     try {
         const serializedState = localStorage.getItem("activeStoreState");
         if (serializedState === null) {
-            return { activeStore: null };
+            return {activeStore: null};
         }
         const parsedState = JSON.parse(serializedState);
-        return { activeStore: parsedState };
+        return {activeStore: parsedState};
     } catch (err) {
         console.error("error:", err);
         // Return default state if parsing fails or on any error
-        return { activeStore: null };
+        return {activeStore: null};
     }
 };
 
@@ -41,7 +41,7 @@ const storeSlice = createSlice({
     },
 });
 
-export const { setActiveStore, clearActiveStore } = storeSlice.actions;
+export const {setActiveStore, clearActiveStore} = storeSlice.actions;
 
 // Selector to get the active store from the state
 export const selectActiveStore = (state: RootState) => state.store.activeStore;

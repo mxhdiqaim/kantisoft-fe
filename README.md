@@ -5,7 +5,7 @@ A modern Point of Sale (POS) frontend for stores and restaurants, built with Rea
 ## About Kantisoft
 
 **Kanti** is a name rooted in Hausa, one of Nigeria's major languages. It means **"Store"**, **Mart**, **Supermarket**
-or **"Shop"**
+or **"Shop"**.
 
 - **Pronunciation:** "Kahn-tee" (with 'a' as in "car", and 't' as in "to").
 
@@ -41,19 +41,28 @@ src/
     cd <repository-name>
     ```
 
-2. **Install dependencies:**
+2. **Start the development server with Docker:**
+
+    ```bash
+    docker compose up
+    ```
+*Ensure you have Docker installed and running.*
+
+Or install it without Docker (pnpm) highly discouraged
+
+3. **Install dependencies:**
 
     ```bash
     pnpm install
     ```
 
-3. **Start the development server:**
+4. **Start the development server:**
 
     ```bash
     pnpm start
     ```
 
-4. **Open your browser:**  
+4. **Open your browser:**
    Visit [http://localhost:3000](http://localhost:3000)
 
 <!-- ## Contributing
