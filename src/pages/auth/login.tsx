@@ -54,7 +54,7 @@ const Login = () => {
             navigate(from, {replace: true});
         } catch (err) {
             // 2. Use the getApiError helper for clean, consistent error parsing
-            const defaultMessage = "Invalid email or password.";
+            const defaultMessage = "Something went wrong. Please try again.";
             const apiError = getApiError(err, defaultMessage);
 
             notify(apiError.message, "error");
@@ -78,10 +78,10 @@ const Login = () => {
             >
                 <Box
                     sx={{
-                        width: "100%", // Ensure box takes up grid item width
+                        width: "100%",
                         maxWidth: {
                             xs: "100%",
-                            sm: "400px", // Set a m ax-width for better layout on larger screens
+                            sm: "400px",
                         },
                     }}
                 >

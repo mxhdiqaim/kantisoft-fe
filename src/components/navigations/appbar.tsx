@@ -92,7 +92,7 @@ const AppbarComponent: FC<Props> = ({toggleDrawer, drawerState}) => {
                 <Box sx={{display: "flex", alignItems: "center", gap: 1}}>
                     <IconButton
                         aria-label="toggle fullscreen"
-                        onClick={toggleFullscreen} // Use the function from context
+                        onClick={toggleFullscreen}
                         sx={{
                             background: theme.palette.background.default,
                         }}
