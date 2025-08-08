@@ -44,7 +44,6 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
     api,
     extraOptions,
 ) => {
-
     const result = await baseQuery(args, api, extraOptions);
 
     // Check if the error is a 401 and the request was NOT to the login endpoint

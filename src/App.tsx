@@ -10,7 +10,7 @@ import {selectCurrentUser, selectTokenExp} from "@/store/slice/auth-slice";
 
 import {ThemeProvider} from "@/theme";
 import {resolveChildren, ScrollToTop} from "@/utils";
-import {type JSX, useEffect} from "react";
+import {type JSX, useEffect, useRef} from "react";
 import {ErrorBoundary} from "react-error-boundary";
 import {useTranslation} from "react-i18next";
 import {useSelector} from "react-redux";
@@ -105,6 +105,8 @@ const AppContent = () => {
     const [logout] = useLogoutMutation();
     const tokenExp = useSelector(selectTokenExp);
 
+    const isLoggingOutRef = useRef(false);
+
     // Effect to handle session timeout
     useEffect(() => {
         if (!tokenExp || !currentUser) {
@@ -112,6 +114,11 @@ const AppContent = () => {
         }
 
         const handleSessionTimeout = async () => {
+            if (isLoggingOutRef.current) {
+                return;
+            }
+            isLoggingOutRef.current = true;
+
             try {
                 await logout({}).unwrap();
             } catch (error) {
