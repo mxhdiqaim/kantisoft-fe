@@ -44,6 +44,7 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
     api,
     extraOptions,
 ) => {
+
     const result = await baseQuery(args, api, extraOptions);
 
     // Check if the error is a 401 and the request was NOT to the login endpoint
@@ -58,8 +59,8 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
             // Dispatch the logOut action to clear credentials
             api.dispatch(logOut());
 
-            // // Reset the entire API state to clear cache and stop other queries
-            // api.dispatch(apiSlice.util.resetApiState());
+            // Reset the entire API state to clear cache and stop other queries
+            api.dispatch(apiSlice.util.resetApiState());
 
             // Redirect to login page
             window.location.href = "/login";
@@ -128,11 +129,23 @@ export const apiSlice = createApi({
                     dispatch(logOut());
                     // 3. Clear the RTK Query cache
                     dispatch(apiSlice.util.resetApiState());
+
+                    // Redirect to login page
+                    window.location.href = "/login";
+
+                    // reload
+                    window.location.reload();
                 } catch (error) {
                     console.error("Logout failed:", error);
                     // Even if the server call fails, force a local logout
                     dispatch(logOut());
                     dispatch(apiSlice.util.resetApiState());
+
+                    // Redirect to login page
+                    window.location.href = "/login";
+
+                    // reload
+                    window.location.reload();
                 }
             },
         }),

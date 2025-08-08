@@ -13,7 +13,7 @@ const AuthGuard = ({currentUser}: Props) => {
 
     const publicAuthRoutes = ["/login", "/register", "/forget-password"];
 
-    // The path the user was trying to access before being redirected to login
+    // The path the user was trying to access before being redirected to log in
     const from = location.state?.from?.pathname || "/";
 
 
@@ -45,7 +45,10 @@ const AuthGuard = ({currentUser}: Props) => {
         // If a user is NOT logged in and tries to access a protected route, redirect to log in.
         const currentRoute = appRoutes.find(route => route.to === location.pathname);
         if (currentRoute?.authGuard && !currentUser) {
-            navigate("/login", {replace: true});
+            navigate("/login", {
+                replace: true,
+                state: {from: location}
+            });
         }
 
     }, [currentUser, location.pathname, navigate]);
