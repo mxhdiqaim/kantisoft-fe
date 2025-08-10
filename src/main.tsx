@@ -14,8 +14,8 @@ createRoot(document.getElementById("root")!).render(
                 autoHideDuration={3000}
                 variant="default"
                 anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
+                    vertical: "top",
+                    horizontal: "center",
                 }}
             >
                 <App />
