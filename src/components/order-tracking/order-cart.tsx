@@ -1,17 +1,7 @@
 import type { CartItem } from "@/types/cart-item-type";
 import { ngnFormatter } from "@/utils";
 import { Add, Delete, Remove } from "@mui/icons-material";
-import {
-    Box,
-    Button,
-    Divider,
-    IconButton,
-    List,
-    ListItem,
-    ListItemText,
-    Typography,
-    useTheme,
-} from "@mui/material";
+import { Box, Button, Divider, IconButton, List, ListItem, ListItemText, Typography, useTheme } from "@mui/material";
 
 interface Props {
     cartItems: CartItem[];
@@ -20,17 +10,9 @@ interface Props {
     onOpenPaymentDialog: () => void;
 }
 
-const OrderCart = ({
-    cartItems,
-    onUpdateQuantity,
-    onRemoveItem,
-    onOpenPaymentDialog,
-}: Props) => {
+const OrderCart = ({ cartItems, onUpdateQuantity, onRemoveItem, onOpenPaymentDialog }: Props) => {
     const theme = useTheme();
-    const total = cartItems.reduce(
-        (acc, item) => acc + item.price * item.quantity,
-        0,
-    );
+    const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
     return (
         <Box
@@ -58,9 +40,7 @@ const OrderCart = ({
                                         <IconButton
                                             edge="end"
                                             aria-label="delete"
-                                            onClick={() =>
-                                                onRemoveItem(item.id)
-                                            }
+                                            onClick={() => onRemoveItem(item.id)}
                                         >
                                             <Delete />
                                         </IconButton>
@@ -68,16 +48,13 @@ const OrderCart = ({
                                 >
                                     <ListItemText
                                         primary={item.name}
-                                        secondary={`Subtotal: ${ngnFormatter.format(
-                                            item.price * item.quantity,
-                                        )}`}
+                                        secondary={`Subtotal: ${ngnFormatter.format(item.price * item.quantity)}`}
                                         slotProps={{
                                             primary: {
                                                 sx: {
                                                     fontWeight: "bold",
                                                     fontSize: "1.5rem",
-                                                    color: theme.palette.primary
-                                                        .main,
+                                                    color: theme.palette.primary.main,
                                                 },
                                             },
                                             secondary: {
@@ -87,27 +64,13 @@ const OrderCart = ({
                                             },
                                         }}
                                     />
-                                    <IconButton
-                                        onClick={() =>
-                                            onUpdateQuantity(
-                                                item.id,
-                                                item.quantity - 1,
-                                            )
-                                        }
-                                    >
-                                        <Remove />
-                                    </IconButton>
-                                    <Typography sx={{ mx: 1 }}>
-                                        {item.quantity}
-                                    </Typography>
-                                    <IconButton
-                                        onClick={() =>
-                                            onUpdateQuantity(
-                                                item.id,
-                                                item.quantity + 1,
-                                            )
-                                        }
-                                    >
+                                    {item.quantity > 1 && (
+                                        <IconButton onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}>
+                                            <Remove />
+                                        </IconButton>
+                                    )}
+                                    <Typography sx={{ mx: 1 }}>{item.quantity}</Typography>
+                                    <IconButton onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}>
                                         <Add />
                                     </IconButton>
                                 </ListItem>
@@ -116,11 +79,7 @@ const OrderCart = ({
                     </List>
                     <Divider />
                     <Box sx={{ mt: 2 }}>
-                        <Typography
-                            variant="h3"
-                            color={theme.palette.success.main}
-                            mt={1}
-                        >
+                        <Typography variant="h3" color={theme.palette.success.main} mt={1}>
                             Total: {ngnFormatter.format(total)}{" "}
                         </Typography>
                     </Box>
