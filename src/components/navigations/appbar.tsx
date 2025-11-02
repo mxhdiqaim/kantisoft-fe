@@ -75,17 +75,19 @@ const AppbarComponent: FC<Props> = ({toggleDrawer, drawerState}) => {
                 width: {md: `calc(100% - ${theme.layout.sidebarWidth})`},
             }}
         >
-            <Toolbar sx={{display: "flex", justifyContent: "space-between"}}>
-                <Box component={"span"}/>
-                <IconButton
-                    onClick={() => toggleDrawer && toggleDrawer(!drawerState)}
-                    aria-label="menu"
-                    sx={{
-                        display: {xs: "block", md: "none"},
-                    }}
-                >
-                    <MenuOutlinedIcon/>
-                </IconButton>
+            <Toolbar sx={{display: "flex", justifyContent: "space-between", alignItems: "center", height: "100%"}}>
+                <Box component={"span"}
+                     sx={{display: {xs: "flex", md: "none"}, alignItems: "center", justifyContent: "center"}}>
+                    <IconButton
+                        onClick={() => toggleDrawer && toggleDrawer(!drawerState)}
+                        aria-label="menu"
+                        sx={{
+                            display: {xs: "block", md: "none"},
+                        }}
+                    >
+                        <MenuOutlinedIcon/>
+                    </IconButton>
+                </Box>
 
                 <Box sx={{flexGrow: 1}}/>
 
