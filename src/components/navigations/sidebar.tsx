@@ -5,7 +5,10 @@ import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {selectActiveStore, setActiveStore} from "@/store/slice/store-slice";
 import {LogoutOutlined, StorefrontOutlined} from "@mui/icons-material";
 
-import CancelIcon from "@mui/icons-material/Cancel";
+import Icon from "@/components/ui/icon.tsx";
+import CancelSvgIcon from "@/assets/icons/cancel.svg";
+import CollapseSvgIcon from "@/assets/icons/collapse.svg";
+import useScreenSize from "@/hooks/use-screen-size";
 
 import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
@@ -14,8 +17,8 @@ import {
     Button,
     CircularProgress,
     Collapse,
-    Divider,
     Drawer,
+    IconButton,
     List,
     ListItem,
     ListItemButton,
@@ -40,6 +43,7 @@ interface Props extends AppBarProps {
 const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
     const {t} = useTranslation();
     const theme = useTheme();
+    const screenSize = useScreenSize();
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -215,54 +219,98 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                 ...sx,
             }}
         >
-            <Box sx={{height: "100%", display: "flex", flexDirection: "column", overflowY: "auto"}}>
-                <Box
-                    sx={{
-                        display: {xs: "flex", md: "none"},
-                        justifyContent: "flex-end",
-                    }}
-                >
-                    <Button
-                        onClick={() => toggleDrawer && toggleDrawer(!drawerState)}
-                        sx={{width: "fit-content", mt: 1, mr: 0.5}}
-                    >
-                        <CancelIcon sx={{color: theme.palette.alternate.dark}}/>
-                    </Button>
-                </Box>
-                <ListItem sx={{width: "100%"}}>
-                    {isLoadingStores ? (
-                        <CircularProgress size={24}/>
-                    ) : (
-                        <ListItemButton
-                            // component={Link}
-                            // to={"/home"}
-                            sx={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                color: "text.primary",
-                                textTransform: "none",
-                            }}
-                        >
+            {/*<Box sx={{height: "100%", display: "flex", flexDirection: "column", overflowY: "auto"}}>*/}
+            {/*    <Box*/}
+            {/*        sx={{*/}
+            {/*            display: {xs: "flex", md: "none"},*/}
+            {/*            justifyContent: "flex-end",*/}
+            {/*        }}*/}
+            {/*    >*/}
+            {/*        <Button*/}
+            {/*            onClick={() => toggleDrawer && toggleDrawer(!drawerState)}*/}
+            {/*            sx={{width: "fit-content", mt: 1, mr: 0.5}}*/}
+            {/*        >*/}
+            {/*            <CancelIcon sx={{color: theme.palette.alternate.dark}}/>*/}
+            {/*        </Button>*/}
+            {/*    </Box>*/}
+            {/*    <ListItem sx={{width: "100%"}}>*/}
+            {/*        {isLoadingStores ? (*/}
+            {/*            <CircularProgress size={24}/>*/}
+            {/*        ) : (*/}
+            {/*            <ListItemButton*/}
+            {/*                // component={Link}*/}
+            {/*                // to={"/home"}*/}
+            {/*                sx={{*/}
+            {/*                    display: "flex",*/}
+            {/*                    justifyContent: "center",*/}
+            {/*                    alignItems: "center",*/}
+            {/*                    color: "text.primary",*/}
+            {/*                    textTransform: "none",*/}
+            {/*                }}*/}
+            {/*            >*/}
+            {/*                <StorefrontOutlined sx={{mr: 1}}/>*/}
+            {/*                <Typography variant="subtitle2" fontWeight="bold">*/}
+            {/*                    {activeStore && activeStore.name}*/}
+            {/*                </Typography>*/}
+            {/*                <ListItemText/>*/}
+            {/*            </ListItemButton>*/}
+            {/*        )}*/}
+            {/*    </ListItem>*/}
+
+            {/*</Box>*/}
+
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "90%",
+                    py: 2,
+                    mx: "auto",
+                    height: theme.layout.appBarHeight,
+                    borderBottom: "1px solid #CFD1D3",
+                }}
+            >
+                {isLoadingStores ?
+                    (<CircularProgress size={24}/>)
+                    : (
+                        <IconButton aria-label={"BILFI"} component={Link} to={"/"} sx={{
+                            borderRadius: 1, display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            color: "text.primary",
+                            textTransform: "none",
+                        }}>
                             <StorefrontOutlined sx={{mr: 1}}/>
                             <Typography variant="subtitle2" fontWeight="bold">
                                 {activeStore && activeStore.name}
                             </Typography>
                             <ListItemText/>
-                        </ListItemButton>
+                        </IconButton>
+
                     )}
-                </ListItem>
-
-                <Divider sx={{display: {xs: "none", md: "block"}}}/>
-
-                {/* Routes rendering */}
-                <List sx={{height: "100%", display: "flex", flexDirection: "column", overflowY: "auto"}}>
-                    {/* Routes rendering */}
-                    <Box sx={{flexGrow: 1, overflowY: "auto", my: 1}}>
-                        {filterRoutes(appRoutes).map((route, index) => renderMenuItem(route, index))}
-                    </Box>
-                </List>
+                {screenSize === "mobile" || screenSize === "tablet" ? (
+                    <IconButton
+                        aria-label="menu"
+                        sx={{borderRadius: 1}}
+                        onClick={() => toggleDrawer && toggleDrawer(!drawerState)}
+                    >
+                        <Icon src={CancelSvgIcon} alt={"Cancel Icon"}/>
+                    </IconButton>
+                ) : (
+                    <IconButton aria-label="menu" sx={{borderRadius: 1}}>
+                        <Icon src={CollapseSvgIcon} alt={"Collapse Icon"}/>
+                    </IconButton>
+                )}
             </Box>
+
+            {/* Routes rendering */}
+            <List sx={{height: "100%", display: "flex", flexDirection: "column", overflowY: "auto"}}>
+                {/* Routes rendering */}
+                <Box sx={{flexGrow: 1, overflowY: "auto"}}>
+                    {filterRoutes(appRoutes).map((route, index) => renderMenuItem(route, index))}
+                </Box>
+            </List>
             <Box position={"absolute"} bottom={0} width={"100%"} p={2}>
                 <Button
                     fullWidth
