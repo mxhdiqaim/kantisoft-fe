@@ -45,7 +45,7 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
     const dispatch = useDispatch();
     const [logout, {isLoading}] = useLogoutMutation();
     const currentUser = useAppSelector(selectCurrentUser);
-    // Fetch all available stores from the API
+
     const {data: stores, isLoading: isLoadingStores} = useGetAllStoresQuery();
     const activeStore = useSelector(selectActiveStore);
 
@@ -81,32 +81,60 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
         }
     };
 
-    const renderMenuItem = (route: AppRouteType, index: number, level: number = 0, parentPath: string = "") => {
-        // Calculate the full path for this route
-        const fullPath = parentPath + route.to;
+    const filterRoutes = (routes: AppRouteType[]): AppRouteType[] => {
+        return routes
+            .filter((route) => {
+                // Basic filtering for hidden/auth routes
+                if (route.hidden || !(route.authGuard ?? true) || !(route.useLayout ?? true)) {
+                    return false;
+                }
+                // Role-based filtering
+                if (route.roles && currentUser) {
+                    // return route.roles.includes("manager");
+                    return route.roles.includes(currentUser.role);
+                }
+                // If no roles are specified, show to all authenticated users
+                return true;
+            })
+            .map((route) => {
+                if (route.children) {
+                    return {...route, children: filterRoutes(route.children)};
+                }
+                return route;
+            });
+    };
 
-        // const dynamicPath = t(route.pathKey, { ns: "translation", defaultValue: route.to });
+    const renderMenuItem = (route: AppRouteType, index: number, level: number = 0, parentPath: string = "") => {
+        const fullPath = parentPath + route.to;
 
         const isActive = location.pathname.startsWith(fullPath);
         const isSelected = location.pathname === fullPath;
         const isExpanded = expandedItems.includes(route.to);
-        const hasChildren = route.children && route.children;
+        const hasChildren = route.children && route.children.length > 0;
+
+        const linkProps = !hasChildren ? {component: Link, to: fullPath} : {};
 
         return (
             <Fragment key={index}>
                 <ListItem disablePadding sx={{px: 2, py: 0.5}}>
                     <ListItemButton
-                        component={Link}
-                        to={fullPath}
                         selected={isSelected}
                         onClick={() => handleItemClick(route)}
+                        {...linkProps}
                         sx={{
-                            borderRadius: theme.shape.borderRadius,
+                            borderRadius: level > 0 ? 2 : theme.borderRadius.small,
+                            height: level > 0 ? 38 : "auto",
                             py: 1,
                             px: 2,
                             color: theme.palette.text.secondary,
                             transition: theme.transitions.create(["background-color", "color"], {
                                 duration: theme.transitions.duration.short,
+                            }),
+
+                            ...(isExpanded && {
+                                color: theme.palette.text.primary,
+                                border: `0.5px solid ${theme.palette.alternate.dark}`,
+                                backgroundColor: theme.palette.background.default,
                             }),
 
                             "&.Mui-selected": {
@@ -125,12 +153,19 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                             },
                         }}
                     >
-                        <ListItemIcon sx={{minWidth: 40, color: "inherit"}}>{route?.icon}</ListItemIcon>
+                        {route?.icon && (
+                            <ListItemIcon
+                                sx={{minWidth: 40, color: "inherit"}}>{route.icon}</ListItemIcon>
+                        )}
                         <ListItemText
                             primary={t(route.title as string)}
-                            primaryTypographyProps={{
-                                fontWeight: isSelected ? "bold" : "regular",
-                                variant: "body2",
+                            slotProps={{
+                                primary: {
+                                    variant: "body2",
+                                    sx: {
+                                        color: isSelected ? theme.palette.text.primary : "inherit",
+                                    },
+                                },
                             }}
                         />
                         {hasChildren && (
@@ -148,7 +183,7 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                 {/* Render children if expanded */}
                 {hasChildren && (
                     <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding sx={{pl: 2}}>
+                        <List component="div" disablePadding>
                             {route.children?.map((childRoute, childIndex) =>
                                 renderMenuItem(childRoute, childIndex, level + 1, fullPath + "/"),
                             )}
@@ -180,7 +215,7 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                 ...sx,
             }}
         >
-            <List sx={{height: "100%", display: "flex", flexDirection: "column", overflowY: "auto"}}>
+            <Box sx={{height: "100%", display: "flex", flexDirection: "column", overflowY: "auto"}}>
                 <Box
                     sx={{
                         display: {xs: "flex", md: "none"},
@@ -221,52 +256,41 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                 <Divider sx={{display: {xs: "none", md: "block"}}}/>
 
                 {/* Routes rendering */}
-                <Box sx={{flexGrow: 1, overflowY: "auto"}}>
-                    {appRoutes
-                        .filter((route) => {
-                            // Basic filtering for hidden/auth routes
-                            if (route.hidden || !(route.authGuard ?? true) || !(route.useLayout ?? true)) {
-                                return false;
-                            }
-                            // Role-based filtering
-                            if (route.roles && currentUser) {
-                                return route.roles.includes(currentUser.role);
-                            }
-                            // If no roles are specified, show to all authenticated users
-                            return true;
-                        })
-                        .map((route, index) => renderMenuItem(route, index))}
-                </Box>
-
-                <Box position={"absolute"} bottom={0} width={"100%"} p={2}>
-                    <Button
-                        fullWidth
-                        onClick={handleLogout}
-                        disabled={isLoading}
-                        variant="contained"
-                        startIcon={<LogoutOutlined/>}
-                        sx={{
-                            backgroundColor: theme.palette.error.main,
-                            color: theme.palette.error.contrastText,
-                            justifyContent: "flex-start",
-                            py: 1.5,
-                            px: 2,
-                            boxShadow: theme.customShadows.button,
-                            transition: theme.transitions.create(["background-color", "transform"], {
-                                duration: theme.transitions.duration.short,
-                            }),
-                            "&:hover": {
-                                // Darken the button on hover for clear visual feedback
-                                backgroundColor: theme.palette.error.dark,
-                                // Add a subtle scale effect for a modern feel
-                                transform: "scale(1.02)",
-                            },
-                        }}
-                    >
-                        {isLoading ? "Logging out..." : t("Logout")}
-                    </Button>
-                </Box>
-            </List>
+                <List sx={{height: "100%", display: "flex", flexDirection: "column", overflowY: "auto"}}>
+                    {/* Routes rendering */}
+                    <Box sx={{flexGrow: 1, overflowY: "auto", my: 1}}>
+                        {filterRoutes(appRoutes).map((route, index) => renderMenuItem(route, index))}
+                    </Box>
+                </List>
+            </Box>
+            <Box position={"absolute"} bottom={0} width={"100%"} p={2}>
+                <Button
+                    fullWidth
+                    onClick={handleLogout}
+                    disabled={isLoading}
+                    variant="contained"
+                    startIcon={<LogoutOutlined/>}
+                    sx={{
+                        backgroundColor: theme.palette.error.main,
+                        color: theme.palette.error.contrastText,
+                        justifyContent: "flex-start",
+                        py: 1.5,
+                        px: 2,
+                        boxShadow: theme.customShadows.button,
+                        transition: theme.transitions.create(["background-color", "transform"], {
+                            duration: theme.transitions.duration.short,
+                        }),
+                        "&:hover": {
+                            // Darken the button on hover for clear visual feedback
+                            backgroundColor: theme.palette.error.dark,
+                            // Add a subtle scale effect for a modern feel
+                            transform: "scale(1.02)",
+                        },
+                    }}
+                >
+                    {isLoading ? "Logging out..." : t("Logout")}
+                </Button>
+            </Box>
         </Drawer>
     );
 };
