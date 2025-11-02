@@ -1,25 +1,18 @@
-import type { AppRouteType } from "@/routes";
-import type { Period } from "@/types/order-types.ts";
-import type { UserRoleType } from "@/types/user-types";
-import type { ChipProps } from "@mui/material";
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import type {Period} from "@/types/order-types.ts";
+import type {UserRoleType} from "@/types/user-types";
+import type {ChipProps} from "@mui/material";
+import {useEffect} from "react";
+import {useLocation} from "react-router-dom";
 
 // fixes scroll behaviour on route change
 export const ScrollToTop = () => {
-    const { pathname } = useLocation();
+    const {pathname} = useLocation();
 
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [pathname]);
 
     return null;
-};
-
-export const resolveChildren = (item: AppRouteType) => {
-    if (item?.children) return true;
-
-    return false;
 };
 
 export const ngnFormatter = new Intl.NumberFormat("en-US", {

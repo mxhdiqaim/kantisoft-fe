@@ -9,7 +9,7 @@ import {useLogoutMutation} from "@/store/slice";
 import {selectCurrentUser, selectTokenExp} from "@/store/slice/auth-slice";
 
 import {ThemeProvider} from "@/theme";
-import {resolveChildren, ScrollToTop} from "@/utils";
+import {ScrollToTop} from "@/utils";
 import {type JSX, useEffect, useRef} from "react";
 import {ErrorBoundary} from "react-error-boundary";
 import {useTranslation} from "react-i18next";
@@ -20,77 +20,38 @@ import {FullscreenProvider} from "./context/fullscreen-context";
 import {selectActiveStore} from "./store/slice/store-slice";
 import "@/config/i18next-config";
 
-// function to handle nested children route rendering
-const handleNestedRoutes = (childRoute: AppRouteType, index: number): JSX.Element => {
-    // Set default authGuard to true if not explicitly set to false
-    // This means all routes require authentication by default
-    const authGuard = childRoute.authGuard ?? true;
+// Recursive function to render routes and their nested children
+const renderRoutes = (routes: AppRouteType[], parentPath = ""): JSX.Element[] => {
+    return routes.flatMap((route, index) => {
+        // Combine the parent path and current route path, ensuring no double slashes
+        const fullPath = (parentPath ? `${parentPath}/${route.to}` : route.to).replace(/\/+/g, "/");
 
-    // Handle routes that have child routes (nested navigation)
-    if (childRoute.children) {
-        return (
-            <>
-                {/* Render the parent route first */}
-                <Route
-                    key={`parent-${index}`}
-                    path={childRoute.to}
-                    element={
-                        <GuardedRoute authGuard={authGuard}>
-                            <Layout>
-                                <childRoute.element/>
-                            </Layout>
-                        </GuardedRoute>
-                    }
-                />
-                {/* Map through and render all child routes as siblings
-            This allows for complete page navigation rather than nested views */}
-                {childRoute.children.map((route, childIndex) => (
-                    <Route
-                        key={`child-${index}-${childIndex}`}
-                        // Combine parent and child paths for a full route path
-                        path={`${childRoute.to}/${route.to}`}
-                        element={
-                            <GuardedRoute authGuard={authGuard}>
-                                <Layout>
-                                    <route.element/>
-                                </Layout>
-                            </GuardedRoute>
-                        }
-                    />
-                ))}
-            </>
-        );
-    }
+        // Set defaults for layout and auth guard
+        const useLayout = route.useLayout ?? true;
+        const authGuard = route.authGuard ?? true;
 
-    // Handle routes that don't need layout or authentication
-    // Typically used for authentication pages (login/register) or error pages
-    return <Route key={index} path={childRoute.to} element={<childRoute.element/>}/>;
-};
+        // Prepare the element with layout and guards if needed
+        let element: JSX.Element = <route.element/>;
 
-const renterRoute = (route: AppRouteType, index: number) => {
-    const isNestedRoute = resolveChildren(route);
-    if (isNestedRoute) return handleNestedRoutes(route, index);
+        // Wrap with Layout if useLayout is true
+        if (useLayout) {
+            element = <Layout>{element}</Layout>;
+        }
 
-    const authGuard = route.authGuard ?? true;
-    const withLayout = route.useLayout ?? true;
+        // Wrap with GuardedRoute if authGuard is true
+        if (authGuard) {
+            element = <GuardedRoute authGuard={authGuard}>{element}</GuardedRoute>;
+        }
 
-    if (withLayout && authGuard) {
-        return (
-            <Route
-                key={index}
-                path={route.to}
-                element={
-                    <GuardedRoute authGuard={authGuard}>
-                        <Layout>
-                            <route.element/>
-                        </Layout>
-                    </GuardedRoute>
-                }
-            />
-        );
-    }
+        const currentRoute = <Route key={`${fullPath}-${index}`} path={fullPath} element={element}/>;
 
-    return <Route key={index} path={route.to} element={<route.element/>}/>;
+        // If the route has children, recursively render them
+        if (route.children && route.children.length > 0) {
+            return [currentRoute, ...renderRoutes(route.children, fullPath)];
+        }
+
+        return [currentRoute];
+    });
 };
 
 // Component with router-dependent logic
@@ -156,7 +117,8 @@ const AppContent = () => {
             <ScrollToTop/>
             <ErrorBoundary FallbackComponent={ErrorFallback}>
                 <AuthGuard currentUser={currentUser}/>
-                <Routes>{appRoutes.map((route, index) => renterRoute(route, index))}</Routes>
+                <Routes>{renderRoutes(appRoutes)}</Routes>
+                {/*<Routes>{appRoutes.map((route, index) => renterRoute(route, index))}</Routes>*/}
             </ErrorBoundary>
         </>
     );
