@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Box, Button, Paper, TextField, Typography, InputAdornment, IconButton } from "@mui/material";
-import { ArrowBackIosNewOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
-import { useForm, Controller } from "react-hook-form";
+import {useState} from "react";
+import {Button, IconButton, InputAdornment, Paper, TextField, Typography} from "@mui/material";
+import {ArrowBackIosNewOutlined, Visibility, VisibilityOff} from "@mui/icons-material";
+import {Controller, useForm} from "react-hook-form";
 import useNotifier from "@/hooks/useNotifier";
-import { useNavigate } from "react-router-dom";
-import { useUpdatePasswordMutation } from "@/store/slice";
-import { getApiError } from "@/helpers/get-api-error";
+import {useNavigate} from "react-router-dom";
+import {useUpdatePasswordMutation} from "@/store/slice";
+import {getApiError} from "@/helpers/get-api-error";
 
 interface ChangePasswordForm {
     currentPassword: string;
@@ -20,13 +20,13 @@ const ChangePassword = () => {
     const [showNew, setShowNew] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
 
-    const [updatePassword, { isLoading, error }] = useUpdatePasswordMutation();
+    const [updatePassword, {isLoading, error}] = useUpdatePasswordMutation();
 
     const {
         handleSubmit,
         control,
         reset,
-        formState: { errors, isSubmitting },
+        formState: {errors, isSubmitting},
         watch,
         setError,
     } = useForm<ChangePasswordForm>({
@@ -44,7 +44,7 @@ const ChangePassword = () => {
             return;
         }
         try {
-            await updatePassword({ oldPassword: values.currentPassword, newPassword: values.newPassword }).unwrap();
+            await updatePassword({oldPassword: values.currentPassword, newPassword: values.newPassword}).unwrap();
             notify("Password changed successfully!", "success");
             reset();
         } catch (error) {
@@ -53,18 +53,18 @@ const ChangePassword = () => {
             const apiError = getApiError(error, defaultMessage);
 
             notify(apiError.message, "error");
-            setError("newPassword", { type: "manual" });
-            setError("confirmPassword", { type: "manual" });
+            setError("newPassword", {type: "manual"});
+            setError("confirmPassword", {type: "manual"});
         }
     };
 
     return (
-        <Box sx={{ mx: "auto", mt: 6 }}>
-            <Button variant="text" onClick={() => navigate(-1)} sx={{ mb: 2 }}>
-                <ArrowBackIosNewOutlined fontSize="small" sx={{ mr: 0.5 }} />
+        <>
+            <Button variant="text" onClick={() => navigate(-1)} sx={{mb: 2}}>
+                <ArrowBackIosNewOutlined fontSize="small" sx={{mr: 0.5}}/>
                 Go back
             </Button>
-            <Paper sx={{ p: 4 }} elevation={0}>
+            <Paper sx={{p: 4}} elevation={0}>
                 <Typography variant="h5" mb={3}>
                     Change Password
                 </Typography>
@@ -72,8 +72,8 @@ const ChangePassword = () => {
                     <Controller
                         name="currentPassword"
                         control={control}
-                        rules={{ required: "Current password is required" }}
-                        render={({ field }) => (
+                        rules={{required: "Current password is required"}}
+                        render={({field}) => (
                             <TextField
                                 {...field}
                                 label="Current Password"
@@ -86,7 +86,7 @@ const ChangePassword = () => {
                                     endAdornment: (
                                         <InputAdornment position="end">
                                             <IconButton onClick={() => setShowCurrent((show) => !show)} edge="end">
-                                                {showCurrent ? <VisibilityOff /> : <Visibility />}
+                                                {showCurrent ? <VisibilityOff/> : <Visibility/>}
                                             </IconButton>
                                         </InputAdornment>
                                     ),
@@ -99,9 +99,9 @@ const ChangePassword = () => {
                         control={control}
                         rules={{
                             required: "New password is required",
-                            minLength: { value: 6, message: "Password must be at least 6 characters" },
+                            minLength: {value: 6, message: "Password must be at least 6 characters"},
                         }}
-                        render={({ field }) => (
+                        render={({field}) => (
                             <TextField
                                 {...field}
                                 label="New Password"
@@ -114,7 +114,7 @@ const ChangePassword = () => {
                                     endAdornment: (
                                         <InputAdornment position="end">
                                             <IconButton onClick={() => setShowNew((show) => !show)} edge="end">
-                                                {showNew ? <VisibilityOff /> : <Visibility />}
+                                                {showNew ? <VisibilityOff/> : <Visibility/>}
                                             </IconButton>
                                         </InputAdornment>
                                     ),
@@ -129,7 +129,7 @@ const ChangePassword = () => {
                             required: "Please confirm your new password",
                             validate: (value) => value === watch("newPassword") || "Passwords do not match",
                         }}
-                        render={({ field }) => (
+                        render={({field}) => (
                             <TextField
                                 {...field}
                                 label="Confirm New Password"
@@ -142,7 +142,7 @@ const ChangePassword = () => {
                                     endAdornment: (
                                         <InputAdornment position="end">
                                             <IconButton onClick={() => setShowConfirm((show) => !show)} edge="end">
-                                                {showConfirm ? <VisibilityOff /> : <Visibility />}
+                                                {showConfirm ? <VisibilityOff/> : <Visibility/>}
                                             </IconButton>
                                         </InputAdornment>
                                     ),
@@ -155,14 +155,14 @@ const ChangePassword = () => {
                         variant="contained"
                         color="primary"
                         fullWidth
-                        sx={{ mt: 2 }}
+                        sx={{mt: 2}}
                         disabled={isLoading || isSubmitting}
                     >
                         Change Password
                     </Button>
                 </form>
             </Paper>
-        </Box>
+        </>
     );
 };
 

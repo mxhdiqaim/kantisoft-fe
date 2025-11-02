@@ -1,17 +1,18 @@
-import { useGetActivitiesQuery } from "@/store/slice";
-import { Box, Paper, Typography, Chip } from "@mui/material";
-import { useAppSelector } from "@/store";
-import { selectCurrentUser } from "@/store/slice/auth-slice";
-import { UserRoleEnum } from "@/types/user-types";
-import { useMemo, useState } from "react";
+import {useGetActivitiesQuery} from "@/store/slice";
+import {Box, Chip, Typography} from "@mui/material";
+import {useAppSelector} from "@/store";
+import {selectCurrentUser} from "@/store/slice/auth-slice";
+import {UserRoleEnum} from "@/types/user-types";
+import {useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/table-styled-box";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import {DataGrid, type GridColDef} from "@mui/x-data-grid";
 import CustomNoRowsOverlay from "@/components/customs/custom-no-rows-overlay";
-import { useTranslation } from "react-i18next";
+import {useTranslation} from "react-i18next";
 import ActivityLogSkeleton from "@/components/activity-log/loading";
 import ApiErrorDisplay from "@/components/feedback/api-error-display";
-import { getApiError } from "@/helpers/get-api-error";
+import {getApiError} from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
+import CustomCard from "@/components/customs/custom-card.tsx";
 
 const getActionColor = (action: string) => {
     const lowerAction = action.toLowerCase();
@@ -25,7 +26,7 @@ const getActionColor = (action: string) => {
 };
 
 const ActivityLogPage = () => {
-    const { t } = useTranslation();
+    const {t} = useTranslation();
     const notify = useNotifier();
     const currentUser = useAppSelector(selectCurrentUser);
 
@@ -33,14 +34,14 @@ const ActivityLogPage = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
 
-    const { data, isLoading, isError, error } = useGetActivitiesQuery({
+    const {data, isLoading, isError, error} = useGetActivitiesQuery({
         limit: rowsPerPage,
         offset: page * rowsPerPage,
     });
 
     if (!currentUser || ![UserRoleEnum.MANAGER, UserRoleEnum.ADMIN].includes(currentUser.role)) {
         return (
-            <Box sx={{ p: 4 }}>
+            <Box sx={{p: 4}}>
                 <Typography color="error">You do not have permission to view activity logs.</Typography>
             </Box>
         );
@@ -57,7 +58,7 @@ const ActivityLogPage = () => {
                 renderCell: (params) => {
                     const date = new Date(params.row.activityLog.createdAt);
                     return (
-                        <TableStyledBox sx={{ textAlign: "center", justifyContent: "center" }}>
+                        <TableStyledBox sx={{textAlign: "center", justifyContent: "center"}}>
                             <Typography variant="body2">
                                 {isNaN(date.getTime()) ? "Invalid Date" : date.toLocaleString()}
                             </Typography>
@@ -101,9 +102,9 @@ const ActivityLogPage = () => {
                 headerAlign: "center",
                 renderCell: (params) =>
                     params.row.user ? (
-                        <Chip label={params.row.user.role} size="medium" sx={{ textTransform: "capitalize" }} />
+                        <Chip label={params.row.user.role} size="medium" sx={{textTransform: "capitalize"}}/>
                     ) : (
-                        <Chip label="N/A" size="small" variant="outlined" />
+                        <Chip label="N/A" size="small" variant="outlined"/>
                     ),
             },
             {
@@ -113,7 +114,7 @@ const ActivityLogPage = () => {
                 minWidth: 180,
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{ textAlign: "center", justifyContent: "center" }}>
+                    <TableStyledBox sx={{textAlign: "center", justifyContent: "center"}}>
                         <Typography variant="body2">{params.row.store?.name || "Global"}</Typography>
                     </TableStyledBox>
                 ),
@@ -125,7 +126,7 @@ const ActivityLogPage = () => {
                 minWidth: 120,
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{ textAlign: "center", justifyContent: "center" }}>
+                    <TableStyledBox sx={{textAlign: "center", justifyContent: "center"}}>
                         <Typography variant="body2">{t(params.row.activityLog.entityType || "N/A")}</Typography>
                     </TableStyledBox>
                 ),
@@ -137,12 +138,12 @@ const ActivityLogPage = () => {
                 headerAlign: "center",
                 minWidth: 240,
                 renderCell: (params) => (
-                    <TableStyledBox sx={{ textAlign: "center", justifyContent: "center" }}>
+                    <TableStyledBox sx={{textAlign: "center", justifyContent: "center"}}>
                         <Chip
                             label={params.row.activityLog.action.replace(/_/g, " ")}
                             color={getActionColor(params.row.activityLog.action)}
                             size="medium"
-                            sx={{ fontWeight: 600, textTransform: "capitalize" }}
+                            sx={{fontWeight: 600, textTransform: "capitalize"}}
                         />
                     </TableStyledBox>
                 ),
@@ -160,22 +161,22 @@ const ActivityLogPage = () => {
         })) ?? [];
 
     if (isLoading) {
-        return <ActivityLogSkeleton rows={10} columns={columns.length} />;
+        return <ActivityLogSkeleton rows={10} columns={columns.length}/>;
     }
 
     if (isError && !data) {
         const apiError = getApiError(error, "Failed to load users. Please try again later.");
         notify(apiError.message, "error");
-        return <ApiErrorDisplay statusCode={apiError.type} message={apiError.message} />;
+        return <ApiErrorDisplay statusCode={apiError.type} message={apiError.message}/>;
     }
 
     return (
-        <Box sx={{ p: 2 }}>
+        <Box sx={{p: 2}}>
             <Typography variant="h4" gutterBottom>
                 Activity Log
             </Typography>
-            <Paper>
-                <Box sx={{ width: "100%", overflowX: "auto" }}>
+            <CustomCard sx={{p: 0, m: 0}}>
+                <Box sx={{width: "100%", overflowX: "auto"}}>
                     <DataGrid
                         rows={rows}
                         columns={columns}
@@ -183,8 +184,8 @@ const ActivityLogPage = () => {
                         rowCount={data?.totalCount || 0}
                         pagination
                         paginationMode="server"
-                        paginationModel={{ page, pageSize: rowsPerPage }}
-                        onPaginationModelChange={({ page: newPage, pageSize: newPageSize }) => {
+                        paginationModel={{page, pageSize: rowsPerPage}}
+                        onPaginationModelChange={({page: newPage, pageSize: newPageSize}) => {
                             setPage(newPage);
                             setRowsPerPage(newPageSize);
                         }}
@@ -215,7 +216,7 @@ const ActivityLogPage = () => {
                         }}
                     />
                 </Box>
-            </Paper>
+            </CustomCard>
         </Box>
     );
 };
