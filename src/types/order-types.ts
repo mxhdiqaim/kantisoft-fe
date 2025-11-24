@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { extendBaseSchema } from "@/types";
+import {extendBaseSchema} from "@/types";
 import * as yup from "yup";
-import { menuItemSchema, type MenuItemType } from "./menu-item-type";
+import {menuItemSchema, type MenuItemType} from "./menu-item-type";
 
 export const OrderStatus = {
     CANCELED: "canceled",
