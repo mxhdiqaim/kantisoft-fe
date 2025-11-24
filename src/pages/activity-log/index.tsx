@@ -5,25 +5,14 @@ import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {UserRoleEnum} from "@/types/user-types";
 import {useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/table-styled-box";
-import {DataGrid, type GridColDef} from "@mui/x-data-grid";
-import CustomNoRowsOverlay from "@/components/customs/custom-no-rows-overlay";
+import {type GridColDef} from "@mui/x-data-grid";
 import {useTranslation} from "react-i18next";
 import ActivityLogSkeleton from "@/components/activity-log/loading";
 import ApiErrorDisplay from "@/components/feedback/api-error-display";
 import {getApiError} from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
-import CustomCard from "@/components/customs/custom-card.tsx";
-
-const getActionColor = (action: string) => {
-    const lowerAction = action.toLowerCase();
-
-    if (lowerAction.includes("create") || lowerAction.includes("login") || lowerAction.includes("viewed"))
-        return "success";
-    if (lowerAction.includes("update") || lowerAction.includes("password_changed")) return "warning";
-    if (lowerAction.includes("delete") || lowerAction.includes("cancelled")) return "error";
-    if (lowerAction.includes("failed") || lowerAction.includes("error")) return "error";
-    return "default";
-};
+import DataGridTable from "@/components/ui/data-grid-table";
+import {getActionColor} from "@/utils";
 
 const ActivityLogPage = () => {
     const {t} = useTranslation();
@@ -31,8 +20,8 @@ const ActivityLogPage = () => {
     const currentUser = useAppSelector(selectCurrentUser);
 
     // Pagination state
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(20);
+    const [page] = useState(0);
+    const [rowsPerPage] = useState(20);
 
     const {data, isLoading, isError, error} = useGetActivitiesQuery({
         limit: rowsPerPage,
@@ -54,11 +43,11 @@ const ActivityLogPage = () => {
                 headerName: "Date",
                 flex: 1,
                 minWidth: 200,
-                headerAlign: "center",
+                headerAlign: "left",
                 renderCell: (params) => {
                     const date = new Date(params.row.activityLog.createdAt);
                     return (
-                        <TableStyledBox sx={{textAlign: "center", justifyContent: "center"}}>
+                        <TableStyledBox>
                             <Typography variant="body2">
                                 {isNaN(date.getTime()) ? "Invalid Date" : date.toLocaleString()}
                             </Typography>
@@ -71,6 +60,7 @@ const ActivityLogPage = () => {
                 headerName: "Details",
                 flex: 1.5,
                 minWidth: 450,
+                headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2">{params.row.activityLog.details}</Typography>
@@ -83,6 +73,7 @@ const ActivityLogPage = () => {
                 headerName: "User",
                 flex: 1,
                 minWidth: 180,
+                headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2">
@@ -99,22 +90,29 @@ const ActivityLogPage = () => {
                 flex: 1,
                 minWidth: 120,
                 align: "center",
-                headerAlign: "center",
-                renderCell: (params) =>
-                    params.row.user ? (
-                        <Chip label={params.row.user.role} size="medium" sx={{textTransform: "capitalize"}}/>
-                    ) : (
-                        <Chip label="N/A" size="small" variant="outlined"/>
-                    ),
+                headerAlign: "left",
+                renderCell: (params) => {
+                    const role = params.row.user.role;
+
+                    return (
+                        <TableStyledBox>
+                            <Chip
+                                label={role ?? "N/A"}
+                                size="medium"
+                                sx={{textTransform: "capitalize", textAlign: "left"}}
+                            />
+                        </TableStyledBox>
+                    )
+                }
             },
             {
                 field: "store",
                 headerName: "Store",
                 flex: 1,
-                minWidth: 180,
-                headerAlign: "center",
+                minWidth: 150,
+                headerAlign: "left",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{textAlign: "center", justifyContent: "center"}}>
+                    <TableStyledBox>
                         <Typography variant="body2">{params.row.store?.name || "Global"}</Typography>
                     </TableStyledBox>
                 ),
@@ -123,10 +121,10 @@ const ActivityLogPage = () => {
                 field: "entityType",
                 headerName: "Entity Type",
                 flex: 1,
-                minWidth: 120,
-                headerAlign: "center",
+                minWidth: 150,
+                headerAlign: "left",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{textAlign: "center", justifyContent: "center"}}>
+                    <TableStyledBox>
                         <Typography variant="body2">{t(params.row.activityLog.entityType || "N/A")}</Typography>
                     </TableStyledBox>
                 ),
@@ -135,10 +133,10 @@ const ActivityLogPage = () => {
                 field: "action",
                 headerName: "Action",
                 flex: 1,
-                headerAlign: "center",
+                headerAlign: "left",
                 minWidth: 240,
                 renderCell: (params) => (
-                    <TableStyledBox sx={{textAlign: "center", justifyContent: "center"}}>
+                    <TableStyledBox>
                         <Chip
                             label={params.row.activityLog.action.replace(/_/g, " ")}
                             color={getActionColor(params.row.activityLog.action)}
@@ -175,48 +173,13 @@ const ActivityLogPage = () => {
             <Typography variant="h4" gutterBottom>
                 Activity Log
             </Typography>
-            <CustomCard sx={{p: 0, m: 0}}>
-                <Box sx={{width: "100%", overflowX: "auto"}}>
-                    <DataGrid
-                        rows={rows}
-                        columns={columns}
-                        loading={isLoading}
-                        rowCount={data?.totalCount || 0}
-                        pagination
-                        paginationMode="server"
-                        paginationModel={{page, pageSize: rowsPerPage}}
-                        onPaginationModelChange={({page: newPage, pageSize: newPageSize}) => {
-                            setPage(newPage);
-                            setRowsPerPage(newPageSize);
-                        }}
-                        pageSizeOptions={[10, 20, 50, 100]}
-                        slots={{
-                            noRowsOverlay: CustomNoRowsOverlay,
-                        }}
-                        slotProps={{
-                            loadingOverlay: {
-                                variant: "skeleton",
-                                noRowsVariant: "skeleton",
-                            },
-                            noRowsOverlay: {
-                                period: "No activity logs found for this period.",
-                            },
-                        }}
-                        sx={{
-                            border: "none",
-                            "& .MuiDataGrid-columnHeaderTitle": {
-                                fontWeight: 600,
-                            },
-                            // Optional: Adjust row height for better density
-                            "& .MuiDataGrid-row": {
-                                minHeight: "48px !important",
-                            },
-
-                            minWidth: columns.reduce((acc, col) => acc + (col.minWidth || 0), 0) + 50 + "px", // Estimate minWidth for content
-                        }}
-                    />
-                </Box>
-            </CustomCard>
+            <Box sx={{width: "100%", overflowX: "auto"}}>
+                <DataGridTable
+                    data={rows}
+                    columns={columns}
+                    loading={isLoading}
+                />
+            </Box>
         </Box>
     );
 };

@@ -1,4 +1,4 @@
-import { orderPeriodSchema, type Period } from "@/types/order-types.ts";
+import {orderPeriodSchema, type Period} from "@/types/order-types.ts";
 import * as yup from "yup";
 
 export type OrderByType = "quantity" | "revenue";
@@ -16,7 +16,7 @@ export const salesFilterSchema = yup.object({
 export type SaleSummarySchemaType = yup.InferType<typeof salesSummarySchema>;
 
 export type TopSellsSchemaType = {
-    period?: Period;
+    timePeriod?: Period;
     limit?: number;
     orderBy?: OrderByType;
 };

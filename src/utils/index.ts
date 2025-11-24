@@ -50,3 +50,14 @@ export const getRoleChipColor = (role: UserRoleType): ChipProps["color"] => {
 
     return colors[role] || "default";
 };
+
+export const getActionColor = (action: string) => {
+    const lowerAction = action.toLowerCase();
+
+    if (lowerAction.includes("create") || lowerAction.includes("login") || lowerAction.includes("viewed"))
+        return "success";
+    if (lowerAction.includes("update") || lowerAction.includes("password_changed")) return "warning";
+    if (lowerAction.includes("delete") || lowerAction.includes("cancelled")) return "error";
+    if (lowerAction.includes("failed") || lowerAction.includes("error")) return "error";
+    return "default";
+};

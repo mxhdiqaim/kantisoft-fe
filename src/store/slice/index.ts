@@ -1,4 +1,4 @@
-import type { ActivityLogResponse } from "@/types";
+import type {ActivityLogResponse} from "@/types";
 import type {
     InventorySummaryType,
     SalesTrendType,
@@ -6,10 +6,15 @@ import type {
     TopSellsItemType,
     TopSellsSchemaType,
 } from "@/types/dashboard-types.ts";
-import type { AddMenuItemType, MenuItemType } from "@/types/menu-item-type.ts";
-import type { CreateOrderType, OrdersByPeriodResponse, Period, SingleOrderType } from "@/types/order-types.ts";
-import type { CreateStoreType, StoreType } from "@/types/store-types";
-import type { CreateUserType, RegisterUserType, UserType } from "@/types/user-types";
+import type {AddMenuItemType, MenuItemType} from "@/types/menu-item-type.ts";
+import type {
+    CreateOrderType,
+    OrdersByPeriodResponse,
+    Period as TimePeriod,
+    SingleOrderType
+} from "@/types/order-types.ts";
+import type {CreateStoreType, StoreType} from "@/types/store-types";
+import type {CreateUserType, RegisterUserType, UserType} from "@/types/user-types";
 import {
     type BaseQueryFn,
     createApi,
@@ -17,15 +22,15 @@ import {
     fetchBaseQuery,
     type FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
-import type { RootState } from "..";
-import { logOut, setCredentials } from "./auth-slice";
+import type {RootState} from "..";
+import {logOut, setCredentials} from "./auth-slice";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;
 
 // Create a new base query that wraps fetchBaseQuery
 const baseQuery = fetchBaseQuery({
     baseUrl,
-    prepareHeaders: (headers, { getState }) => {
+    prepareHeaders: (headers, {getState}) => {
         // Get the token from the auth state
         const token = (getState() as RootState).auth.token;
         if (token) {
@@ -67,7 +72,8 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
         // Preventing other queries from failing and causing unhandled exceptions
         // while the logout is in progress, return a promise that never resolves.
         // The page reload to "/login" will render this moot.
-        return new Promise(() => {});
+        return new Promise(() => {
+        });
     }
 
     return result;
@@ -92,19 +98,19 @@ export const apiSlice = createApi({
     endpoints: (builder) => ({
         // Health Check Endpoint
         healthCheck: builder.query<{ status: string }, void>({
-            query: () => "/",
+            query: () => "/health",
         }),
 
         // Auth Endpoints
         login: builder.mutation({
             query: (credentials) => ({
-                url: "/api/login",
+                url: "/auth/login",
                 method: "POST",
                 body: credentials,
             }),
-            async onQueryStarted(_args, { dispatch, queryFulfilled }) {
+            async onQueryStarted(_args, {dispatch, queryFulfilled}) {
                 try {
-                    const { data } = await queryFulfilled;
+                    const {data} = await queryFulfilled;
 
                     // On success, dispatch setCredentials to store token and user
                     dispatch(setCredentials(data));
@@ -117,10 +123,10 @@ export const apiSlice = createApi({
         // Logout Endpoint
         logout: builder.mutation({
             query: () => ({
-                url: "/api/logout",
+                url: "/auth/logout",
                 method: "POST",
             }),
-            async onQueryStarted(_args, { dispatch, queryFulfilled }) {
+            async onQueryStarted(_args, {dispatch, queryFulfilled}) {
                 try {
                     await queryFulfilled;
                     // Dispatch the logOut action to clear credentials and localStorage
@@ -153,7 +159,7 @@ export const apiSlice = createApi({
             Omit<RegisterUserType, "confirmPassword">
         >({
             query: (body) => ({
-                url: "/api/register",
+                url: "/auth/register",
                 method: "POST",
                 body,
             }),
@@ -168,26 +174,26 @@ export const apiSlice = createApi({
         }),
 
         getActivities: builder.query<ActivityLogResponse, { limit?: number; offset?: number }>({
-            query: ({ limit = 20, offset = 0 } = {}) => ({
+            query: ({limit = 20, offset = 0} = {}) => ({
                 url: "/activities",
-                params: { limit, offset },
+                params: {limit, offset},
             }),
             providesTags: ["ActivityLog"],
         }),
 
         // Dashboard Endpoint
-        getSalesSummary: builder.query<SaleSummarySchemaType, Period>({
-            query: (period = "today") => ({
+        getSalesSummary: builder.query<SaleSummarySchemaType, TimePeriod>({
+            query: (timePeriod = "today") => ({
                 url: "/dashboard/sales-summary",
-                params: { period },
+                params: {timePeriod},
             }),
             providesTags: ["Summary"],
         }),
 
         getTopSells: builder.query<TopSellsItemType[], TopSellsSchemaType>({
-            query: ({ period = "month", limit = "5", orderBy = "quantity" }) => ({
+            query: ({timePeriod = "today", limit = "5", orderBy = "quantity"}) => ({
                 url: "/dashboard/top-sells",
-                params: { period, limit, orderBy },
+                params: {timePeriod, limit, orderBy},
             }),
             providesTags: ["TopSells"],
         }),
@@ -197,25 +203,25 @@ export const apiSlice = createApi({
             providesTags: ["InventorySummary"],
         }),
 
-        getSalesTrend: builder.query<SalesTrendType[], Period | void>({
-            query: (period = "week") => ({
+        getSalesTrend: builder.query<SalesTrendType[], TimePeriod | void>({
+            query: (timePeriod = "week") => ({
                 url: "/dashboard/sales-trend",
-                params: { period },
+                params: {timePeriod},
             }),
             providesTags: ["SalesTrend"],
         }),
 
         // Order Endpoints
-        getOrdersByPeriod: builder.query<OrdersByPeriodResponse, Period>({
-            query: (period = "today") => ({
+        getOrdersByPeriod: builder.query<OrdersByPeriodResponse, TimePeriod>({
+            query: (timePeriod = "today") => ({
                 url: "/orders/by-period",
-                params: { period },
+                params: {timePeriod},
             }),
             providesTags: ["Order"],
         }),
         getOrderById: builder.query<SingleOrderType, string>({
             query: (id) => `/orders/${id}`,
-            providesTags: (_result, _error, id) => [{ type: "Order", id }],
+            providesTags: (_result, _error, id) => [{type: "Order", id}],
         }),
         createOrder: builder.mutation<SingleOrderType, Omit<CreateOrderType, "amountReceived">>({
             query: (newOrder) => ({
@@ -248,12 +254,12 @@ export const apiSlice = createApi({
             invalidatesTags: ["MenuItem"],
         }),
         updateMenuItem: builder.mutation<MenuItemType, Partial<MenuItemType> & Pick<MenuItemType, "id">>({
-            query: ({ id, ...patch }) => ({
+            query: ({id, ...patch}) => ({
                 url: `/menu-items/${id}`,
                 method: "PATCH",
                 body: patch,
             }),
-            invalidatesTags: (_result, _error, { id }) => [{ type: "MenuItem", id }, "MenuItem"],
+            invalidatesTags: (_result, _error, {id}) => [{type: "MenuItem", id}, "MenuItem"],
         }),
 
         // User Management Endpoints
@@ -261,8 +267,8 @@ export const apiSlice = createApi({
             query: () => "/users",
             providesTags: (result) =>
                 result
-                    ? [...result.map(({ id }) => ({ type: "User" as const, id })), { type: "User", id: "LIST" }]
-                    : [{ type: "User", id: "LIST" }],
+                    ? [...result.map(({id}) => ({type: "User" as const, id})), {type: "User", id: "LIST"}]
+                    : [{type: "User", id: "LIST"}],
         }),
         createUser: builder.mutation<UserType, CreateUserType>({
             query: (newUser) => ({
@@ -270,28 +276,28 @@ export const apiSlice = createApi({
                 method: "POST",
                 body: newUser,
             }),
-            invalidatesTags: [{ type: "User", id: "LIST" }],
+            invalidatesTags: [{type: "User", id: "LIST"}],
         }),
         getUserById: builder.query<UserType, string>({
             query: (id) => `/users/${id}`,
-            providesTags: (_result, _error, id) => [{ type: "User", id }],
+            providesTags: (_result, _error, id) => [{type: "User", id}],
         }),
         deleteUser: builder.mutation<{ message: string }, string>({
             query: (id) => ({
                 url: `/users/${id}`,
                 method: "DELETE",
             }),
-            invalidatesTags: [{ type: "User", id: "LIST" }],
+            invalidatesTags: [{type: "User", id: "LIST"}],
         }),
         updateUser: builder.mutation<UserType, Partial<UserType> & Pick<UserType, "id">>({
-            query: ({ id, ...patch }) => ({
+            query: ({id, ...patch}) => ({
                 url: `/users/${id}`,
                 method: "PATCH",
                 body: patch,
             }),
-            invalidatesTags: (_result, _error, { id }) => [
-                { type: "User", id },
-                { type: "User", id: "LIST" },
+            invalidatesTags: (_result, _error, {id}) => [
+                {type: "User", id},
+                {type: "User", id: "LIST"},
             ],
         }),
 
@@ -300,12 +306,12 @@ export const apiSlice = createApi({
             query: () => "/stores",
             providesTags: (result) =>
                 result
-                    ? [...result.map(({ id }) => ({ type: "Store" as const, id })), { type: "Store", id: "LIST" }]
-                    : [{ type: "Store", id: "LIST" }],
+                    ? [...result.map(({id}) => ({type: "Store" as const, id})), {type: "Store", id: "LIST"}]
+                    : [{type: "Store", id: "LIST"}],
         }),
         getStoreById: builder.query<StoreType, string>({
             query: (id) => `/stores/${id}`,
-            providesTags: (_result, _error, id) => [{ type: "Store", id }],
+            providesTags: (_result, _error, id) => [{type: "Store", id}],
         }),
         createStore: builder.mutation<StoreType, CreateStoreType>({
             query: (newStore) => ({
@@ -313,17 +319,17 @@ export const apiSlice = createApi({
                 method: "POST",
                 body: newStore,
             }),
-            invalidatesTags: [{ type: "Store", id: "LIST" }],
+            invalidatesTags: [{type: "Store", id: "LIST"}],
         }),
         updateStore: builder.mutation<StoreType, Partial<StoreType> & Pick<StoreType, "id">>({
-            query: ({ id, ...patch }) => ({
+            query: ({id, ...patch}) => ({
                 url: `/stores/${id}`,
                 method: "PATCH",
                 body: patch,
             }),
-            invalidatesTags: (_result, _error, { id }) => [
-                { type: "Store", id },
-                { type: "Store", id: "LIST" },
+            invalidatesTags: (_result, _error, {id}) => [
+                {type: "Store", id},
+                {type: "Store", id: "LIST"},
             ],
         }),
         deleteStore: builder.mutation<{ message: string }, string>({
@@ -331,7 +337,7 @@ export const apiSlice = createApi({
                 url: `/stores/${id}`,
                 method: "DELETE",
             }),
-            invalidatesTags: [{ type: "Store", id: "LIST" }],
+            invalidatesTags: [{type: "Store", id: "LIST"}],
         }),
     }),
 });
