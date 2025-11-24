@@ -178,7 +178,7 @@ export const apiSlice = createApi({
                 url: "/activities",
                 params: {limit, offset},
             }),
-            providesTags: ["ActivityLog"],
+            providesTags: [{type: "ActivityLog", id: "LIST"}],
         }),
 
         // Dashboard Endpoint
@@ -217,7 +217,10 @@ export const apiSlice = createApi({
                 url: "/orders/by-period",
                 params: {timePeriod},
             }),
-            providesTags: ["Order"],
+            providesTags: (result) =>
+                result && 'data' in result && Array.isArray(result.data)
+                    ? [...result.data.map(({id}) => ({type: "Order" as const, id})), {type: "Order", id: "LIST"}]
+                    : [{type: "Order", id: "LIST"}],
         }),
         getOrderById: builder.query<SingleOrderType, string>({
             query: (id) => `/orders/${id}`,
@@ -229,14 +232,16 @@ export const apiSlice = createApi({
                 method: "POST",
                 body: newOrder,
             }),
-            // When a new order is created, invalidate the 'Order' tag to refetch the list
-            invalidatesTags: ["Order"],
+            invalidatesTags: [{type: "Order", id: "LIST"}],
         }),
 
         // Menu Item Endpoints
         getMenuItems: builder.query<MenuItemType[], void>({
             query: () => "/menu-items/",
-            providesTags: ["MenuItem"],
+            providesTags: (result) =>
+                result
+                    ? [...result.map(({id}) => ({type: "MenuItem" as const, id})), {type: "MenuItem", id: "LIST"}]
+                    : [{type: "MenuItem", id: "LIST"}],
         }),
         createMenuItem: builder.mutation<MenuItemType, AddMenuItemType>({
             query: (newMenuItem) => ({
@@ -244,14 +249,14 @@ export const apiSlice = createApi({
                 method: "POST",
                 body: newMenuItem,
             }),
-            invalidatesTags: ["MenuItem"],
+            invalidatesTags: [{type: "MenuItem", id: "LIST"}],
         }),
         deleteMenuItem: builder.mutation<void, string>({
             query: (id) => ({
                 url: `/menu-items/${id}`,
                 method: "DELETE",
             }),
-            invalidatesTags: ["MenuItem"],
+            invalidatesTags: [{type: "MenuItem", id: "LIST"}],
         }),
         updateMenuItem: builder.mutation<MenuItemType, Partial<MenuItemType> & Pick<MenuItemType, "id">>({
             query: ({id, ...patch}) => ({
@@ -259,7 +264,10 @@ export const apiSlice = createApi({
                 method: "PATCH",
                 body: patch,
             }),
-            invalidatesTags: (_result, _error, {id}) => [{type: "MenuItem", id}, "MenuItem"],
+            invalidatesTags: (_result, _error, {id}) => [
+                {type: "MenuItem", id},
+                {type: "MenuItem", id: "LIST"},
+            ],
         }),
 
         // User Management Endpoints
@@ -315,7 +323,7 @@ export const apiSlice = createApi({
         }),
         createStore: builder.mutation<StoreType, CreateStoreType>({
             query: (newStore) => ({
-                url: "/stores",
+                url: "/stores/create",
                 method: "POST",
                 body: newStore,
             }),
