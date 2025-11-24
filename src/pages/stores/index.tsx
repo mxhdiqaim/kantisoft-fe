@@ -25,20 +25,8 @@ const StoresPage = () => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
-
     const [storeToDelete, setStoreToDelete] = useState<StoreType | null>(null);
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-    const flattenedStores = useMemo(() => {
-        if (!storesData || storesData.length === 0) {
-            return [];
-        }
-        const mainStore = storesData[0];
-        const branches = mainStore.branches || [];
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const {branches: _, ...mainStoreWithoutBranches} = mainStore;
-        return [mainStoreWithoutBranches, ...branches];
-    }, [storesData]);
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
         setAnchorEl(event.currentTarget);
@@ -85,6 +73,29 @@ const StoresPage = () => {
                         <Typography variant="body2">{params.value}</Typography>
                     </TableStyledBox>
                 ),
+            },
+            {
+                flex: 1,
+                field: "branchType",
+                headerName: "Branch Type",
+                minWidth: 120,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params: GridRenderCellParams<StoreType>) => {
+                    const isMain = params.row.branchType === "main";
+                    const label = isMain ? `Main ${t("store")}` : `Branch ${t("store")}`;
+                    const color = isMain ? "primary" : "secondary";
+                    return (
+                        <TableStyledBox>
+                            <Chip
+                                label={label}
+                                size="medium"
+                                color={color}
+                                sx={{textTransform: "capitalize", borderRadius: theme.borderRadius.small}}
+                            />
+                        </TableStyledBox>
+                    );
+                },
             },
             {
                 flex: 1,
@@ -148,6 +159,10 @@ const StoresPage = () => {
                 renderCell: (params) => {
                     const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
 
+                    const isMainStore = params.row.branchType === "main";
+                    const hasBranches = storesData?.length > 1;
+                    const isDeleteDisabled = isMainStore && hasBranches;
+
                     const handleView = () => {
                         navigate(`/stores/${params.row.id}/view`);
                         handleMenuClose();
@@ -177,7 +192,7 @@ const StoresPage = () => {
                                     <EditOutlined sx={{mr: 1}}/>
                                     Edit
                                 </MenuItem>
-                                <MenuItem onClick={handleDelete}>
+                                <MenuItem onClick={handleDelete} disabled={isDeleteDisabled}>
                                     <DeleteOutline sx={{mr: 1}}/>
                                     Delete
                                 </MenuItem>
@@ -187,7 +202,7 @@ const StoresPage = () => {
                 },
             },
         ],
-        [anchorEl, selectedRowId, navigate, theme.borderRadius.small],
+        [anchorEl, selectedRowId, navigate, theme.borderRadius.small, storesData, t],
     );
 
     if (isLoading) return <StoresPageLoading/>;
@@ -210,7 +225,7 @@ const StoresPage = () => {
             </Box>
             <Grid container spacing={2}>
                 <Grid size={12}>
-                    <DataGridTable data={flattenedStores} loading={isLoading} columns={columns}/>
+                    <DataGridTable data={storesData} loading={isLoading} columns={columns}/>
                 </Grid>
             </Grid>
 
