@@ -1,29 +1,33 @@
 import ApiErrorDisplay from "@/components/feedback/api-error-display";
 import UsersPageLoading from "@/components/users/loading";
-import UsersTable from "@/components/users/users-table";
-import { getApiError } from "@/helpers/get-api-error";
-import useNotifier from "@/hooks/useNotifier";
-import { useAppSelector } from "@/store";
-import { useGetAllUsersQuery } from "@/store/slice";
-import { selectCurrentUser } from "@/store/slice/auth-slice";
-import type { UserType } from "@/types/user-types.ts";
 
-import { getExportFormattedData } from "@/utils/table-export-utils";
-import { AddOutlined, FileDownloadOutlined } from "@mui/icons-material";
-import { Box, Button, Menu, MenuItem, Paper, Typography, useTheme } from "@mui/material";
-import type { GridColDef } from "@mui/x-data-grid";
-import { saveAs } from "file-saver";
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {getApiError} from "@/helpers/get-api-error";
+import useNotifier from "@/hooks/useNotifier";
+import {useAppSelector} from "@/store";
+import {useGetAllUsersQuery} from "@/store/slice";
+import {selectCurrentUser} from "@/store/slice/auth-slice";
+import {roleHierarchy, type UserType} from "@/types/user-types.ts";
+
+import {getExportFormattedData} from "@/utils/table-export-utils";
+import {AddOutlined, EditOutlined, FileDownloadOutlined, MoreVert, VisibilityOutlined} from "@mui/icons-material";
+import {Avatar, Box, Button, Chip, Grid, IconButton, Menu, MenuItem, Tooltip, Typography,} from "@mui/material";
+import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
+import {saveAs} from "file-saver";
+import {type MouseEvent, useMemo, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import * as XLSX from "xlsx";
+import TableStyledBox from "@/components/ui/table-styled-box.tsx";
+import DataGridTable from "@/components/ui/data-grid-table";
+import CustomCard from "@/components/customs/custom-card.tsx";
 
 const UsersPage = () => {
     const notify = useNotifier();
-    const theme = useTheme();
     const navigate = useNavigate();
     const currentUser = useAppSelector(selectCurrentUser);
-    const { data: users, isLoading, isError, error } = useGetAllUsersQuery();
+    const {data: usersData, isLoading, isError, error} = useGetAllUsersQuery();
 
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
     const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
     const isExportMenuOpen = Boolean(exportAnchorEl);
 
@@ -45,14 +49,14 @@ const UsersPage = () => {
         // Create a simplified columns array just for export, to match `getExportFormattedData`'s needs
         // and avoid passing complex renderCell logic from UsersTable.
         const exportColumns: GridColDef[] = [
-            { field: "name", headerName: "Name" },
-            { field: "email", headerName: "Email" },
-            { field: "role", headerName: "Role" },
-            { field: "status", headerName: "Status" },
-            { field: "createdAt", headerName: "Date Created" },
+            {field: "name", headerName: "Name"},
+            {field: "email", headerName: "Email"},
+            {field: "role", headerName: "Role"},
+            {field: "status", headerName: "Status"},
+            {field: "createdAt", headerName: "Date Created"},
         ];
 
-        const dataToExport = getExportFormattedData(users ?? [], exportColumns, usersFieldFormatters); // Pass users (can be null) and new exportColumns
+        const dataToExport = getExportFormattedData(usersData ?? [], exportColumns, usersFieldFormatters); // Pass users (can be null) and new exportColumns
 
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
@@ -68,7 +72,7 @@ const UsersPage = () => {
             ),
         ].join("\n");
 
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
         saveAs(blob, `users_data.csv`);
         setExportAnchorEl(null);
     };
@@ -76,14 +80,14 @@ const UsersPage = () => {
     // Export to XLSX function
     const handleExportXlsx = () => {
         const exportColumns: GridColDef[] = [
-            { field: "name", headerName: "Name" },
-            { field: "email", headerName: "Email" },
-            { field: "role", headerName: "Role" },
-            { field: "status", headerName: "Status" },
-            { field: "createdAt", headerName: "Date Created" },
+            {field: "name", headerName: "Name"},
+            {field: "email", headerName: "Email"},
+            {field: "role", headerName: "Role"},
+            {field: "status", headerName: "Status"},
+            {field: "createdAt", headerName: "Date Created"},
         ];
 
-        const dataToExport = getExportFormattedData(users ?? [], exportColumns, usersFieldFormatters);
+        const dataToExport = getExportFormattedData(usersData ?? [], exportColumns, usersFieldFormatters);
 
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
@@ -96,54 +100,225 @@ const UsersPage = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Users Data");
 
         // Use exportColumns for calculating widths
-        const colWidths = exportColumns
+        worksheet["!cols"] = exportColumns
             .filter((col) => col.headerName) // Ensure headerName exists for width calculation
-            .map((col) => ({ wch: (col.headerName?.toString().length || 15) + 5 }));
-
-        worksheet["!cols"] = colWidths;
+            .map((col) => ({wch: (col.headerName?.toString().length || 15) + 5}));
 
         XLSX.writeFile(workbook, `users_data.xlsx`);
         setExportAnchorEl(null);
     };
 
+    const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedRowId(rowId);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+        setSelectedRowId(null);
+    };
+
+    const columns: GridColDef[] = useMemo(
+        () => [
+            {
+                flex: 1,
+                field: "name",
+                headerName: "Name",
+                width: 150,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => {
+                    const name = `${params.row.firstName} ${params.row.lastName}`;
+                    const initials =
+                        `${params.row.firstName?.[0] ?? ""}${params.row.lastName?.[0] ?? ""}`.toUpperCase();
+                    return (
+                        <TableStyledBox>
+                            <Avatar
+                                sx={{
+                                    bgcolor: "primary.light",
+                                    color: "primary.dark",
+                                    width: 36,
+                                    height: 36,
+                                    mr: 1.5,
+                                    fontSize: "0.875rem",
+                                    fontWeight: "bold",
+                                }}
+                            >
+                                {initials}
+                            </Avatar>
+                            <Typography variant="body2" fontWeight="500">
+                                {name}
+                            </Typography>
+                        </TableStyledBox>
+                    );
+                },
+            },
+            {
+                flex: 1,
+                field: "email",
+                headerName: "Email",
+                width: 150,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography variant="body2">{params.value}</Typography>
+                    </TableStyledBox>
+                ),
+            },
+            {
+                field: "role",
+                headerName: "Role",
+                width: 120,
+                cellClassName: "capitalize-cell",
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography variant="body2">{params.value}</Typography>
+                    </TableStyledBox>
+                ),
+            },
+            {
+                field: "status",
+                headerName: "Status",
+                width: 120,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params: GridRenderCellParams<UserType>) => (
+                    <TableStyledBox>
+                        <Chip
+                            label={params.value}
+                            color={params.value === "active" ? "success" : "error"}
+                            size="medium"
+                            sx={{textTransform: "capitalize", fontWeight: "bold"}}
+                        />
+                    </TableStyledBox>
+                ),
+            },
+            {
+                field: "createdAt",
+                headerName: "Date Created",
+                width: 180,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params: GridRenderCellParams<UserType, string>) => {
+                    const date = new Date(params.value as string);
+                    if (isNaN(date.getTime())) {
+                        return "Invalid Date";
+                    }
+                    return (
+                        <TableStyledBox>
+                            <Typography variant="body2" fontWeight="500">
+                                {date.toLocaleDateString()}
+                            </Typography>
+                        </TableStyledBox>
+                    );
+                },
+            },
+            {
+                field: "actions",
+                headerName: "Actions",
+                width: 100,
+                sortable: false,
+                align: "center",
+                headerAlign: "center",
+                renderCell: (params) => {
+                    const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
+
+                    const handleView = () => {
+                        navigate(`/user/${params.row.id}/view`);
+                        handleMenuClose();
+                    };
+                    const handleEdit = () => {
+                        navigate(`/user/${params.row.id}/edit`);
+                        handleMenuClose();
+                    };
+
+                    const canEdit = () => {
+                        if (!currentUser) return false; // Cannot edit if not logged in
+
+                        const currentUserRoleLevel = roleHierarchy[currentUser.role];
+                        const rowUserRoleLevel = roleHierarchy[(params.row as UserType).role];
+                        const isSelf = currentUser.id === params.row.id;
+
+                        // Manager can edit anyone
+                        if (currentUser.role === "manager") return true;
+
+                        // Admin can edit admins and lower, but not managers
+                        if (currentUser.role === "admin") {
+                            return currentUserRoleLevel <= rowUserRoleLevel;
+                        }
+
+                        // Users and Guests can only edit themselves or roles below them
+                        return currentUserRoleLevel > rowUserRoleLevel || isSelf;
+                    };
+
+                    const isEditDisabled =
+                        params.row.status === "deleted" || params.row.status === "inactive" || !canEdit();
+
+                    return (
+                        <>
+                            <Tooltip title="More Actions">
+                                <IconButton onClick={(e) => handleMenuClick(e, params.row.id)}>
+                                    <MoreVert/>
+                                </IconButton>
+                            </Tooltip>
+                            <Menu anchorEl={anchorEl} open={isOpen} onClose={handleMenuClose}>
+                                <MenuItem onClick={handleView} disabled={isEditDisabled}>
+                                    <VisibilityOutlined sx={{mr: 1}}/>
+                                    View
+                                </MenuItem>
+                                <MenuItem onClick={handleEdit} disabled={isEditDisabled}>
+                                    <EditOutlined sx={{mr: 1}}/>
+                                    Edit
+                                </MenuItem>
+                            </Menu>
+                        </>
+                    );
+                },
+            },
+        ],
+        [anchorEl, selectedRowId, navigate, currentUser],
+    );
+
     if (isLoading) {
-        return <UsersPageLoading />;
+        return <UsersPageLoading/>;
     }
 
     if (isError) {
         const apiError = getApiError(error, "Failed to load users. Please try again later.");
         notify(apiError.message, "error");
-        return <ApiErrorDisplay statusCode={apiError.type} message={apiError.message} />;
+        return <ApiErrorDisplay statusCode={apiError.type} message={apiError.message}/>;
     }
 
     return (
         <Box>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+            <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
                 <Typography variant="h4">User Management</Typography>
                 {currentUser && (currentUser.role === "manager" || currentUser.role === "admin") && (
-                    <Button variant="contained" startIcon={<AddOutlined />} onClick={() => navigate("/user/new")}>
+                    <Button variant="contained" startIcon={<AddOutlined/>} onClick={() => navigate("/user/new")}>
                         New User
                     </Button>
                 )}
             </Box>
-            <Paper
-                elevation={0}
+            <CustomCard
                 sx={{
-                    border: `1px solid ${theme.palette.divider}`,
-                    height: "70vh",
+                    // height: "70vh",
+                    mb: 2,
                     width: "100%",
                     "& .capitalize-cell": {
                         textTransform: "capitalize",
                     },
                 }}
             >
-                <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+                <Box sx={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
                     {/* Export Button and Menu */}
                     <Button
                         variant="contained"
                         size="small"
-                        startIcon={<FileDownloadOutlined />}
-                        sx={{ height: 45, minWidth: 200 }}
+                        startIcon={<FileDownloadOutlined/>}
+                        sx={{height: 45, minWidth: 200}}
                         onClick={(event) => setExportAnchorEl(event.currentTarget)}
                     >
                         Export
@@ -153,8 +328,12 @@ const UsersPage = () => {
                         <MenuItem onClick={handleExportXlsx}>Export as XLSX</MenuItem>
                     </Menu>
                 </Box>
-                <UsersTable users={users ?? []} loading={isLoading} />
-            </Paper>
+            </CustomCard>
+            <Grid container spacing={2}>
+                <Grid size={12}>
+                    <DataGridTable data={usersData ?? []} columns={columns} loading={isLoading}/>
+                </Grid>
+            </Grid>
         </Box>
     );
 };
