@@ -3,7 +3,6 @@ import {
     AddUserScreen,
     ChangePasswordScreen,
     DashboardScreen,
-    EditStoreScreen,
     EditUserScreen,
     ForgetPasswordScreen,
     HomeScreen,
@@ -187,7 +186,7 @@ export const appRoutes: AppRouteType[] = [
     {
         to: "/stores/:id/edit",
         title: "editStore",
-        element: EditStoreScreen,
+        element: StoreFormScreen,
         hidden: true,
         roles: [UserRoleEnum.MANAGER],
     },
