@@ -4,12 +4,19 @@ import UsersPageLoading from "@/components/users/loading";
 import {getApiError} from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
 import {useAppSelector} from "@/store";
-import {useGetAllUsersQuery} from "@/store/slice";
+import {useChangeUserStoreMutation, useGetAllStoresQuery, useGetAllUsersQuery} from "@/store/slice";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
-import {roleHierarchy, type UserType} from "@/types/user-types.ts";
+import {roleHierarchy, UserRoleEnum, type UserType} from "@/types/user-types.ts";
 
 import {getExportFormattedData} from "@/utils/table-export-utils";
-import {AddOutlined, EditOutlined, FileDownloadOutlined, MoreVert, VisibilityOutlined} from "@mui/icons-material";
+import {
+    AddOutlined,
+    EditOutlined,
+    FileDownloadOutlined,
+    MoreVert,
+    StorefrontOutlined,
+    VisibilityOutlined
+} from "@mui/icons-material";
 import {Avatar, Box, Button, Chip, Grid, IconButton, Menu, MenuItem, Tooltip, Typography,} from "@mui/material";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
 import {saveAs} from "file-saver";
@@ -19,17 +26,47 @@ import * as XLSX from "xlsx";
 import TableStyledBox from "@/components/ui/table-styled-box.tsx";
 import DataGridTable from "@/components/ui/data-grid-table";
 import CustomCard from "@/components/customs/custom-card.tsx";
+import ChangeStoreDialog from "@/components/users/change-store-modal.tsx";
 
 const UsersPage = () => {
     const notify = useNotifier();
     const navigate = useNavigate();
     const currentUser = useAppSelector(selectCurrentUser);
     const {data: usersData, isLoading, isError, error} = useGetAllUsersQuery();
+    const {data: storesData} = useGetAllStoresQuery();
+    const [changeUserStore, {isLoading: isChangingStore}] = useChangeUserStoreMutation();
+
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
     const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
     const isExportMenuOpen = Boolean(exportAnchorEl);
+
+    const [isChangeStoreDialogOpen, setChangeStoreDialogOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
+
+
+    const handleOpenChangeStoreDialog = (user: UserType) => {
+        setSelectedUser(user);
+        setChangeStoreDialogOpen(true);
+        handleMenuClose();
+    };
+
+    const handleCloseChangeStoreDialog = () => {
+        setSelectedUser(null);
+        setChangeStoreDialogOpen(false);
+    };
+
+    const handleChangeStore = async (userId: string, newStoreId: string) => {
+        try {
+            await changeUserStore({id: userId, newStoreId}).unwrap();
+            notify("User store changed successfully", "success");
+            handleCloseChangeStoreDialog();
+        } catch (err) {
+            const apiError = getApiError(err, "Failed to change user store.");
+            notify(apiError.message, "error");
+        }
+    };
 
     // Define custom formatters for UsersTable
     const usersFieldFormatters = useMemo(
@@ -257,6 +294,12 @@ const UsersPage = () => {
                     const isEditDisabled =
                         params.row.status === "deleted" || params.row.status === "inactive" || !canEdit();
 
+                    const canChangeStore =
+                        currentUser?.role === UserRoleEnum.MANAGER &&
+                        params.row.id !== currentUser.id &&
+                        [UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST].includes(params.row.role);
+
+
                     return (
                         <>
                             <Tooltip title="More Actions">
@@ -273,6 +316,13 @@ const UsersPage = () => {
                                     <EditOutlined sx={{mr: 1}}/>
                                     Edit
                                 </MenuItem>
+                                {currentUser?.role === UserRoleEnum.MANAGER && (
+                                    <MenuItem onClick={() => handleOpenChangeStoreDialog(params.row)}
+                                              disabled={!canChangeStore}>
+                                        <StorefrontOutlined sx={{mr: 1}}/>
+                                        Change Store
+                                    </MenuItem>
+                                )}
                             </Menu>
                         </>
                     );
@@ -334,6 +384,14 @@ const UsersPage = () => {
                     <DataGridTable data={usersData ?? []} columns={columns} loading={isLoading}/>
                 </Grid>
             </Grid>
+            <ChangeStoreDialog
+                open={isChangeStoreDialogOpen}
+                onClose={handleCloseChangeStoreDialog}
+                user={selectedUser}
+                stores={storesData ?? []}
+                onConfirm={handleChangeStore}
+                isLoading={isChangingStore}
+            />
         </Box>
     );
 };

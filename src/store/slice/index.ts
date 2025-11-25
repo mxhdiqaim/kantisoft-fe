@@ -308,6 +308,17 @@ export const apiSlice = createApi({
                 {type: "User", id: "LIST"},
             ],
         }),
+        changeUserStore: builder.mutation<UserType, { id: string; newStoreId: string }>({
+            query: ({id, newStoreId}) => ({
+                url: `/users/${id}/change-store`,
+                method: "PATCH",
+                body: {newStoreId},
+            }),
+            invalidatesTags: (_result, _error, {id}) => [
+                {type: "User", id},
+                {type: "User", id: "LIST"},
+            ],
+        }),
 
         // Store Endpoints
         getAllStores: builder.query<StoreType[], void>({
@@ -378,6 +389,8 @@ export const {
     useCreateUserMutation,
     useUpdateUserMutation,
     useUpdatePasswordMutation,
+    useChangeUserStoreMutation,
+
     // Store Management Hooks
     useGetAllStoresQuery,
     useGetStoreByIdQuery,
