@@ -264,11 +264,11 @@ const UsersPage = () => {
                     const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
 
                     const handleView = () => {
-                        navigate(`/user/${params.row.id}/view`);
+                        navigate(`/users/${params.row.id}/view`);
                         handleMenuClose();
                     };
                     const handleEdit = () => {
-                        navigate(`/user/${params.row.id}/edit`);
+                        navigate(`/users/${params.row.id}/edit`);
                         handleMenuClose();
                     };
 
@@ -347,7 +347,7 @@ const UsersPage = () => {
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
                 <Typography variant="h4">User Management</Typography>
                 {currentUser && (currentUser.role === "manager" || currentUser.role === "admin") && (
-                    <Button variant="contained" startIcon={<AddOutlined/>} onClick={() => navigate("/user/new")}>
+                    <Button variant="contained" startIcon={<AddOutlined/>} onClick={() => navigate("/users/new")}>
                         New User
                     </Button>
                 )}

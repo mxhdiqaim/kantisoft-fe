@@ -103,13 +103,15 @@ export const appRoutes: AppRouteType[] = [
             </IconButton>
         ),
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
-    },
-    {
-        to: "/sales-history/:id/view",
-        title: "viewSalesHistory",
-        element: ViewSalesHistoryScreen,
-        hidden: true,
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+        children: [
+            {
+                to: ":id/view",
+                title: "viewSalesHistory",
+                element: ViewSalesHistoryScreen,
+                hidden: true,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+            },
+        ]
     },
     {
         to: "/menu-item",
@@ -134,27 +136,29 @@ export const appRoutes: AppRouteType[] = [
             </IconButton>
         ),
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
-    },
-    {
-        to: "/user/:id/view",
-        title: "viewUser",
-        element: ViewUserScreen,
-        hidden: true,
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
-    },
-    {
-        to: "/user/new",
-        title: "createUser",
-        element: AddUserScreen,
-        hidden: true,
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
-    },
-    {
-        to: "/user/:id/edit",
-        title: "editUser",
-        element: EditUserScreen,
-        hidden: true,
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+        children: [
+            {
+                to: ":id/view",
+                title: "viewUser",
+                element: ViewUserScreen,
+                hidden: true,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+            },
+            {
+                to: "new",
+                title: "createUser",
+                element: AddUserScreen,
+                hidden: true,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+            },
+            {
+                to: ":id/edit",
+                title: "editUser",
+                element: EditUserScreen,
+                hidden: true,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+            },
+        ]
     },
 
     // Store management
@@ -168,27 +172,29 @@ export const appRoutes: AppRouteType[] = [
             </IconButton>
         ),
         roles: [UserRoleEnum.MANAGER],
-    },
-    {
-        to: "/stores/new",
-        title: "createStore",
-        element: StoreFormScreen,
-        hidden: true,
-        roles: [UserRoleEnum.MANAGER],
-    },
-    {
-        to: "/stores/:id/view",
-        title: "viewStore",
-        element: ViewStoreScreen,
-        hidden: true,
-        roles: [UserRoleEnum.MANAGER],
-    },
-    {
-        to: "/stores/:id/edit",
-        title: "editStore",
-        element: StoreFormScreen,
-        hidden: true,
-        roles: [UserRoleEnum.MANAGER],
+        children: [
+            {
+                to: "new",
+                title: "createStore",
+                element: StoreFormScreen,
+                hidden: true,
+                roles: [UserRoleEnum.MANAGER],
+            },
+            {
+                to: ":id/view",
+                title: "viewStore",
+                element: ViewStoreScreen,
+                hidden: true,
+                roles: [UserRoleEnum.MANAGER],
+            },
+            {
+                to: ":id/edit",
+                title: "editStore",
+                element: StoreFormScreen,
+                hidden: true,
+                roles: [UserRoleEnum.MANAGER],
+            },
+        ]
     },
 
     {
