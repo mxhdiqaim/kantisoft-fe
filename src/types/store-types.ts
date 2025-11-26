@@ -18,3 +18,15 @@ export const storeSchema = extendBaseSchema(baseStoreSchema);
 
 export type StoreType = yup.InferType<typeof storeSchema>;
 export type CreateStoreType = yup.InferType<typeof createStoreSchema>;
+
+export type Pagination = {
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    pageSize: number;
+};
+
+export type PaginatedStoreResponse = {
+    data: StoreType[];
+    pagination: Pagination;
+};

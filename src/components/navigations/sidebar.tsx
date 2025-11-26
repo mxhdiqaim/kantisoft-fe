@@ -219,46 +219,6 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                 ...sx,
             }}
         >
-            {/*<Box sx={{height: "100%", display: "flex", flexDirection: "column", overflowY: "auto"}}>*/}
-            {/*    <Box*/}
-            {/*        sx={{*/}
-            {/*            display: {xs: "flex", md: "none"},*/}
-            {/*            justifyContent: "flex-end",*/}
-            {/*        }}*/}
-            {/*    >*/}
-            {/*        <Button*/}
-            {/*            onClick={() => toggleDrawer && toggleDrawer(!drawerState)}*/}
-            {/*            sx={{width: "fit-content", mt: 1, mr: 0.5}}*/}
-            {/*        >*/}
-            {/*            <CancelIcon sx={{color: theme.palette.alternate.dark}}/>*/}
-            {/*        </Button>*/}
-            {/*    </Box>*/}
-            {/*    <ListItem sx={{width: "100%"}}>*/}
-            {/*        {isLoadingStores ? (*/}
-            {/*            <CircularProgress size={24}/>*/}
-            {/*        ) : (*/}
-            {/*            <ListItemButton*/}
-            {/*                // component={Link}*/}
-            {/*                // to={"/home"}*/}
-            {/*                sx={{*/}
-            {/*                    display: "flex",*/}
-            {/*                    justifyContent: "center",*/}
-            {/*                    alignItems: "center",*/}
-            {/*                    color: "text.primary",*/}
-            {/*                    textTransform: "none",*/}
-            {/*                }}*/}
-            {/*            >*/}
-            {/*                <StorefrontOutlined sx={{mr: 1}}/>*/}
-            {/*                <Typography variant="subtitle2" fontWeight="bold">*/}
-            {/*                    {activeStore && activeStore.name}*/}
-            {/*                </Typography>*/}
-            {/*                <ListItemText/>*/}
-            {/*            </ListItemButton>*/}
-            {/*        )}*/}
-            {/*    </ListItem>*/}
-
-            {/*</Box>*/}
-
             <Box
                 sx={{
                     display: "flex",

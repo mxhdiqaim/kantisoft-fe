@@ -13,7 +13,7 @@ import type {
     Period as TimePeriod,
     SingleOrderType
 } from "@/types/order-types.ts";
-import type {CreateStoreType, StoreType} from "@/types/store-types";
+import type {CreateStoreType, PaginatedStoreResponse, StoreType} from "@/types/store-types";
 import type {CreateUserType, RegisterUserType, UserType} from "@/types/user-types";
 import {
     type BaseQueryFn,
@@ -323,6 +323,7 @@ export const apiSlice = createApi({
         // Store Endpoints
         getAllStores: builder.query<StoreType[], void>({
             query: () => "/stores",
+            transformResponse: (response: PaginatedStoreResponse) => response.data,
             providesTags: (result) =>
                 result
                     ? [...result.map(({id}) => ({type: "Store" as const, id})), {type: "Store", id: "LIST"}]

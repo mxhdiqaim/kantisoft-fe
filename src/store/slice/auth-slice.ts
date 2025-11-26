@@ -2,37 +2,12 @@ import type {RootState} from "@/store";
 import type {UserType} from "@/types/user-types";
 import {createSlice, type PayloadAction} from "@reduxjs/toolkit";
 import {jwtDecode} from "jwt-decode";
+import {getTokenExpFromStorage, getUserDataFromStorage} from "@/utils";
 
 type AuthState = {
     user: UserType | null;
     token: string | null;
     tokenExp: number | null;
-};
-
-// Function to safely parse user data from localStorage
-const getUserDataFromStorage = (): UserType | null => {
-    const storedUser = localStorage.getItem("userData");
-    if (storedUser) {
-        try {
-            return JSON.parse(storedUser) as UserType;
-        } catch (error) {
-            console.error("Failed to parse user data from localStorage", error);
-            localStorage.removeItem("userData");
-            return null;
-        }
-    }
-    return null;
-};
-
-// Function to safely get token expiration time from localStorage
-const getTokenExpFromStorage = (): number | null => {
-    const storedTokenExp = localStorage.getItem("tokenExp");
-    if (storedTokenExp) {
-        const exp = parseInt(storedTokenExp, 10);
-
-        return isNaN(exp) ? null : exp;
-    }
-    return null;
 };
 
 

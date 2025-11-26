@@ -1,5 +1,5 @@
 import type {Period} from "@/types/order-types.ts";
-import type {UserRoleType} from "@/types/user-types";
+import type {UserRoleType, UserType} from "@/types/user-types";
 import type {ChipProps} from "@mui/material";
 import {useEffect} from "react";
 import {useLocation} from "react-router-dom";
@@ -60,4 +60,31 @@ export const getActionColor = (action: string) => {
     if (lowerAction.includes("delete") || lowerAction.includes("cancelled")) return "error";
     if (lowerAction.includes("failed") || lowerAction.includes("error")) return "error";
     return "default";
+};
+
+
+// Function to safely parse user data from localStorage
+export const getUserDataFromStorage = (): UserType | null => {
+    const storedUser = localStorage.getItem("userData");
+    if (storedUser) {
+        try {
+            return JSON.parse(storedUser) as UserType;
+        } catch (error) {
+            console.error("Failed to parse user data from localStorage", error);
+            localStorage.removeItem("userData");
+            return null;
+        }
+    }
+    return null;
+};
+
+// Function to safely get token expiration time from localStorage
+export const getTokenExpFromStorage = (): number | null => {
+    const storedTokenExp = localStorage.getItem("tokenExp");
+    if (storedTokenExp) {
+        const exp = parseInt(storedTokenExp, 10);
+
+        return isNaN(exp) ? null : exp;
+    }
+    return null;
 };

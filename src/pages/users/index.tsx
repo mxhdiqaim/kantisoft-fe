@@ -354,7 +354,7 @@ const UsersPage = () => {
             </Box>
             <CustomCard
                 sx={{
-                    // height: "70vh",
+                    borderRadius: 2,
                     mb: 2,
                     width: "100%",
                     "& .capitalize-cell": {

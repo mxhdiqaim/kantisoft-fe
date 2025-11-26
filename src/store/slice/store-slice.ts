@@ -17,7 +17,7 @@ const loadState = (): StoreState => {
         return {activeStore: parsedState};
     } catch (err) {
         console.error("error:", err);
-        // Return default state if parsing fails or on any error
+        // Return the default state if parsing fails or on any error
         return {activeStore: null};
     }
 };
