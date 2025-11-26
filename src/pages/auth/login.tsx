@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 
 import {Controller, useForm} from "react-hook-form";
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 const defaultValues = {
     password: "",
@@ -26,12 +26,12 @@ const defaultValues = {
 const Login = () => {
     const theme = useTheme();
     const navigate = useNavigate();
-    const location = useLocation();
+    // const location = useLocation();
     const notify = useNotifier();
     const [login, {isLoading: loading}] = useLoginMutation();
 
     // Get the path the user was trying to access before being redirected
-    const from = location.state?.from?.pathname || "/";
+    // const from = location.state?.from?.pathname || "/";
 
     const {
         control,
@@ -51,7 +51,7 @@ const Login = () => {
             await login(data).unwrap();
 
             // On successful login, navigate to the intended page or a default.
-            navigate(from, {replace: true});
+            navigate("/", {replace: true});
         } catch (err) {
             // 2. Use the getApiError helper for clean, consistent error parsing
             const defaultMessage = "Something went wrong. Please try again.";

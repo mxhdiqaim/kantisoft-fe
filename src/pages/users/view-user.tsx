@@ -151,7 +151,7 @@ const ViewUser = () => {
                                 <Button
                                     variant="contained"
                                     startIcon={<EditOutlined/>}
-                                    onClick={() => navigate(`/user/${user.id}/edit`)}
+                                    onClick={() => navigate(`/users/${user.id}/edit`)}
                                 >
                                     Edit Profile
                                 </Button>

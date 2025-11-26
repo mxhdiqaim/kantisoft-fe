@@ -24,6 +24,8 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
+    Menu,
+    MenuItem,
     type SxProps,
     type Theme,
     Typography,
@@ -34,6 +36,7 @@ import {useTranslation} from "react-i18next";
 import {useDispatch, useSelector} from "react-redux";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import type {Props as AppBarProps} from "./appbar";
+import type {StoreType} from "@/types/store-types.ts";
 
 interface Props extends AppBarProps {
     sx?: SxProps<Theme>;
@@ -53,23 +56,36 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
     const {data: stores, isLoading: isLoadingStores} = useGetAllStoresQuery();
     const activeStore = useSelector(selectActiveStore);
 
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+
+    const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+        if (currentUser?.role === "manager") {
+            setAnchorEl(event.currentTarget);
+        }
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleStoreSelect = (store: StoreType) => {
+        dispatch(setActiveStore(store));
+        handleMenuClose();
+    };
+
     const handleLogout = async () => {
         try {
-            // Call the logout mutation
             await logout({}).unwrap();
         } catch (error) {
-            // The console will show if the server call failed, but we proceed.
             console.error("Server logout failed, proceeding with client-side logout:", error);
         } finally {
-            // Since the apiSlice always clears local credentials,
-            // we can safely navigate the user away.
             navigate("/login");
         }
     };
 
     const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
-    // function to handle both drawer close and menu expand
     const handleItemClick = (route: AppRouteType) => {
         if (showDrawer) return;
 
@@ -77,7 +93,6 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
             toggleDrawer(!drawerState);
         }
 
-        // Toggle expanded state for items with children
         if (route.children) {
             setExpandedItems((prev) =>
                 prev.includes(route.to) ? prev.filter((item) => item !== route.to) : [...prev, route.to],
@@ -88,16 +103,12 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
     const filterRoutes = (routes: AppRouteType[]): AppRouteType[] => {
         return routes
             .filter((route) => {
-                // Basic filtering for hidden/auth routes
                 if (route.hidden || !(route.authGuard ?? true) || !(route.useLayout ?? true)) {
                     return false;
                 }
-                // Role-based filtering
                 if (route.roles && currentUser) {
-                    // return route.roles.includes("manager");
                     return route.roles.includes(currentUser.role);
                 }
-                // If no roles are specified, show to all authenticated users
                 return true;
             })
             .map((route) => {
@@ -150,17 +161,13 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                                 },
                             },
 
-                            // Hover styles for non-selected items
                             "&:hover": {
                                 backgroundColor: theme.palette.action.hover,
                                 color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
                             },
                         }}
                     >
-                        {route?.icon && (
-                            <ListItemIcon
-                                sx={{minWidth: 40, color: "inherit"}}>{route.icon}</ListItemIcon>
-                        )}
+                        {route?.icon && <ListItemIcon sx={{minWidth: 40, color: "inherit"}}>{route.icon}</ListItemIcon>}
                         <ListItemText
                             primary={t(route.title as string)}
                             slotProps={{
@@ -184,7 +191,6 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                     </ListItemButton>
                 </ListItem>
 
-                {/* Render children if expanded */}
                 {hasChildren && (
                     <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                         <List component="div" disablePadding>
@@ -199,10 +205,25 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
     };
 
     useEffect(() => {
-        if (!activeStore && stores && stores.length > 0) {
-            dispatch(setActiveStore(stores[0]));
+        if (stores && stores.length > 0 && currentUser) {
+            const userDefaultStore = stores.find((store) => store.id === currentUser.storeId);
+
+            if (currentUser.role !== "manager") {
+                // For non-managers, always set their default store as active
+                if (userDefaultStore && activeStore?.id !== userDefaultStore.id) {
+                    dispatch(setActiveStore(userDefaultStore));
+                }
+            } else {
+                // For managers, if no store is active, set their default one.
+                if (!activeStore && userDefaultStore) {
+                    dispatch(setActiveStore(userDefaultStore));
+                }
+            }
         }
-    }, [activeStore, stores, dispatch]);
+    }, [activeStore, stores, currentUser, dispatch]);
+
+    const isManager = currentUser?.role === "manager";
+
     return (
         <Drawer
             variant="permanent"
@@ -231,30 +252,57 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                     borderBottom: "1px solid #CFD1D3",
                 }}
             >
-                {isLoadingStores ?
-                    (<CircularProgress size={24}/>)
-                    : (
-                        <IconButton aria-label={"BILFI"} component={Link} to={"/"} sx={{
-                            borderRadius: 1, display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            color: "text.primary",
-                            textTransform: "none",
-                        }}>
+                {isLoadingStores ? (
+                    <CircularProgress size={24}/>
+                ) : (
+                    <>
+                        <IconButton
+                            aria-label={"Select Store"}
+                            aria-controls={open ? "store-menu" : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={open ? "true" : undefined}
+                            onClick={handleMenuClick}
+                            sx={{
+                                borderRadius: 1,
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                color: "text.primary",
+                                textTransform: "none",
+                                cursor: isManager ? "pointer" : "default",
+                            }}
+                            component={!isManager ? Link : "button"}
+                            to={"/"}
+                        >
                             <StorefrontOutlined sx={{mr: 1}}/>
                             <Typography variant="subtitle2" fontWeight="bold">
-                                {activeStore && activeStore.name}
+                                {activeStore?.name || "Select Store"}
                             </Typography>
-                            <ListItemText/>
+                            {isManager && (open ? <ExpandLessOutlinedIcon/> : <ExpandMoreOutlinedIcon/>)}
                         </IconButton>
-
-                    )}
+                        {isManager && (
+                            <Menu
+                                id="store-menu"
+                                anchorEl={anchorEl}
+                                open={open}
+                                onClose={handleMenuClose}
+                                MenuListProps={{
+                                    "aria-labelledby": "basic-button",
+                                }}
+                            >
+                                {stores?.map((store) => (
+                                    <MenuItem key={store.id} onClick={() => handleStoreSelect(store)}
+                                              selected={store.id === activeStore?.id}>
+                                        {store.name}
+                                    </MenuItem>
+                                ))}
+                            </Menu>
+                        )}
+                    </>
+                )}
                 {screenSize === "mobile" || screenSize === "tablet" ? (
-                    <IconButton
-                        aria-label="menu"
-                        sx={{borderRadius: 1}}
-                        onClick={() => toggleDrawer && toggleDrawer(!drawerState)}
-                    >
+                    <IconButton aria-label="menu" sx={{borderRadius: 1}}
+                                onClick={() => toggleDrawer && toggleDrawer(!drawerState)}>
                         <Icon src={CancelSvgIcon} alt={"Cancel Icon"}/>
                     </IconButton>
                 ) : (
@@ -264,9 +312,7 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                 )}
             </Box>
 
-            {/* Routes rendering */}
             <List sx={{height: "100%", display: "flex", flexDirection: "column", overflowY: "auto"}}>
-                {/* Routes rendering */}
                 <Box sx={{flexGrow: 1, overflowY: "auto"}}>
                     {filterRoutes(appRoutes).map((route, index) => renderMenuItem(route, index))}
                 </Box>
@@ -289,9 +335,7 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                             duration: theme.transitions.duration.short,
                         }),
                         "&:hover": {
-                            // Darken the button on hover for clear visual feedback
                             backgroundColor: theme.palette.error.dark,
-                            // Add a subtle scale effect for a modern feel
                             transform: "scale(1.02)",
                         },
                     }}
