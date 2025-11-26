@@ -11,8 +11,6 @@ const ViewStore = () => {
 
     const {data: store, isLoading, isError} = useGetStoreByIdQuery(id!, {skip: !id});
 
-    console.log(store);
-
     if (isLoading) {
         return <ViewStoreLoading/>;
     }
