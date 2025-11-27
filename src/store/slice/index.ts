@@ -25,7 +25,7 @@ import {
 import type {RootState} from "..";
 import {logOut, selectCurrentUser, setCredentials} from "./auth-slice";
 import {selectActiveStore} from "@/store/slice/store-slice.ts";
-import type {InventoryType} from "@/types/inventory-types.ts";
+import type {CreateInventoryType, InventoryType} from "@/types/inventory-types.ts";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -441,14 +441,14 @@ export const apiSlice = createApi({
         //     providesTags: (_result, _error, menuItemId) => [{type: "Inventory", id: menuItemId}],
         // }),
 
-        // createInventoryRecord: builder.mutation<InventoryType, CreateInventoryType>({
-        //     query: (body) => ({
-        //         url: "/inventory",
-        //         method: "POST",
-        //         body,
-        //     }),
-        //     invalidatesTags: [{type: "Inventory", id: "LIST"}],
-        // }),
+        createInventoryRecord: builder.mutation<InventoryType, CreateInventoryType>({
+            query: (body) => ({
+                url: "/inventory/create",
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: [{type: "Inventory", id: "LIST"}],
+        }),
 
         // adjustStock: builder.mutation<InventoryType, {
         //     menuItemId: string;
@@ -538,7 +538,7 @@ export const {
     // useGetTransactionsByMenuItemQuery,
     // useGetHistoricalStockReportQuery,
     // useGetInventoryByMenuItemQuery,
-    // useCreateInventoryRecordMutation,
+    useCreateInventoryRecordMutation,
     // useAdjustStockMutation,
     // useMarkAsDiscontinuedMutation,
     // useDeleteInventoryRecordMutation,

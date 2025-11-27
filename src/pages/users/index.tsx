@@ -6,7 +6,7 @@ import useNotifier from "@/hooks/useNotifier";
 import {useAppSelector} from "@/store";
 import {useChangeUserStoreMutation, useGetAllStoresQuery, useGetAllUsersQuery} from "@/store/slice";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
-import {roleHierarchy, UserRoleEnum, type UserType} from "@/types/user-types.ts";
+import {roleHierarchy, UserRoleEnum, UserStatusEnum, type UserType} from "@/types/user-types.ts";
 
 import {getExportFormattedData} from "@/utils/table-export-utils";
 import {
@@ -280,10 +280,10 @@ const UsersPage = () => {
                         const isSelf = currentUser.id === params.row.id;
 
                         // Manager can edit anyone
-                        if (currentUser.role === "manager") return true;
+                        if (currentUser.role === UserRoleEnum.MANAGER) return true;
 
                         // Admin can edit admins and lower, but not managers
-                        if (currentUser.role === "admin") {
+                        if (currentUser.role === UserRoleEnum.ADMIN) {
                             return currentUserRoleLevel <= rowUserRoleLevel;
                         }
 
@@ -292,7 +292,7 @@ const UsersPage = () => {
                     };
 
                     const isEditDisabled =
-                        params.row.status === "deleted" || params.row.status === "inactive" || !canEdit();
+                        params.row.status === UserStatusEnum.DELETED || params.row.status === UserStatusEnum.INACTIVE || !canEdit();
 
                     const canChangeStore =
                         currentUser?.role === UserRoleEnum.MANAGER &&
@@ -346,7 +346,7 @@ const UsersPage = () => {
         <Box>
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
                 <Typography variant="h4">User Management</Typography>
-                {currentUser && (currentUser.role === "manager" || currentUser.role === "admin") && (
+                {currentUser && (currentUser.role === UserRoleEnum.MANAGER || currentUser.role === UserRoleEnum.ADMIN) && (
                     <Button variant="contained" startIcon={<AddOutlined/>} onClick={() => navigate("/users/new")}>
                         New User
                     </Button>

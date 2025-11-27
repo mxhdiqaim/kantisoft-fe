@@ -13,23 +13,34 @@ import {
     useTheme
 } from "@mui/material";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
-import {useState} from "react";
+import {type MouseEvent, useMemo, useState} from "react";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DataGridTable from "@/components/ui/data-grid-table";
 import {format} from "date-fns";
 import TableStyledBox from "@/components/ui/table-styled-box.tsx";
+import CreateInventoryRecord from "@/components/inventory/create-inventory-record.tsx";
 
 const InventoryScreen = () => {
     const theme = useTheme();
     const {data: inventoryData, isLoading, isError, error} = useGetAllInventoryQuery();
 
+    const [formModalOpen, setFormModalOpen] = useState(false);
+
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRow, setSelectedRow] = useState<InventoryType | null>(null);
 
-    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, row: InventoryType) => {
+    const handleOpenFormModal = () => {
+        setFormModalOpen(true);
+    };
+
+    const handleCloseFormModal = () => {
+        setFormModalOpen(false);
+    };
+
+    const handleMenuOpen = (event: MouseEvent<HTMLElement>, row: InventoryType) => {
         setAnchorEl(event.currentTarget);
-        setSelectedRow(row);
+        // setSelectedRow(row);
     };
 
     const handleMenuClose = () => {
@@ -52,17 +63,18 @@ const InventoryScreen = () => {
         }
     };
 
-    const columns: GridColDef[] = [
+    const columns: GridColDef<InventoryType>[] = useMemo(() => [
         {
             flex: 1,
-            field: "menuItemName",
+            field: "menuItem",
             headerName: "Menu Item",
             minWidth: 150,
             align: "left",
             headerAlign: "left",
+            // valueGetter: (params) => params.row.menuItem?.name ?? "",
             renderCell: (params) => (
                 <TableStyledBox>
-                    <Typography variant="body2">{params.value}</Typography>
+                    <Typography variant="body2">{params.value.name}</Typography>
                 </TableStyledBox>
             ),
         },
@@ -73,6 +85,7 @@ const InventoryScreen = () => {
             width: 120,
             align: "left",
             headerAlign: "left",
+            // valueGetter: (params) => params.row.menuItem?.itemCode ?? "",
             renderCell: (params) => (
                 <TableStyledBox>
                     <Typography variant="body2">{params.value}</Typography>
@@ -115,12 +128,14 @@ const InventoryScreen = () => {
             align: "left",
             headerAlign: "left",
             renderCell: (params: GridRenderCellParams<InventoryType, string>) => (
-                <Chip
-                    label={params.value}
-                    color={getStatusChipColor(params.value || "")}
-                    size="small"
-                    sx={{textTransform: "capitalize"}}
-                />
+                <TableStyledBox>
+                    <Chip
+                        label={params.value}
+                        color={getStatusChipColor(params.value || "")}
+                        size="small"
+                        sx={{textTransform: "capitalize"}}
+                    />
+                </TableStyledBox>
             ),
         },
         {
@@ -152,7 +167,7 @@ const InventoryScreen = () => {
                 </IconButton>
             ),
         },
-    ];
+    ], [handleMenuOpen])
 
     if (isLoading) {
         return <Box sx={{display: "flex", justifyContent: "center", mt: 4}}><CircularProgress/></Box>;
@@ -171,7 +186,7 @@ const InventoryScreen = () => {
                 <Button
                     variant="contained"
                     startIcon={<AddIcon/>}
-                    // onClick={() => handleOpenAddModal()}
+                    onClick={handleOpenFormModal}
                 >
                     Add Record
                 </Button>
@@ -199,6 +214,7 @@ const InventoryScreen = () => {
                     Discontinue
                 </MenuItem>
             </Menu>
+            <CreateInventoryRecord open={formModalOpen} onClose={handleCloseFormModal}/>
         </>
     );
 };
