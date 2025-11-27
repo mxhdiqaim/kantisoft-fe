@@ -18,6 +18,9 @@ export {default as ViewStoreScreen} from "./stores/view-store";
 export {default as ProfileScreen} from "./profile";
 export {default as ChangePasswordScreen} from "./profile/change-password";
 
+// Inventory screens
+export {default as InventoryScreen} from "./inventory";
+
 // User screens
 export {default as AddUserScreen} from "./users/add-user";
 export {default as UsersScreen} from "./users";

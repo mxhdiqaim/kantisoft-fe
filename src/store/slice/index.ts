@@ -25,6 +25,7 @@ import {
 import type {RootState} from "..";
 import {logOut, selectCurrentUser, setCredentials} from "./auth-slice";
 import {selectActiveStore} from "@/store/slice/store-slice.ts";
+import type {InventoryType} from "@/types/inventory-types.ts";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -119,6 +120,8 @@ export const apiSlice = createApi({
         "SalesTrend",
         "Store",
         "ActivityLog",
+        "Inventory",
+        "InventoryReport",
     ],
     endpoints: (builder) => ({
         // -------------------------
@@ -397,6 +400,91 @@ export const apiSlice = createApi({
             }),
             invalidatesTags: [{type: "Store", id: "LIST"}],
         }),
+
+        // -------------------------
+        // Inventory Endpoints
+        // -------------------------
+        getAllInventory: builder.query<InventoryType[], void>({
+            query: () => "/inventory",
+            providesTags: (result) =>
+                result
+                    ? [...result.map(({id}) => ({type: "Inventory" as const, id})), {type: "Inventory", id: "LIST"}]
+                    : [{type: "Inventory", id: "LIST"}],
+        }),
+
+        // getTransactionsByMenuItem: builder.query<InventoryTransactionType[], {
+        //     menuItemId: string;
+        //     startDate?: string;
+        //     endDate?: string
+        // }>({
+        //     query: ({menuItemId, ...params}) => ({
+        //         url: `/inventory/transactions/${menuItemId}`,
+        //         params,
+        //     }),
+        //     providesTags: (_result, _error, {menuItemId}) => [{type: "InventoryTransaction", id: menuItemId}],
+        // }),
+
+        // getHistoricalStockReport: builder.query<HistoricalStockReportType, {
+        //     timePeriod?: string;
+        //     startDate?: string;
+        //     endDate?: string
+        // }>({
+        //     query: (params) => ({
+        //         url: "/inventory/transactions/report",
+        //         params,
+        //     }),
+        //     providesTags: ["InventoryReport"],
+        // }),
+
+        // getInventoryByMenuItem: builder.query<InventoryType, string>({
+        //     query: (menuItemId) => `/inventory/${menuItemId}`,
+        //     providesTags: (_result, _error, menuItemId) => [{type: "Inventory", id: menuItemId}],
+        // }),
+
+        // createInventoryRecord: builder.mutation<InventoryType, CreateInventoryType>({
+        //     query: (body) => ({
+        //         url: "/inventory",
+        //         method: "POST",
+        //         body,
+        //     }),
+        //     invalidatesTags: [{type: "Inventory", id: "LIST"}],
+        // }),
+
+        // adjustStock: builder.mutation<InventoryType, {
+        //     menuItemId: string;
+        //     quantityAdjustment: number;
+        //     transactionType: string;
+        //     notes?: string
+        // }>({
+        //     query: ({menuItemId, ...body}) => ({
+        //         url: `/inventory/adjust-stock/${menuItemId}`,
+        //         method: "PATCH",
+        //         body,
+        //     }),
+        //     invalidatesTags: (_result, _error, {menuItemId}) => [
+        //         {type: "Inventory", id: menuItemId},
+        //         {type: "Inventory", id: "LIST"},
+        //     ],
+        // }),
+
+        // markAsDiscontinued: builder.mutation<InventoryType, string>({
+        //     query: (menuItemId) => ({
+        //         url: `/inventory/discontinue/${menuItemId}`,
+        //         method: "PATCH",
+        //     }),
+        //     invalidatesTags: (_result, _error, menuItemId) => [
+        //         {type: "Inventory", id: menuItemId},
+        //         {type: "Inventory", id: "LIST"},
+        //     ],
+        // }),
+
+        // deleteInventoryRecord: builder.mutation<{ message: string }, string>({
+        //     query: (menuItemId) => ({
+        //         url: `/inventory/${menuItemId}`,
+        //         method: "DELETE",
+        //     }),
+        //     invalidatesTags: [{type: "Inventory", id: "LIST"}],
+        // }),
     }),
 });
 
@@ -444,4 +532,14 @@ export const {
 
     // activity log hooks
     useGetActivitiesQuery,
+
+    // Inventory Hooks
+    useGetAllInventoryQuery,
+    // useGetTransactionsByMenuItemQuery,
+    // useGetHistoricalStockReportQuery,
+    // useGetInventoryByMenuItemQuery,
+    // useCreateInventoryRecordMutation,
+    // useAdjustStockMutation,
+    // useMarkAsDiscontinuedMutation,
+    // useDeleteInventoryRecordMutation,
 } = apiSlice;

@@ -268,11 +268,9 @@ const MenuItems = () => {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Menu Items Data");
 
-        const colWidths = columns
+        worksheet["!cols"] = columns
             .filter((col) => col.field !== "actions" && col.headerName)
             .map((col) => ({wch: (col.headerName?.toString().length || 15) + 5}));
-
-        worksheet["!cols"] = colWidths;
 
         XLSX.writeFile(workbook, `menu_items_data.xlsx`);
         setExportAnchorEl(null);

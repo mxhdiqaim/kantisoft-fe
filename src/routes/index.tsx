@@ -6,6 +6,7 @@ import {
     EditUserScreen,
     ForgetPasswordScreen,
     HomeScreen,
+    InventoryScreen,
     LoginScreen,
     MenuItemScreen,
     NotFoundScreen,
@@ -28,6 +29,7 @@ import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlin
 import PlaylistAddCheckCircleOutlinedIcon from "@mui/icons-material/PlaylistAddCheckCircleOutlined";
 import RestaurantMenuOutlinedIcon from "@mui/icons-material/RestaurantMenuOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 
 import {IconButton} from "@mui/material";
 import {type ComponentType, type ReactNode} from "react";
@@ -121,6 +123,21 @@ export const appRoutes: AppRouteType[] = [
             </IconButton>
         ),
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+    },
+
+    // ---------------------------------
+    // Inventory Management
+    // ---------------------------------
+    {
+        to: "/inventory",
+        title: "inventory",
+        element: InventoryScreen,
+        icon: (
+            <IconButton size={"medium"}>
+                <InventoryOutlinedIcon/>
+            </IconButton>
+        ),
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
     },
 
     // Users management
