@@ -14,7 +14,7 @@ import type {
     SingleOrderType
 } from "@/types/order-types.ts";
 import type {CreateStoreType, PaginatedStoreResponse, StoreType} from "@/types/store-types";
-import type {CreateUserType, RegisterUserType, UserType} from "@/types/user-types";
+import {type CreateUserType, type RegisterUserType, UserRoleEnum, type UserType} from "@/types/user-types";
 import {
     type BaseQueryFn,
     createApi,
@@ -23,7 +23,8 @@ import {
     type FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
 import type {RootState} from "..";
-import {logOut, setCredentials} from "./auth-slice";
+import {logOut, selectCurrentUser, setCredentials} from "./auth-slice";
+import {selectActiveStore} from "@/store/slice/store-slice.ts";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -49,7 +50,31 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
     api,
     extraOptions,
 ) => {
-    const result = await baseQuery(args, api, extraOptions);
+    const state = api.getState() as RootState;
+    const currentUser = selectCurrentUser(state);
+    const activeStore = selectActiveStore(state);
+
+    let modifiedArgs = args;
+
+    // If the user is a manager and has an active store, add targetStoreId to params
+    if (currentUser?.role === UserRoleEnum.MANAGER && activeStore?.id) {
+        if (typeof args === "string") {
+            modifiedArgs = {
+                url: args,
+                params: {targetStoreId: activeStore.id},
+            };
+        } else {
+            modifiedArgs = {
+                ...args,
+                params: {
+                    ...args.params,
+                    targetStoreId: activeStore.id,
+                },
+            };
+        }
+    }
+
+    const result = await baseQuery(modifiedArgs, api, extraOptions);
 
     // Check if the error is a 401 and the request was NOT to the login endpoint
     const isLoginAttempt = typeof args === "object" && "url" in args && args.url.includes("/login");

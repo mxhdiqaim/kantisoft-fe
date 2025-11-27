@@ -38,7 +38,7 @@ const MenuItems = () => {
 
     const currentUser = useAppSelector(selectCurrentUser);
 
-    const {data: menuItems, isLoading, isError, error} = useGetMenuItemsQuery();
+    const {data: menuItems, isLoading, isError, error} = useGetMenuItemsQuery({});
     const [deleteMenuItem, {isLoading: isDeleting}] = useDeleteMenuItemMutation();
 
     const [formModalOpen, setFormModalOpen] = useState(false);
