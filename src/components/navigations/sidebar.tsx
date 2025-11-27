@@ -1,6 +1,6 @@
 import {appRoutes, type AppRouteType} from "@/routes";
 import {useAppSelector} from "@/store";
-import {useGetAllStoresQuery, useLogoutMutation} from "@/store/slice";
+import {apiSlice, useGetAllStoresQuery, useLogoutMutation} from "@/store/slice";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {selectActiveStore, setActiveStore} from "@/store/slice/store-slice";
 import {LogoutOutlined, StorefrontOutlined} from "@mui/icons-material";
@@ -71,6 +71,8 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
 
     const handleStoreSelect = (store: StoreType) => {
         dispatch(setActiveStore(store));
+        // Reset the entire API state to force refetching of all data for the new store
+        dispatch(apiSlice.util.resetApiState());
         handleMenuClose();
     };
 
