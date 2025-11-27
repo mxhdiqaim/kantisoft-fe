@@ -94,7 +94,7 @@ const ProfilePage = () => {
                                 fullWidth
                                 variant="outlined"
                                 startIcon={<EditOutlined/>}
-                                onClick={() => navigate(`/user/change-password`)}
+                                onClick={() => navigate(`/users/change-password`)}
                             >
                                 Change Password
                             </Button>

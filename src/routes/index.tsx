@@ -53,24 +53,10 @@ export const appRoutes: AppRouteType[] = [
         hidden: true,
         roles: [UserRoleEnum.GUEST],
     },
-    {
-        to: "/user/profile",
-        title: "Profile",
-        element: ProfileScreen,
-        hidden: true,
-        authGuard: true,
-        useLayout: true,
-        roles: [UserRoleEnum.GUEST],
-    },
-    {
-        to: "/user/change-password",
-        title: "Change Password",
-        element: ChangePasswordScreen,
-        hidden: true,
-        authGuard: true,
-        useLayout: true,
-        roles: [UserRoleEnum.GUEST],
-    },
+
+    // ---------------------------------
+    // Dashboard
+    // ---------------------------------
     {
         to: "/dashboard",
         title: "dashboard",
@@ -82,6 +68,10 @@ export const appRoutes: AppRouteType[] = [
         ),
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
     },
+
+    // ---------------------------------
+    // POS Management
+    // ---------------------------------
     {
         to: "/order-tracking",
         title: "orderTracking",
@@ -93,6 +83,10 @@ export const appRoutes: AppRouteType[] = [
         ),
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
     },
+
+    // ---------------------------------
+    // Sales Management
+    // ---------------------------------
     {
         to: "/sales-history",
         title: "salesHistory",
@@ -113,6 +107,10 @@ export const appRoutes: AppRouteType[] = [
             },
         ]
     },
+
+    // ---------------------------------
+    // Menu Item Management
+    // ---------------------------------
     {
         to: "/menu-item",
         title: "menuItem",
@@ -158,10 +156,30 @@ export const appRoutes: AppRouteType[] = [
                 hidden: true,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
+            {
+                to: "profile",
+                title: "Profile",
+                element: ProfileScreen,
+                hidden: true,
+                authGuard: true,
+                useLayout: true,
+                roles: [UserRoleEnum.GUEST],
+            },
+            {
+                to: "change-password",
+                title: "Change Password",
+                element: ChangePasswordScreen,
+                hidden: true,
+                authGuard: true,
+                useLayout: true,
+                roles: [UserRoleEnum.GUEST],
+            },
         ]
     },
 
+    // ---------------------------------
     // Store management
+    // ---------------------------------
     {
         to: "/stores",
         title: "stores",
@@ -197,6 +215,9 @@ export const appRoutes: AppRouteType[] = [
         ]
     },
 
+    // ---------------------------------
+    // Activity Log
+    // ---------------------------------
     {
         to: "/activity-log",
         title: "Activity Log",
@@ -209,7 +230,9 @@ export const appRoutes: AppRouteType[] = [
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
     },
 
+    // ---------------------------------
     // Public Routes
+    // ---------------------------------
     {
         to: "/login",
         element: LoginScreen,
@@ -233,7 +256,9 @@ export const appRoutes: AppRouteType[] = [
         roles: [UserRoleEnum.GUEST]
     },
 
+    // ---------------------------------
     // Error Pages
+    // ---------------------------------
     {
         to: "*",
         title: "notFound",
