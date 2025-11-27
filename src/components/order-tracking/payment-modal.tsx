@@ -1,24 +1,14 @@
 import CustomModal from "@/components/customs/custom-modal";
-import { selectCurrentUser } from "@/store/slice/auth-slice";
-import { selectActiveStore } from "@/store/slice/store-slice";
-import type { CartItem } from "@/types/cart-item-type";
-import { createOrderSchema, type CreateOrderType } from "@/types/order-types.ts";
-import { ngnFormatter } from "@/utils";
-import { yupResolver } from "@hookform/resolvers/yup";
-import {
-    Button,
-    DialogActions,
-    FormControl,
-    FormControlLabel,
-    FormHelperText,
-    Radio,
-    RadioGroup,
-    TextField,
-    Typography,
-} from "@mui/material";
-import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { useSelector } from "react-redux";
+import {selectCurrentUser} from "@/store/slice/auth-slice";
+import {selectActiveStore} from "@/store/slice/store-slice";
+import type {CartItem} from "@/types/cart-item-type";
+import {createOrderSchema, type CreateOrderType} from "@/types/order-types.ts";
+import {ngnFormatter} from "@/utils";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {Button, DialogActions, FormControl, FormControlLabel, FormHelperText, Radio, RadioGroup,} from "@mui/material";
+import {useEffect} from "react";
+import {Controller, useForm} from "react-hook-form";
+import {useSelector} from "react-redux";
 
 interface Props {
     open: boolean;
@@ -28,7 +18,7 @@ interface Props {
     isLoading?: boolean;
 }
 
-const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: Props) => {
+const PaymentModal = ({open, onClose, onCompleteSale, cartItems, isLoading}: Props) => {
     const seller = useSelector(selectCurrentUser);
     const activeStore = useSelector(selectActiveStore);
 
@@ -42,7 +32,7 @@ const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: P
         setValue,
         setError,
         clearErrors,
-        formState: { errors, isValid },
+        formState: {errors, isValid},
     } = useForm<CreateOrderType>({
         mode: "onChange",
         resolver: yupResolver(createOrderSchema),
@@ -59,13 +49,13 @@ const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: P
     const paymentMethod = watch("paymentMethod");
     const amountReceived = watch("amountReceived", 0);
 
-    const change = amountReceived - total;
+    // const change = amountReceived - total;
 
-    const isCashPaymentInsufficient = paymentMethod === "cash" && amountReceived < total;
+    // const isCashPaymentInsufficient = paymentMethod === "cash" && amountReceived < total;
 
     const onSubmit = (data: CreateOrderType) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { amountReceived, ...orderData } = data;
+        const {amountReceived, ...orderData} = data;
         onCompleteSale(orderData);
     };
 
@@ -90,13 +80,13 @@ const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: P
     useEffect(() => {
         if (paymentMethod === "cash") {
             if (amountReceived < total) {
-                // If cash is insufficient, manually set an error
+                // If cash is not enough, manually set an error
                 setError("amountReceived", {
                     type: "manual",
                     message: "Amount received must be at least the total.",
                 });
             } else {
-                // If cash is sufficient, clear the error
+                // If cash is enough, clear the error
                 clearErrors("amountReceived");
             }
         } else {
@@ -108,10 +98,10 @@ const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: P
     useEffect(() => {
         if (paymentMethod !== "cash") {
             // If payment is not cash, set amountReceived to the total
-            setValue("amountReceived", total, { shouldValidate: true });
+            setValue("amountReceived", total, {shouldValidate: true});
         } else {
             // If switching back to cash, reset amountReceived
-            setValue("amountReceived", 0, { shouldValidate: true });
+            setValue("amountReceived", 0, {shouldValidate: true});
         }
     }, [paymentMethod, total, setValue]);
 
@@ -127,45 +117,45 @@ const PaymentModal = ({ open, onClose, onCompleteSale, cartItems, isLoading }: P
                     <Controller
                         name="paymentMethod"
                         control={control}
-                        render={({ field }) => (
+                        render={({field}) => (
                             <RadioGroup {...field} row>
-                                <FormControlLabel value="cash" control={<Radio />} label="Cash" />
-                                <FormControlLabel value="card" control={<Radio />} label="Card" />
-                                <FormControlLabel value="transfer" control={<Radio />} label="Transfer" />
+                                <FormControlLabel value="cash" control={<Radio/>} label="Cash"/>
+                                <FormControlLabel value="card" control={<Radio/>} label="Card"/>
+                                <FormControlLabel value="transfer" control={<Radio/>} label="Transfer"/>
                             </RadioGroup>
                         )}
                     />
                     {errors.paymentMethod && <FormHelperText>{errors.paymentMethod.message}</FormHelperText>}
-                    {paymentMethod === "cash" && (
-                        <>
-                            <Controller
-                                name="amountReceived"
-                                control={control}
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        label="Amount Received"
-                                        type="number"
-                                        fullWidth
-                                        margin="normal"
-                                        error={!!errors.amountReceived}
-                                        helperText={errors.amountReceived?.message}
-                                    />
-                                )}
-                            />
-                            <Typography sx={{ mt: 1 }}>
-                                Change: {change > 0 ? ngnFormatter.format(change) : "NGN 0.00"}
-                            </Typography>
-                        </>
-                    )}
+                    {/*{paymentMethod === "cash" && (*/}
+                    {/*    <>*/}
+                    {/*        <Controller*/}
+                    {/*            name="amountReceived"*/}
+                    {/*            control={control}*/}
+                    {/*            render={({ field }) => (*/}
+                    {/*                <TextField*/}
+                    {/*                    {...field}*/}
+                    {/*                    label="Amount Received"*/}
+                    {/*                    type="number"*/}
+                    {/*                    fullWidth*/}
+                    {/*                    margin="normal"*/}
+                    {/*                    error={!!errors.amountReceived}*/}
+                    {/*                    helperText={errors.amountReceived?.message}*/}
+                    {/*                />*/}
+                    {/*            )}*/}
+                    {/*        />*/}
+                    {/*        <Typography sx={{ mt: 1 }}>*/}
+                    {/*            Change: {change > 0 ? ngnFormatter.format(change) : "NGN 0.00"}*/}
+                    {/*        </Typography>*/}
+                    {/*    </>*/}
+                    {/*)}*/}
                 </FormControl>
-                <DialogActions sx={{ mt: 2, px: 0 }}>
+                <DialogActions sx={{mt: 2, px: 0}}>
                     <Button onClick={onClose}>Cancel</Button>
                     <Button
                         type="submit"
                         variant="contained"
                         color="primary"
-                        disabled={!isValid || isCashPaymentInsufficient || isLoading}
+                        disabled={!isValid || /* isCashPaymentInsufficient || */ isLoading}
                     >
                         {isLoading ? "Processing..." : "Complete Order"}
                     </Button>

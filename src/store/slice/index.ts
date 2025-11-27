@@ -4,7 +4,7 @@ import type {
     SalesTrendType,
     SaleSummarySchemaType,
     TopSellsItemType,
-    TopSellsSchemaType,
+    TopSellsParamType,
 } from "@/types/dashboard-types.ts";
 import type {AddMenuItemType, MenuItemType} from "@/types/menu-item-type.ts";
 import type {
@@ -96,12 +96,16 @@ export const apiSlice = createApi({
         "ActivityLog",
     ],
     endpoints: (builder) => ({
+        // -------------------------
         // Health Check Endpoint
+        // -------------------------
         healthCheck: builder.query<{ status: string }, void>({
             query: () => "/health",
         }),
 
+        // -------------------------
         // Auth Endpoints
+        // -------------------------
         login: builder.mutation({
             query: (credentials) => ({
                 url: "/auth/login",
@@ -120,7 +124,6 @@ export const apiSlice = createApi({
             },
         }),
 
-        // Logout Endpoint
         logout: builder.mutation({
             query: () => ({
                 url: "/auth/logout",
@@ -165,14 +168,6 @@ export const apiSlice = createApi({
             }),
         }),
 
-        updatePassword: builder.mutation<{ message: string }, { oldPassword: string; newPassword: string }>({
-            query: (body) => ({
-                url: "/users/update-password",
-                method: "PATCH",
-                body,
-            }),
-        }),
-
         getActivities: builder.query<ActivityLogResponse, { limit?: number; offset?: number }>({
             query: ({limit = 20, offset = 0} = {}) => ({
                 url: "/activities",
@@ -181,7 +176,9 @@ export const apiSlice = createApi({
             providesTags: [{type: "ActivityLog", id: "LIST"}],
         }),
 
+        // -------------------------
         // Dashboard Endpoint
+        // -------------------------
         getSalesSummary: builder.query<SaleSummarySchemaType, TimePeriod>({
             query: (timePeriod = "today") => ({
                 url: "/dashboard/sales-summary",
@@ -189,20 +186,17 @@ export const apiSlice = createApi({
             }),
             providesTags: ["Summary"],
         }),
-
-        getTopSells: builder.query<TopSellsItemType[], TopSellsSchemaType>({
-            query: ({timePeriod = "today", limit = "5", orderBy = "quantity"}) => ({
+        getTopSells: builder.query<TopSellsItemType[], TopSellsParamType>({
+            query: ({timePeriod = "today", limit = 5, orderBy = "quantity", startDate = "", endDate = ""}) => ({
                 url: "/dashboard/top-sells",
-                params: {timePeriod, limit, orderBy},
+                params: {timePeriod, limit, orderBy, startDate, endDate},
             }),
             providesTags: ["TopSells"],
         }),
-
         getInventorySummary: builder.query<InventorySummaryType, void>({
             query: () => "/dashboard/inventory-summary",
             providesTags: ["InventorySummary"],
         }),
-
         getSalesTrend: builder.query<SalesTrendType[], TimePeriod | void>({
             query: (timePeriod = "week") => ({
                 url: "/dashboard/sales-trend",
@@ -211,7 +205,9 @@ export const apiSlice = createApi({
             providesTags: ["SalesTrend"],
         }),
 
+        // -------------------------
         // Order Endpoints
+        // -------------------------
         getOrdersByPeriod: builder.query<OrdersByPeriodResponse, TimePeriod>({
             query: (timePeriod = "today") => ({
                 url: "/orders/by-period",
@@ -235,9 +231,15 @@ export const apiSlice = createApi({
             invalidatesTags: [{type: "Order", id: "LIST"}],
         }),
 
+        // -------------------------
         // Menu Item Endpoints
-        getMenuItems: builder.query<MenuItemType[], void>({
-            query: () => "/menu-items/",
+        // -------------------------
+        getMenuItems: builder.query<MenuItemType[], { page?: number; limit?: number; targetStoreId?: string }>({
+            query: (params = {}) => ({
+                url: "/menu-items/",
+                params,
+            }),
+            transformResponse: (response: { data: MenuItemType[] }) => response.data,
             providesTags: (result) =>
                 result
                     ? [...result.map(({id}) => ({type: "MenuItem" as const, id})), {type: "MenuItem", id: "LIST"}]
@@ -270,7 +272,9 @@ export const apiSlice = createApi({
             ],
         }),
 
+        // -------------------------
         // User Management Endpoints
+        // -------------------------
         getAllUsers: builder.query<UserType[], void>({
             query: () => "/users",
             providesTags: (result) =>
@@ -308,6 +312,13 @@ export const apiSlice = createApi({
                 {type: "User", id: "LIST"},
             ],
         }),
+        updatePassword: builder.mutation<{ message: string }, { oldPassword: string; newPassword: string }>({
+            query: (body) => ({
+                url: "/users/update-password",
+                method: "PATCH",
+                body,
+            }),
+        }),
         changeUserStore: builder.mutation<UserType, { id: string; newStoreId: string }>({
             query: ({id, newStoreId}) => ({
                 url: `/users/${id}/change-store`,
@@ -320,7 +331,9 @@ export const apiSlice = createApi({
             ],
         }),
 
+        // -------------------------
         // Store Endpoints
+        // -------------------------
         getAllStores: builder.query<StoreType[], void>({
             query: () => "/stores",
             transformResponse: (response: PaginatedStoreResponse) => response.data,
@@ -365,24 +378,29 @@ export const apiSlice = createApi({
 // Export auto-generated hooks for use in your components
 export const {
     useHealthCheckQuery,
+
     // auth hooks
     useLoginMutation,
     useLogoutMutation,
     useRegisterManagerAndStoreMutation,
+
     // order hooks
     useGetOrdersByPeriodQuery,
     useGetOrderByIdQuery,
     useCreateOrderMutation,
+
     // menu item hooks
     useGetMenuItemsQuery,
     useCreateMenuItemMutation,
     useDeleteMenuItemMutation,
     useUpdateMenuItemMutation,
+
     // Dashboard Hooks
     useGetSalesSummaryQuery,
     useGetTopSellsQuery,
     useGetInventorySummaryQuery,
     useGetSalesTrendQuery,
+
     // User Management Hooks
     useGetAllUsersQuery,
     useGetUserByIdQuery,

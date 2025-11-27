@@ -1,6 +1,6 @@
-import { useGetTopSellsQuery } from "@/store/slice";
-import type { Period } from "@/types/order-types";
-import { ngnFormatter } from "@/utils";
+import {useGetTopSellsQuery} from "@/store/slice";
+import type {Period} from "@/types/order-types";
+import {ngnFormatter} from "@/utils";
 import {
     Box,
     Card,
@@ -13,31 +13,31 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import { useTranslation } from "react-i18next";
+import {useTranslation} from "react-i18next";
 
 interface Props {
-    period: Period;
+    timePeriod: Period;
 }
 
-const TopSells = ({ period }: Props) => {
-    const { t } = useTranslation();
+const TopSells = ({timePeriod}: Props) => {
+    const {t} = useTranslation();
     const theme = useTheme();
-    const { data: topSells, isLoading } = useGetTopSellsQuery({
-        period,
+    const {data: topSells, isLoading} = useGetTopSellsQuery({
+        timePeriod,
         limit: 5,
         orderBy: "revenue",
     });
 
     if (isLoading) {
-        return <Skeleton variant="rectangular" height={300} sx={{ borderRadius: theme.borderRadius.small }} />;
+        return <Skeleton variant="rectangular" height={300} sx={{borderRadius: theme.borderRadius.small}}/>;
     }
 
     const maxRevenue = Math.max(...(topSells?.map((item) => parseFloat(item.totalRevenueGenerated)) || [0]));
 
     return (
-        <Card sx={{ boxShadow: theme.customShadows.card, borderRadius: theme.borderRadius.small, height: "100%" }}>
-            <CardHeader title={`Top Selling ${t("menuItems")}`} subheader={`By revenue for this ${period}`} />
-            <Box sx={{ px: 2, mt: -2 }}>
+        <Card sx={{boxShadow: theme.customShadows.card, borderRadius: theme.borderRadius.small, height: "100%"}}>
+            <CardHeader title={`Top Selling ${t("menuItems")}`} subheader={`By revenue for this ${timePeriod}`}/>
+            <Box sx={{px: 2, mt: -2}}>
                 <List disablePadding>
                     {topSells?.map((item, index) => {
                         const revenue = parseFloat(item.totalRevenueGenerated);
@@ -52,7 +52,7 @@ const TopSells = ({ period }: Props) => {
                                         </Typography>
                                     }
                                     secondary={
-                                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                        <Box sx={{display: "flex", alignItems: "center", gap: 2}}>
                                             <Typography variant="body2" color="text.secondary">
                                                 {`Sold: ${item.totalQuantitySold}`}
                                             </Typography>
@@ -62,7 +62,7 @@ const TopSells = ({ period }: Props) => {
                                         </Box>
                                     }
                                 />
-                                <Box sx={{ width: "40%", ml: 2 }}>
+                                <Box sx={{width: "40%", ml: 2}}>
                                     <LinearProgress
                                         variant="determinate"
                                         value={progressValue}

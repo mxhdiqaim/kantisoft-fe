@@ -15,10 +15,12 @@ export const salesFilterSchema = yup.object({
 
 export type SaleSummarySchemaType = yup.InferType<typeof salesSummarySchema>;
 
-export type TopSellsSchemaType = {
+export type TopSellsParamType = {
     timePeriod?: Period;
     limit?: number;
     orderBy?: OrderByType;
+    startDate?: string;
+    endDate?: string;
 };
 
 export type TopSellsItemType = {
