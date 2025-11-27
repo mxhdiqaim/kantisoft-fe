@@ -28,10 +28,10 @@ const PaymentModal = ({open, onClose, onCompleteSale, cartItems, isLoading}: Pro
         control,
         handleSubmit,
         reset,
-        watch,
-        setValue,
-        setError,
-        clearErrors,
+        // watch,
+        // setValue,
+        // setError,
+        // clearErrors,
         formState: {errors, isValid},
     } = useForm<CreateOrderType>({
         mode: "onChange",
@@ -46,8 +46,8 @@ const PaymentModal = ({open, onClose, onCompleteSale, cartItems, isLoading}: Pro
         },
     });
 
-    const paymentMethod = watch("paymentMethod");
-    const amountReceived = watch("amountReceived", 0);
+    // const paymentMethod = watch("paymentMethod");
+    // const amountReceived = watch("amountReceived", 0);
 
     // const change = amountReceived - total;
 
@@ -77,33 +77,33 @@ const PaymentModal = ({open, onClose, onCompleteSale, cartItems, isLoading}: Pro
         }
     }, [open, cartItems, seller?.id, activeStore?.id, reset]);
 
-    useEffect(() => {
-        if (paymentMethod === "cash") {
-            if (amountReceived < total) {
-                // If cash is not enough, manually set an error
-                setError("amountReceived", {
-                    type: "manual",
-                    message: "Amount received must be at least the total.",
-                });
-            } else {
-                // If cash is enough, clear the error
-                clearErrors("amountReceived");
-            }
-        } else {
-            // For other payment methods, ensure the error is cleared
-            clearErrors("amountReceived");
-        }
-    }, [amountReceived, paymentMethod, total, setError, clearErrors]);
-
-    useEffect(() => {
-        if (paymentMethod !== "cash") {
-            // If payment is not cash, set amountReceived to the total
-            setValue("amountReceived", total, {shouldValidate: true});
-        } else {
-            // If switching back to cash, reset amountReceived
-            setValue("amountReceived", 0, {shouldValidate: true});
-        }
-    }, [paymentMethod, total, setValue]);
+    // useEffect(() => {
+    //     if (paymentMethod === "cash") {
+    //         if (amountReceived < total) {
+    //             // If cash is not enough, manually set an error
+    //             setError("amountReceived", {
+    //                 type: "manual",
+    //                 message: "Amount received must be at least the total.",
+    //             });
+    //         } else {
+    //             // If cash is enough, clear the error
+    //             clearErrors("amountReceived");
+    //         }
+    //     } else {
+    //         // For other payment methods, ensure the error is cleared
+    //         clearErrors("amountReceived");
+    //     }
+    // }, [amountReceived, paymentMethod, total, setError, clearErrors]);
+    //
+    // useEffect(() => {
+    //     if (paymentMethod !== "cash") {
+    //         // If payment is not cash, set the amountReceived to the total
+    //         setValue("amountReceived", total, {shouldValidate: true});
+    //     } else {
+    //         // If switching back to cash, reset the amountReceived
+    //         setValue("amountReceived", 0, {shouldValidate: true});
+    //     }
+    // }, [paymentMethod, total, setValue]);
 
     return (
         <CustomModal
