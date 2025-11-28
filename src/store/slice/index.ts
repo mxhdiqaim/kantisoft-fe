@@ -25,7 +25,12 @@ import {
 import type {RootState} from "..";
 import {logOut, selectCurrentUser, setCredentials} from "./auth-slice";
 import {selectActiveStore} from "@/store/slice/store-slice.ts";
-import type {CreateInventoryType, InventoryType} from "@/types/inventory-types.ts";
+import type {
+    AdjustStockResponseType,
+    AdjustStockType,
+    CreateInventoryType,
+    InventoryType
+} from "@/types/inventory-types.ts";
 
 const baseUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -450,22 +455,17 @@ export const apiSlice = createApi({
             invalidatesTags: [{type: "Inventory", id: "LIST"}],
         }),
 
-        // adjustStock: builder.mutation<InventoryType, {
-        //     menuItemId: string;
-        //     quantityAdjustment: number;
-        //     transactionType: string;
-        //     notes?: string
-        // }>({
-        //     query: ({menuItemId, ...body}) => ({
-        //         url: `/inventory/adjust-stock/${menuItemId}`,
-        //         method: "PATCH",
-        //         body,
-        //     }),
-        //     invalidatesTags: (_result, _error, {menuItemId}) => [
-        //         {type: "Inventory", id: menuItemId},
-        //         {type: "Inventory", id: "LIST"},
-        //     ],
-        // }),
+        adjustStock: builder.mutation<AdjustStockResponseType, AdjustStockType>({
+            query: ({menuItemId, ...body}) => ({
+                url: `/inventory/adjust-stock/${menuItemId}`,
+                method: "PATCH",
+                body,
+            }),
+            invalidatesTags: (_result, _error, {menuItemId}) => [
+                {type: "Inventory", id: menuItemId},
+                {type: "Inventory", id: "LIST"},
+            ],
+        }),
 
         markAsDiscontinued: builder.mutation<InventoryType, string>({
             query: (menuItemId) => ({
@@ -539,7 +539,7 @@ export const {
     // useGetHistoricalStockReportQuery,
     // useGetInventoryByMenuItemQuery,
     useCreateInventoryRecordMutation,
-    // useAdjustStockMutation,
+    useAdjustStockMutation,
     useMarkAsDiscontinuedMutation,
     // useDeleteInventoryRecordMutation,
 } = apiSlice;

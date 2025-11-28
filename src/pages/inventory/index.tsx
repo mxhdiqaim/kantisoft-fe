@@ -13,6 +13,7 @@ import {useTranslation} from "react-i18next";
 import CustomButton from "@/components/ui/button.tsx";
 import useNotifier from "@/hooks/useNotifier.ts";
 import {getApiError} from "@/helpers/get-api-error.ts";
+import AdjustStock from "@/components/inventory/adjust-stock.tsx";
 
 const InventoryScreen = () => {
     const {t} = useTranslation();
@@ -22,6 +23,7 @@ const InventoryScreen = () => {
     const [markAsDiscontinued, {isLoading: isDiscontinuing}] = useMarkAsDiscontinuedMutation();
 
     const [formModalOpen, setFormModalOpen] = useState(false);
+    const [adjustStockModalOpen, setAdjustStockModalOpen] = useState(false);
 
     const [selectedRow, setSelectedRow] = useState<InventoryType | null>(null);
 
@@ -35,6 +37,15 @@ const InventoryScreen = () => {
 
     const handleCloseFormModal = () => {
         setFormModalOpen(false);
+    };
+
+    const handleOpenAdjustStockModal = () => {
+        setAdjustStockModalOpen(true);
+    };
+
+    const handleCloseAdjustStockModal = () => {
+        setAdjustStockModalOpen(false);
+        handleMenuClose();
     };
 
     const handleMenuClose = () => {
@@ -179,9 +190,10 @@ const InventoryScreen = () => {
                     }
                 >
                     <MenuItem onClick={handleMenuClose}>View Details</MenuItem>
-                    <MenuItem onClick={handleMenuClose}>Adjust Stock</MenuItem>
+                    <MenuItem onClick={handleOpenAdjustStockModal}>Adjust Stock</MenuItem>
                     <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
-                    <MenuItem onClick={handleDiscontinue} disabled={isDiscontinuing}
+                    <MenuItem onClick={handleDiscontinue}
+                              disabled={isDiscontinuing || params.row.status === "discontinued"}
                               sx={{color: theme.palette.error.main}}>
                         Discontinue
                     </MenuItem>
@@ -223,6 +235,7 @@ const InventoryScreen = () => {
                 </Grid>
             </Grid>
             <CreateInventoryRecord open={formModalOpen} onClose={handleCloseFormModal}/>
+            <AdjustStock open={adjustStockModalOpen} onClose={handleCloseAdjustStockModal} inventoryItem={selectedRow}/>
         </>
     );
 };

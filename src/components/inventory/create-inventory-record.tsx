@@ -1,6 +1,6 @@
 import type {FC} from "react";
 import {useEffect} from "react";
-import {Autocomplete, Box, Button, CircularProgress, Grid, TextField,} from "@mui/material";
+import {Autocomplete, Box, CircularProgress, Grid, TextField,} from "@mui/material";
 import CustomModal from "@/components/customs/custom-modal.tsx";
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
@@ -8,6 +8,7 @@ import {createInventorySchema, type CreateInventoryType} from "@/types/inventory
 import {useCreateInventoryRecordMutation, useGetMenuItemsQuery} from "@/store/slice";
 import useNotifier from "@/hooks/useNotifier.ts";
 import {getApiError} from "@/helpers/get-api-error.ts";
+import CustomButton from "@/components/ui/button.tsx";
 
 interface Props {
     open: boolean;
@@ -56,7 +57,7 @@ const CreateInventoryRecord: FC<Props> = ({open, onClose}) => {
         <CustomModal
             open={open}
             onClose={onClose}
-            // title="Create Inventory Record"
+            title="Create Inventory Record"
         >
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{mt: 3}}>
                 <Grid container spacing={3}>
@@ -131,12 +132,12 @@ const CreateInventoryRecord: FC<Props> = ({open, onClose}) => {
                     </Grid>
                 </Grid>
                 <Box sx={{display: "flex", justifyContent: "flex-end", gap: 2, mt: 4}}>
-                    <Button onClick={onClose} variant="outlined">
+                    <CustomButton onClick={onClose} variant="outlined">
                         Cancel
-                    </Button>
-                    <Button type="submit" variant="contained" disabled={isLoading}>
+                    </CustomButton>
+                    <CustomButton type="submit" variant="contained" disabled={isLoading}>
                         {isLoading ? <CircularProgress size={24}/> : "Create Record"}
-                    </Button>
+                    </CustomButton>
                 </Box>
             </Box>
         </CustomModal>
