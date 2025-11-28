@@ -1,17 +1,6 @@
-import {useGetAllInventoryQuery} from "@/store/slice";
+import {useGetAllInventoryQuery, useMarkAsDiscontinuedMutation} from "@/store/slice";
 import type {InventoryType} from "@/types/inventory-types.ts";
-import {
-    Box,
-    Button,
-    Chip,
-    CircularProgress,
-    Grid,
-    IconButton,
-    Menu,
-    MenuItem,
-    Typography,
-    useTheme
-} from "@mui/material";
+import {Box, Button, Chip, CircularProgress, Grid, MenuItem, Tooltip, Typography, useTheme} from "@mui/material";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
 import {type MouseEvent, useMemo, useState} from "react";
 import AddIcon from "@mui/icons-material/Add";
@@ -20,15 +9,25 @@ import DataGridTable from "@/components/ui/data-grid-table";
 import {format} from "date-fns";
 import TableStyledBox from "@/components/ui/table-styled-box.tsx";
 import CreateInventoryRecord from "@/components/inventory/create-inventory-record.tsx";
+import {useTranslation} from "react-i18next";
+import CustomButton from "@/components/ui/button.tsx";
+import useNotifier from "@/hooks/useNotifier.ts";
+import {getApiError} from "@/helpers/get-api-error.ts";
 
 const InventoryScreen = () => {
+    const {t} = useTranslation();
     const theme = useTheme();
+    const notify = useNotifier();
     const {data: inventoryData, isLoading, isError, error} = useGetAllInventoryQuery();
+    const [markAsDiscontinued, {isLoading: isDiscontinuing}] = useMarkAsDiscontinuedMutation();
 
     const [formModalOpen, setFormModalOpen] = useState(false);
 
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRow, setSelectedRow] = useState<InventoryType | null>(null);
+
+    const handleMenuClick = (_event: MouseEvent<HTMLElement>, row: InventoryType) => {
+        setSelectedRow(row);
+    };
 
     const handleOpenFormModal = () => {
         setFormModalOpen(true);
@@ -38,14 +37,21 @@ const InventoryScreen = () => {
         setFormModalOpen(false);
     };
 
-    const handleMenuOpen = (event: MouseEvent<HTMLElement>, row: InventoryType) => {
-        setAnchorEl(event.currentTarget);
-        // setSelectedRow(row);
+    const handleMenuClose = () => {
+        setSelectedRow(null);
     };
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-        setSelectedRow(null);
+    const handleDiscontinue = async () => {
+        if (!selectedRow) return;
+
+        try {
+            await markAsDiscontinued(selectedRow.menuItemId).unwrap();
+            notify("Item has been discontinued.", "success");
+        } catch (err) {
+            const defaultMessage = "Failed to discontinue item.";
+            const apiError = getApiError(err, defaultMessage);
+            notify(apiError.message, "error");
+        }
     };
 
     const getStatusChipColor = (status: string) => {
@@ -67,7 +73,7 @@ const InventoryScreen = () => {
         {
             flex: 1,
             field: "menuItem",
-            headerName: "Menu Item",
+            headerName: `${t('menuItem')}`,
             minWidth: 150,
             align: "left",
             headerAlign: "left",
@@ -81,7 +87,7 @@ const InventoryScreen = () => {
         {
             flex: 1,
             field: "itemCode",
-            headerName: "Item Code",
+            headerName: "SKU",
             width: 120,
             align: "left",
             headerAlign: "left",
@@ -95,7 +101,7 @@ const InventoryScreen = () => {
         {
             flex: 1,
             field: "quantity",
-            headerName: "On Hand",
+            headerName: "Quantity",
             type: "number",
             width: 120,
             align: "left",
@@ -159,15 +165,30 @@ const InventoryScreen = () => {
             headerAlign: "center",
             sortable: false,
             renderCell: (params) => (
-                <IconButton
-                    aria-label="actions"
-                    onClick={(event) => handleMenuOpen(event, params.row)}
+                <CustomButton
+                    variant={"text"}
+                    sx={{
+                        borderRadius: "10px",
+                        color: theme.palette.text.primary,
+                    }}
+                    onClick={(e) => handleMenuClick(e, params.row)}
+                    startIcon={
+                        <Tooltip title="More Actions" placement={"top"}>
+                            <MoreVertIcon/>
+                        </Tooltip>
+                    }
                 >
-                    <MoreVertIcon/>
-                </IconButton>
+                    <MenuItem onClick={handleMenuClose}>View Details</MenuItem>
+                    <MenuItem onClick={handleMenuClose}>Adjust Stock</MenuItem>
+                    <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
+                    <MenuItem onClick={handleDiscontinue} disabled={isDiscontinuing}
+                              sx={{color: theme.palette.error.main}}>
+                        Discontinue
+                    </MenuItem>
+                </CustomButton>
             ),
         },
-    ], [handleMenuOpen])
+    ], [selectedRow, isDiscontinuing])
 
     if (isLoading) {
         return <Box sx={{display: "flex", justifyContent: "center", mt: 4}}><CircularProgress/></Box>;
@@ -201,19 +222,6 @@ const InventoryScreen = () => {
                     />
                 </Grid>
             </Grid>
-
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-            >
-                <MenuItem onClick={handleMenuClose}>View Details</MenuItem>
-                <MenuItem onClick={handleMenuClose}>Adjust Stock</MenuItem>
-                <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
-                <MenuItem onClick={handleMenuClose} sx={{color: theme.palette.error.main}}>
-                    Discontinue
-                </MenuItem>
-            </Menu>
             <CreateInventoryRecord open={formModalOpen} onClose={handleCloseFormModal}/>
         </>
     );
