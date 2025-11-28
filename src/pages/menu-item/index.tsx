@@ -28,7 +28,7 @@ import {saveAs} from "file-saver";
 import {DeleteOutline, EditOutlined, FileDownloadOutlined, MoreVert} from "@mui/icons-material";
 import DataGridTable from "@/components/ui/data-grid-table";
 import type {GridColDef} from "@mui/x-data-grid";
-import TableStyledBox from "@/components/ui/table-styled-box.tsx";
+import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {ngnFormatter} from "@/utils";
 
 const MenuItems = () => {

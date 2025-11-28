@@ -29,6 +29,7 @@ import type {
     AdjustStockResponseType,
     AdjustStockType,
     CreateInventoryType,
+    InventoryTransactionType,
     InventoryType
 } from "@/types/inventory-types.ts";
 
@@ -127,6 +128,7 @@ export const apiSlice = createApi({
         "ActivityLog",
         "Inventory",
         "InventoryReport",
+        "InventoryTransaction"
     ],
     endpoints: (builder) => ({
         // -------------------------
@@ -417,17 +419,24 @@ export const apiSlice = createApi({
                     : [{type: "Inventory", id: "LIST"}],
         }),
 
-        // getTransactionsByMenuItem: builder.query<InventoryTransactionType[], {
-        //     menuItemId: string;
-        //     startDate?: string;
-        //     endDate?: string
-        // }>({
-        //     query: ({menuItemId, ...params}) => ({
-        //         url: `/inventory/transactions/${menuItemId}`,
-        //         params,
-        //     }),
-        //     providesTags: (_result, _error, {menuItemId}) => [{type: "InventoryTransaction", id: menuItemId}],
-        // }),
+        getTransactionsByMenuItem: builder.query<InventoryTransactionType[], {
+            menuItemId: string;
+            startDate?: string;
+            endDate?: string
+        }>({
+            query: ({menuItemId, ...params}) => ({
+                url: `/inventory/transactions/${menuItemId}`,
+                params,
+            }),
+            providesTags: (result) =>
+                result
+                    ? [...result.map(({id}) => ({
+                        type: "InventoryTransaction" as const,
+                        id
+                    })), {type: "InventoryTransaction", id: "LIST"}]
+                    : [{type: "InventoryTransaction", id: "LIST"}],
+            // providesTags: (_result, _error, {menuItemId}) => [{type: "InventoryTransaction", id: menuItemId}],
+        }),
 
         // getHistoricalStockReport: builder.query<HistoricalStockReportType, {
         //     timePeriod?: string;
@@ -535,7 +544,7 @@ export const {
 
     // Inventory Hooks
     useGetAllInventoryQuery,
-    // useGetTransactionsByMenuItemQuery,
+    useGetTransactionsByMenuItemQuery,
     // useGetHistoricalStockReportQuery,
     // useGetInventoryByMenuItemQuery,
     useCreateInventoryRecordMutation,

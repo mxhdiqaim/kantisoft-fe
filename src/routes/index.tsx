@@ -7,6 +7,7 @@ import {
     ForgetPasswordScreen,
     HomeScreen,
     InventoryScreen,
+    InventoryTransactionScreen,
     LoginScreen,
     MenuItemScreen,
     NotFoundScreen,
@@ -138,6 +139,15 @@ export const appRoutes: AppRouteType[] = [
             </IconButton>
         ),
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+        children: [
+            {
+                to: ":id/transactions",
+                title: "inventoryTransactions",
+                element: InventoryTransactionScreen,
+                hidden: true,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+            }
+        ]
     },
 
     // Users management

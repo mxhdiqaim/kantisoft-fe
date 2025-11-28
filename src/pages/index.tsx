@@ -20,6 +20,7 @@ export {default as ChangePasswordScreen} from "./profile/change-password";
 
 // Inventory screens
 export {default as InventoryScreen} from "./inventory";
+export {default as InventoryTransactionScreen} from "./inventory/inventory-transaction";
 
 // User screens
 export {default as AddUserScreen} from "./users/add-user";

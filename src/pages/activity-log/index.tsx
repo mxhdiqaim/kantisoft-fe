@@ -4,7 +4,7 @@ import {useAppSelector} from "@/store";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {UserRoleEnum} from "@/types/user-types";
 import {useMemo, useState} from "react";
-import TableStyledBox from "@/components/ui/table-styled-box";
+import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {type GridColDef} from "@mui/x-data-grid";
 import {useTranslation} from "react-i18next";
 import ActivityLogSkeleton from "@/components/activity-log/loading";

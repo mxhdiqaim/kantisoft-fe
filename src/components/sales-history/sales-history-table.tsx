@@ -1,12 +1,12 @@
 import CustomNoRowsOverlay from "@/components/customs/custom-no-rows-overlay";
 import useNotifier from "@/hooks/useNotifier.ts";
-import { useAppSelector } from "@/store";
-import { selectCurrentUser } from "@/store/slice/auth-slice";
-import type { OrderType } from "@/types/order-types";
-import { UserRoleEnum } from "@/types/user-types";
-import { ngnFormatter } from "@/utils";
-import { relativeTime } from "@/utils/get-relative-time";
-import { getExportFormattedData } from "@/utils/table-export-utils";
+import {useAppSelector} from "@/store";
+import {selectCurrentUser} from "@/store/slice/auth-slice";
+import type {OrderType} from "@/types/order-types";
+import {UserRoleEnum} from "@/types/user-types";
+import {ngnFormatter} from "@/utils";
+import {relativeTime} from "@/utils/get-relative-time";
+import {getExportFormattedData} from "@/utils/table-export-utils";
 import {
     EditOutlined,
     FileDownloadOutlined,
@@ -27,18 +27,18 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import { saveAs } from "file-saver";
-import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
+import {DataGrid, type GridColDef} from "@mui/x-data-grid";
+import {saveAs} from "file-saver";
+import {type MouseEvent, useEffect, useMemo, useRef, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {useReactToPrint} from "react-to-print";
 
 import * as XLSX from "xlsx";
-import TableStyledBox from "../ui/table-styled-box";
+import TableStyledBox from "../ui/data-grid-table/table-styled-box.tsx";
 import Receipt from "./receipt";
-import { useGetAllStoresQuery } from "@/store/slice";
-import { useDispatch, useSelector } from "react-redux";
-import { selectActiveStore, setActiveStore } from "@/store/slice/store-slice";
+import {useGetAllStoresQuery} from "@/store/slice";
+import {useDispatch, useSelector} from "react-redux";
+import {selectActiveStore, setActiveStore} from "@/store/slice/store-slice";
 
 export interface Props {
     orders: OrderType[];
@@ -46,7 +46,7 @@ export interface Props {
     period: string;
 }
 
-const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) => {
+const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const notify = useNotifier();
@@ -62,7 +62,7 @@ const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) 
     const [orderToPrint, setOrderToPrint] = useState<OrderType | null>(null);
     const componentRef = useRef<HTMLDivElement>(null);
 
-    const { data: stores, isLoading: isLoadingStores } = useGetAllStoresQuery();
+    const {data: stores, isLoading: isLoadingStores} = useGetAllStoresQuery();
     const activeStore = useSelector(selectActiveStore);
 
     const loading = isLoadingOrders || isLoadingStores;
@@ -131,7 +131,7 @@ const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) 
             ),
         ].join("\n");
 
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
         saveAs(blob, `sales_history_${period.toLowerCase().replace(" ", "_")}.csv`);
         setExportAnchorEl(null);
     };
@@ -154,7 +154,7 @@ const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) 
 
         const colWidths = columns
             .filter((col) => col.field !== "actions" && col.headerName)
-            .map((col) => ({ wch: (col.headerName?.toString().length || 15) + 5 }));
+            .map((col) => ({wch: (col.headerName?.toString().length || 15) + 5}));
 
         worksheet["!cols"] = colWidths;
 
@@ -197,7 +197,7 @@ const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) 
                 headerAlign: "center",
                 width: 150,
                 renderCell: (params) => (
-                    <TableStyledBox sx={{ alignItems: "center", justifyContent: "center" }}>
+                    <TableStyledBox sx={{alignItems: "center", justifyContent: "center"}}>
                         <Typography variant="body2">{relativeTime(new Date(), new Date(params.value))}</Typography>
                     </TableStyledBox>
                 ),
@@ -211,7 +211,7 @@ const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) 
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{ alignItems: "center", justifyContent: "center" }}>
+                    <TableStyledBox sx={{alignItems: "center", justifyContent: "center"}}>
                         <Typography variant="body2" fontWeight="medium">
                             {ngnFormatter.format(params.value)}{" "}
                         </Typography>
@@ -235,7 +235,7 @@ const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) 
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{ alignItems: "center", justifyContent: "center" }}>
+                    <TableStyledBox sx={{alignItems: "center", justifyContent: "center"}}>
                         <Typography
                             variant="body2"
                             className="capitalize"
@@ -252,8 +252,8 @@ const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) 
                                     params.value === "completed"
                                         ? theme.palette.success.light
                                         : params.value === "pending"
-                                          ? theme.palette.warning.light
-                                          : theme.palette.error.light,
+                                            ? theme.palette.warning.light
+                                            : theme.palette.error.light,
                             }}
                         >
                             {params.value}
@@ -298,22 +298,22 @@ const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) 
                         <>
                             <Tooltip title="More Actions">
                                 <IconButton onClick={(e) => handleMenuClick(e, params.row.id)}>
-                                    <MoreVert />
+                                    <MoreVert/>
                                 </IconButton>
                             </Tooltip>
                             <Menu anchorEl={anchorEl} open={isOpen} onClose={handleMenuClose}>
                                 <MenuItem onClick={handleView}>
-                                    <VisibilityOutlined sx={{ mr: 1 }} />
+                                    <VisibilityOutlined sx={{mr: 1}}/>
                                     View
                                 </MenuItem>
                                 {canEdit && (
                                     <MenuItem onClick={handleEdit}>
-                                        <EditOutlined sx={{ mr: 1 }} />
+                                        <EditOutlined sx={{mr: 1}}/>
                                         Edit
                                     </MenuItem>
                                 )}
                                 <MenuItem onClick={handlePrintReceipt}>
-                                    <PrintOutlined sx={{ mr: 1 }} />
+                                    <PrintOutlined sx={{mr: 1}}/>
                                     Print
                                 </MenuItem>
                             </Menu>
@@ -339,26 +339,26 @@ const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) 
 
     return (
         <Box>
-            <div style={{ display: "none" }}>
+            <div style={{display: "none"}}>
                 {orderToPrint && (
                     <div ref={componentRef}>
-                        <Receipt order={orderToPrint} storeData={activeStore} />
+                        <Receipt order={orderToPrint} storeData={activeStore}/>
                     </div>
                 )}
             </div>
-            <Box sx={{ p: 2, display: "flex", justifyContent: "flex-start" }}>
+            <Box sx={{p: 2, display: "flex", justifyContent: "flex-start"}}>
                 <TextField
                     variant="outlined"
                     size="small"
                     placeholder="Search by reference..."
                     value={searchText}
                     fullWidth
-                    sx={{ height: 45 }}
+                    sx={{height: 45}}
                     onChange={(e) => setSearchText(e.target.value)}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <SearchIcon />
+                                <SearchIcon/>
                             </InputAdornment>
                         ),
                     }}
@@ -367,9 +367,9 @@ const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) 
                 <Button
                     variant="contained"
                     size="small"
-                    startIcon={<FileDownloadOutlined />}
+                    startIcon={<FileDownloadOutlined/>}
                     onClick={(event) => setExportAnchorEl(event.currentTarget)}
-                    sx={{ ml: 2, height: 45, minWidth: 200 }}
+                    sx={{ml: 2, height: 45, minWidth: 200}}
                 >
                     Export
                 </Button>
@@ -396,7 +396,7 @@ const SalesHistoryTable = ({ orders, loading: isLoadingOrders, period }: Props) 
                 }}
                 initialState={{
                     pagination: {
-                        paginationModel: { pageSize: 10 },
+                        paginationModel: {pageSize: 10},
                     },
                 }}
                 disableColumnResize

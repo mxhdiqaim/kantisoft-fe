@@ -1,7 +1,7 @@
-import { Box, styled, type SxProps, type Theme } from "@mui/material";
-import type { ReactNode } from "react";
+import {Box, styled, type SxProps, type Theme} from "@mui/material";
+import type {ReactNode} from "react";
 
-const StyledBox = styled(Box)(({ theme }) => ({
+const StyledBox = styled(Box)(({theme}) => ({
     display: "flex",
     alignItems: "center",
     height: "100%",
@@ -11,9 +11,10 @@ const StyledBox = styled(Box)(({ theme }) => ({
 interface Props {
     children: ReactNode;
     sx?: SxProps<Theme>;
+    onClick?: () => void;
 }
 
-const TableStyledBox = ({ children, ...props }: Props) => {
+const TableStyledBox = ({children, ...props}: Props) => {
     return <StyledBox {...props}>{children}</StyledBox>;
 };
 

@@ -23,7 +23,7 @@ import {saveAs} from "file-saver";
 import {type MouseEvent, useMemo, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import * as XLSX from "xlsx";
-import TableStyledBox from "@/components/ui/table-styled-box.tsx";
+import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import DataGridTable from "@/components/ui/data-grid-table";
 import CustomCard from "@/components/customs/custom-card.tsx";
 import ChangeStoreDialog from "@/components/users/change-store-modal.tsx";

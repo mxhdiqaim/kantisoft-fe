@@ -52,8 +52,33 @@ export const inventorySchema = extendBaseSchema({
         .optional(),
 });
 
+export const inventoryTransactionSchema = extendBaseSchema({
+    menuItemId: yup.string().uuid().required("MenuItem not selected"),
+    storeId: yup.string().uuid().required("Store not selected"),
+    transactionType: yup.string().oneOf(TRANSACTION_TYPE).required("Transaction type is required"),
+    quantityChange: yup.number().required("Quantity change is required"),
+    resultingQuantity: yup.number().required("Resulting quantity is required"),
+    sourceDocumentId: yup.string().optional().nullable(),
+    performedBy: yup.string().uuid().required("Performed by is required"),
+    notes: yup.string().optional(),
+    transactionDate: yup.string().required("Transaction date is required"),
+    performedByUser: yup
+        .object({
+            firstName: yup.string().required(),
+            lastName: yup.string().required(),
+        })
+        .optional(),
+    menuItem: yup
+        .object({
+            name: yup.string().required(),
+            itemCode: yup.string().required(),
+        })
+        .optional(),
+})
+
 export type CreateInventoryType = yup.InferType<typeof createInventorySchema>;
 export type InventoryType = yup.InferType<typeof inventorySchema>;
 export type AdjustStockType = yup.InferType<typeof adjustStockSchema>;
 export type AdjustStockResponseType = Omit<InventoryType, "menuItem" | "store">;
+export type InventoryTransactionType = yup.InferType<typeof inventoryTransactionSchema>;
 // export type EditInventoryType = Partial<InventoryType>;

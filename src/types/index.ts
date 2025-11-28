@@ -21,7 +21,7 @@ export const extendBaseSchema = <T extends yup.AnyObject>(fields: T): yup.Object
 };
 
 export const searchSchema = yup.object({
-    search: yup.string().required("Search term is required").min(2),
+    search: yup.string().min(2).optional(),
 });
 
 export type SearchTermType = yup.InferType<typeof searchSchema>;

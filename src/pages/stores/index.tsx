@@ -7,7 +7,7 @@ import {useTranslation} from "react-i18next";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
 import type {StoreType} from "@/types/store-types.ts";
 import {type MouseEvent, useMemo, useState} from "react";
-import TableStyledBox from "@/components/ui/table-styled-box.tsx";
+import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import StoreDeleteConfirmation from "@/components/stores/store-delete-confirmation.tsx";
 import useNotifier from "@/hooks/useNotifier.ts";
 import {getApiError} from "@/helpers/get-api-error.ts";

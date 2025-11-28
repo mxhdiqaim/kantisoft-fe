@@ -7,13 +7,15 @@ import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DataGridTable from "@/components/ui/data-grid-table";
 import {format} from "date-fns";
-import TableStyledBox from "@/components/ui/table-styled-box.tsx";
+import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import CreateInventoryRecord from "@/components/inventory/create-inventory-record.tsx";
 import {useTranslation} from "react-i18next";
 import CustomButton from "@/components/ui/button.tsx";
 import useNotifier from "@/hooks/useNotifier.ts";
 import {getApiError} from "@/helpers/get-api-error.ts";
 import AdjustStock from "@/components/inventory/adjust-stock.tsx";
+import {getStatusChipColor} from "@/styles";
+import {useNavigate} from "react-router-dom";
 import {useSearch} from "@/use-search.ts";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 
@@ -21,6 +23,7 @@ const InventoryScreen = () => {
     const {t} = useTranslation();
     const theme = useTheme();
     const notify = useNotifier();
+    const navigate = useNavigate();
     const {data: inventoryData, isLoading, isError, error} = useGetAllInventoryQuery();
     const [markAsDiscontinued, {isLoading: isDiscontinuing}] = useMarkAsDiscontinuedMutation();
 
@@ -74,21 +77,6 @@ const InventoryScreen = () => {
         }
     };
 
-    const getStatusChipColor = (status: string) => {
-        switch (status) {
-            case "inStock":
-                return "success";
-            case "lowStock":
-                return "warning";
-            case "outOfStock":
-                return "error";
-            case "discontinued":
-                return "default";
-            default:
-                return "default";
-        }
-    };
-
     const columns: GridColDef<InventoryType>[] = useMemo(() => [
         {
             flex: 1,
@@ -99,7 +87,10 @@ const InventoryScreen = () => {
             headerAlign: "left",
             // valueGetter: (params) => params.row.menuItem?.name ?? "",
             renderCell: (params) => (
-                <TableStyledBox>
+                <TableStyledBox
+                    sx={{cursor: 'pointer', ":hover": {textDecoration: "underline"}}}
+                    onClick={() => navigate(`/inventory/${params.row.menuItemId}/transactions`)}
+                >
                     <Typography variant="body2">{params.value.name}</Typography>
                 </TableStyledBox>
             ),
@@ -157,7 +148,7 @@ const InventoryScreen = () => {
                 <TableStyledBox>
                     <Chip
                         label={params.value}
-                        color={getStatusChipColor(params.value || "")}
+                        color={getStatusChipColor(params.value ?? "")}
                         size="small"
                         sx={{textTransform: "capitalize"}}
                     />
@@ -245,7 +236,6 @@ const InventoryScreen = () => {
                     Add Record
                 </Button>
             </Box>
-
             <TableSearchActions
                 searchControl={searchControl}
                 searchSubmit={searchSubmit}
@@ -254,7 +244,7 @@ const InventoryScreen = () => {
 
             <Grid container spacing={2}>
                 <Grid size={12}>
-                    <DataGridTable data={filteredData} columns={columns} loading={isLoading}/>
+                    <DataGridTable data={filteredData ?? []} columns={columns} loading={isLoading}/>
                 </Grid>
             </Grid>
             <CreateInventoryRecord open={formModalOpen} onClose={handleCloseFormModal}/>
