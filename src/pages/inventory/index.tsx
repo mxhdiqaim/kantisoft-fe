@@ -1,6 +1,6 @@
 import {useGetAllInventoryQuery, useMarkAsDiscontinuedMutation} from "@/store/slice";
 import type {InventoryType} from "@/types/inventory-types.ts";
-import {Box, Button, Chip, CircularProgress, Grid, MenuItem, Tooltip, Typography, useTheme} from "@mui/material";
+import {Box, Button, Chip, Grid, MenuItem, Skeleton, Tooltip, Typography, useTheme} from "@mui/material";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
 import {type MouseEvent, useMemo, useState} from "react";
 import AddIcon from "@mui/icons-material/Add";
@@ -14,6 +14,8 @@ import CustomButton from "@/components/ui/button.tsx";
 import useNotifier from "@/hooks/useNotifier.ts";
 import {getApiError} from "@/helpers/get-api-error.ts";
 import AdjustStock from "@/components/inventory/adjust-stock.tsx";
+import {useSearch} from "@/use-search.ts";
+import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 
 const InventoryScreen = () => {
     const {t} = useTranslation();
@@ -21,6 +23,13 @@ const InventoryScreen = () => {
     const notify = useNotifier();
     const {data: inventoryData, isLoading, isError, error} = useGetAllInventoryQuery();
     const [markAsDiscontinued, {isLoading: isDiscontinuing}] = useMarkAsDiscontinuedMutation();
+
+    const memoizedInventories = useMemo(() => inventoryData || [], [inventoryData]);
+
+    const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
+        initialData: memoizedInventories,
+        searchKeys: ["menuItem.name", "menuItem.itemCode"],
+    });
 
     const [formModalOpen, setFormModalOpen] = useState(false);
     const [adjustStockModalOpen, setAdjustStockModalOpen] = useState(false);
@@ -203,7 +212,19 @@ const InventoryScreen = () => {
     ], [selectedRow, isDiscontinuing])
 
     if (isLoading) {
-        return <Box sx={{display: "flex", justifyContent: "center", mt: 4}}><CircularProgress/></Box>;
+        return (
+            <>
+                <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
+                    <Skeleton variant="text" width={250} height={48}/>
+                    <Skeleton variant="rectangular" width={140} height={40} sx={{borderRadius: 2}}/>
+                </Box>
+                <Grid container spacing={2}>
+                    <Grid size={12}>
+                        <Skeleton variant="rectangular" width="100%" height={500} sx={{borderRadius: 1}}/>
+                    </Grid>
+                </Grid>
+            </>
+        );
     }
 
     if (isError) {
@@ -225,13 +246,15 @@ const InventoryScreen = () => {
                 </Button>
             </Box>
 
+            <TableSearchActions
+                searchControl={searchControl}
+                searchSubmit={searchSubmit}
+                handleSearch={handleSearch}
+            />
+
             <Grid container spacing={2}>
                 <Grid size={12}>
-                    <DataGridTable
-                        data={inventoryData || []}
-                        columns={columns}
-                        loading={isLoading}
-                    />
+                    <DataGridTable data={filteredData} columns={columns} loading={isLoading}/>
                 </Grid>
             </Grid>
             <CreateInventoryRecord open={formModalOpen} onClose={handleCloseFormModal}/>

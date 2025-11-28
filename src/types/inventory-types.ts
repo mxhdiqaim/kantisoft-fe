@@ -56,4 +56,4 @@ export type CreateInventoryType = yup.InferType<typeof createInventorySchema>;
 export type InventoryType = yup.InferType<typeof inventorySchema>;
 export type AdjustStockType = yup.InferType<typeof adjustStockSchema>;
 export type AdjustStockResponseType = Omit<InventoryType, "menuItem" | "store">;
-export type EditInventoryType = Partial<InventoryType>;
+// export type EditInventoryType = Partial<InventoryType>;

@@ -11,18 +11,6 @@ export const baseSchema = yup.object().shape({
 // Type inference from the base schema
 export type BaseSchema = yup.InferType<typeof baseSchema>;
 
-// Helper types to extend base schema
-export type ExtendSchema<T> = BaseSchema & T;
-
-// Helper function to extend base schema
-// export const extendBaseSchema = <T extends yup.ObjectSchema<any>>(
-//     schema: T,
-// ): yup.ObjectSchema<ExtendSchema<yup.InferType<T>>> => {
-//     // eslint-disable-next-line
-//     // @ts-ignore
-//     return baseSchema.concat(schema);
-// };
-
 export const extendBaseSchema = <T extends yup.AnyObject>(fields: T): yup.ObjectSchema<any> => {
     return yup.object({
         id: yup.string().uuid().required(),
@@ -32,7 +20,11 @@ export const extendBaseSchema = <T extends yup.AnyObject>(fields: T): yup.Object
     });
 };
 
-export type ErrCallbackType = (err: string) => void;
+export const searchSchema = yup.object({
+    search: yup.string().required("Search term is required").min(2),
+});
+
+export type SearchTermType = yup.InferType<typeof searchSchema>;
 
 export interface ActivityLogType {
     id: string;
