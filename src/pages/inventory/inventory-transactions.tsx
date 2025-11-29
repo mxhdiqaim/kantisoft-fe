@@ -1,13 +1,33 @@
 import {Box, Chip, Grid, Skeleton, Typography} from "@mui/material";
 import {useGetInventoryTransactionsQuery} from "@/store/slice";
 import type {GridColDef} from "@mui/x-data-grid";
-import {useMemo} from "react";
+import {useEffect, useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import DataGridTable from "@/components/ui/data-grid-table";
 import {getTransactionChipColor} from "@/styles";
+import OverviewHeader from "@/components/ui/custom-header.tsx";
+import {getTitle} from "@/utils";
+import {useForm} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {filterSchema, type TimePeriod} from "@/types";
+import {relativeTime} from "@/utils/get-relative-time.ts";
 
 const InventoryTransactions = () => {
-    const {data, isLoading, isError} = useGetInventoryTransactionsQuery({});
+
+    const {control, watch} = useForm<{ timePeriod: TimePeriod }>({
+        mode: "onChange",
+        resolver: yupResolver(filterSchema),
+        defaultValues: {
+            timePeriod: "today",
+        },
+    });
+
+    const period = watch("timePeriod");
+
+    const {data, isLoading, isError, fulfilledTimeStamp} = useGetInventoryTransactionsQuery({timePeriod: period});
+
+    const [lastFetched, setLastFetched] = useState<Date | null>(null);
+
 
     const columns: GridColDef[] = useMemo(() => [
         {
@@ -57,7 +77,12 @@ const InventoryTransactions = () => {
             ),
         }
     ], []);
-
+    
+    useEffect(() => {
+        if (fulfilledTimeStamp) {
+            setLastFetched(new Date(fulfilledTimeStamp));
+        }
+    }, [fulfilledTimeStamp]);
 
     if (isLoading) {
         return (
@@ -75,15 +100,29 @@ const InventoryTransactions = () => {
     }
 
     const {transactions: transactionsData, timePeriod} = data;
-    
+
     return (
         <Box>
-            <Typography variant="h4" component="h1">
-                Transaction History
-            </Typography>
-            <Typography variant="subtitle1" color="text.secondary" sx={{mb: 3, textDecoration: "capitalize"}}>
-                Time Period: {timePeriod}
-            </Typography>
+            <OverviewHeader
+                title={"Transaction"}
+                timePeriod={timePeriod as TimePeriod}
+                control={control} getTimeTitle={getTitle}
+            />
+            <Box sx={{display: "flex", justifyContent: "flex-end"}}>
+                <Typography
+                    variant="h6"
+                    component="span"
+                    color="text.secondary"
+                    align="right"
+                    mb={1}
+                    sx={{
+                        fontWeight: 400,
+                        textAlign: "right",
+                    }}
+                >
+                    {lastFetched ? `Last updated ${relativeTime(new Date(), lastFetched)}` : "Fetching data..."}
+                </Typography>
+            </Box>
 
             <Grid container spacing={2}>
                 <Grid size={12}>

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as yup from "yup";
 
+export const ORDER_PERIODS = ["today", "week", "month", "all-time"] as const;
+
 // Base schema type that all other schemas will extend
 export const baseSchema = yup.object().shape({
     id: yup.string().uuid().required(), // uuid string
@@ -25,6 +27,18 @@ export const searchSchema = yup.object({
 });
 
 export type SearchTermType = yup.InferType<typeof searchSchema>;
+
+export const timePeriodSchema = yup
+    .string()
+    .oneOf(ORDER_PERIODS, "Invalid period. Must be 'day', 'week', or 'month'.")
+    .required("Period is required.");
+
+
+export const filterSchema = yup.object({
+    timePeriod: timePeriodSchema,
+});
+
+export type TimePeriod = (typeof ORDER_PERIODS)[number];
 
 export interface ActivityLogType {
     id: string;

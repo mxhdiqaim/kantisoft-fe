@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {extendBaseSchema} from "@/types";
+import {extendBaseSchema, ORDER_PERIODS} from "@/types";
 import * as yup from "yup";
 import {menuItemSchema, type MenuItemType} from "./menu-item-type";
 
@@ -18,8 +18,6 @@ export const OrderPaymentMethod = {
 // Define allowed values for better type safety and validation
 const PAYMENT_METHODS = Object.values(OrderPaymentMethod);
 const ORDER_STATUSES = Object.values(OrderStatus);
-
-export const ORDER_PERIODS = ["today", "week", "month", "all-time"] as const;
 
 // Core schema for creating and validating an order
 const coreOrderSchema = yup.object({
@@ -170,11 +168,6 @@ export type CreateOrderItemType = Pick<OrderItemType, "menuItemId" | "quantity" 
 // Explicitly define the types for the constants
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
-
-export const orderPeriodSchema = yup
-    .string()
-    .oneOf(ORDER_PERIODS, "Invalid period. Must be 'day', 'week', or 'month'.")
-    .required("Period is required.");
 
 export type Period = (typeof ORDER_PERIODS)[number];
 

@@ -4,7 +4,7 @@ import SalesTrendChart from "@/components/dashboard/sales-trend-chart";
 import SummaryCard from "@/components/dashboard/summary-card";
 import TopSells from "@/components/dashboard/top-sells";
 import {useGetSalesSummaryQuery} from "@/store/slice";
-import {salesFilterSchema} from "@/types/dashboard-types";
+import {filterSchema} from "@/types/dashboard-types";
 import type {Period} from "@/types/order-types.ts";
 import {getTitle} from "@/utils";
 import {relativeTime} from "@/utils/get-relative-time.ts";
@@ -18,7 +18,7 @@ const Index = () => {
     const theme = useTheme();
     const {control, watch} = useForm<{ period: Period }>({
         mode: "onChange",
-        resolver: yupResolver(salesFilterSchema),
+        resolver: yupResolver(filterSchema),
         defaultValues: {
             period: "today",
         },

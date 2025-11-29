@@ -1,22 +1,23 @@
 import Spinner from "@/components/sales-history/spinners";
 import SalesHistoryOverviewCard from "@/components/sales-history/sales-history-overview-card";
 import SalesHistoryTable from "@/components/sales-history/sales-history-table";
-import { useGetOrdersByPeriodQuery } from "@/store/slice";
-import { salesFilterSchema } from "@/types/dashboard-types.ts";
-import { type Period } from "@/types/order-types";
-import { getTitle, ngnFormatter } from "@/utils";
-import { relativeTime } from "@/utils/get-relative-time";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { DinnerDiningOutlined, DomainVerificationOutlined, MonetizationOn, Person2Outlined } from "@mui/icons-material";
-import { Box, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Typography, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import {useGetOrdersByPeriodQuery} from "@/store/slice";
+import {type Period} from "@/types/order-types";
+import {getTitle, ngnFormatter} from "@/utils";
+import {relativeTime} from "@/utils/get-relative-time";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {DinnerDiningOutlined, DomainVerificationOutlined, MonetizationOn, Person2Outlined} from "@mui/icons-material";
+import {Box, Grid, Paper, Typography, useTheme} from "@mui/material";
+import {useEffect, useState} from "react";
+import {useForm} from "react-hook-form";
+import OverviewHeader from "@/components/ui/custom-header.tsx";
+import {filterSchema} from "@/types/dashboard-types.ts";
 
 const SalesHistory = () => {
     const theme = useTheme();
-    const { control, watch } = useForm<{ period: Period }>({
+    const {control, watch} = useForm<{ period: Period }>({
         mode: "onChange",
-        resolver: yupResolver(salesFilterSchema),
+        resolver: yupResolver(filterSchema),
         defaultValues: {
             period: "today",
         },
@@ -24,7 +25,7 @@ const SalesHistory = () => {
 
     const period = watch("period");
 
-    const { data: ordersData, isLoading, isError, fulfilledTimeStamp } = useGetOrdersByPeriodQuery(period);
+    const {data: ordersData, isLoading, isError, fulfilledTimeStamp} = useGetOrdersByPeriodQuery(period);
 
     const [lastFetched, setLastFetched] = useState<Date | null>(null);
 
@@ -34,57 +35,20 @@ const SalesHistory = () => {
         }
     }, [fulfilledTimeStamp]);
 
-    if (isLoading) return <Spinner />;
+    if (isLoading) return <Spinner/>;
 
     if (isError) {
         return (
-            <Typography color="error" align="center" sx={{ mt: 4 }}>
+            <Typography color="error" align="center" sx={{mt: 4}}>
                 Failed to load sales history. Please try again later.
             </Typography>
         );
     }
 
     return (
-        <Box sx={{ mx: "auto" }}>
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mb: 1,
-                }}
-            >
-                <Typography variant="h4">Sales Overview</Typography>
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "right",
-                    }}
-                >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                        <Typography variant="h4" component="h1">
-                            {getTitle(period)}&apos;s Sales
-                        </Typography>
-                        <Controller
-                            name="period"
-                            control={control}
-                            render={({ field }) => (
-                                <FormControl sx={{ minWidth: 120 }} size="small">
-                                    <InputLabel id="period-select-label">Period</InputLabel>
-                                    <Select {...field} labelId="period-select-label" label="Period">
-                                        <MenuItem value={"today"}>Today</MenuItem>
-                                        <MenuItem value={"week"}>This Week</MenuItem>
-                                        <MenuItem value={"month"}>This Month</MenuItem>
-                                        <MenuItem value={"all-time"}>All Time</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            )}
-                        />
-                    </Box>
-                </Box>
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <Box sx={{mx: "auto"}}>
+            <OverviewHeader title={"Sales"} timePeriod={period} control={control} getTimeTitle={getTitle}/>
+            <Box sx={{display: "flex", justifyContent: "flex-end"}}>
                 <Typography
                     variant="h6"
                     component="span"
@@ -101,39 +65,39 @@ const SalesHistory = () => {
             </Box>
 
             <Grid container spacing={3} mb={3}>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{xs: 12, sm: 6, md: 3}}>
                     <SalesHistoryOverviewCard
                         title="Total Sales Balance"
                         color="success"
-                        icon={<MonetizationOn />}
+                        icon={<MonetizationOn/>}
                         value={ngnFormatter.format(Number(ordersData?.totalRevenue ?? 0))}
                         isLoading={isLoading}
                     />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{xs: 12, sm: 6, md: 3}}>
                     <SalesHistoryOverviewCard
                         title="Most Ordered Item"
                         color="warning"
-                        icon={<DinnerDiningOutlined />}
+                        icon={<DinnerDiningOutlined/>}
                         value={ordersData?.mostOrderedItem?.name || "N/A"}
                         subValue={ordersData?.mostOrderedItem ? `(${ordersData.mostOrderedItem.quantity} sold)` : ""}
                         isLoading={isLoading}
                     />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{xs: 12, sm: 6, md: 3}}>
                     <SalesHistoryOverviewCard
                         title="Top Seller"
                         color="secondary"
-                        icon={<Person2Outlined />}
+                        icon={<Person2Outlined/>}
                         value={ordersData?.topSeller?.name || "N/A"}
                         isLoading={isLoading}
                     />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{xs: 12, sm: 6, md: 3}}>
                     <SalesHistoryOverviewCard
                         title="Total Orders"
                         color="info"
-                        icon={<DomainVerificationOutlined />}
+                        icon={<DomainVerificationOutlined/>}
                         value={ordersData?.totalOrders ?? 0}
                         isLoading={isLoading}
                     />
@@ -150,7 +114,7 @@ const SalesHistory = () => {
                     },
                 }}
             >
-                <SalesHistoryTable orders={ordersData?.orders ?? []} loading={isLoading} period={period} />
+                <SalesHistoryTable orders={ordersData?.orders ?? []} loading={isLoading} period={period}/>
             </Paper>
         </Box>
     );
