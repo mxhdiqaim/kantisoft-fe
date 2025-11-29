@@ -489,13 +489,13 @@ export const apiSlice = createApi({
             ],
         }),
 
-        // deleteInventoryRecord: builder.mutation<{ message: string }, string>({
-        //     query: (menuItemId) => ({
-        //         url: `/inventory/${menuItemId}`,
-        //         method: "DELETE",
-        //     }),
-        //     invalidatesTags: [{type: "Inventory", id: "LIST"}],
-        // }),
+        deleteInventoryRecord: builder.mutation<{ message: string }, string>({
+            query: (menuItemId) => ({
+                url: `/inventory/${menuItemId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: [{type: "Inventory", id: "LIST"}],
+        }),
     }),
 });
 
@@ -548,9 +548,8 @@ export const {
     useGetAllInventoryQuery,
     useGetTransactionsByMenuItemQuery,
     useGetInventoryTransactionsQuery,
-    // useGetInventoryByMenuItemQuery,
     useCreateInventoryRecordMutation,
     useAdjustStockMutation,
     useMarkAsDiscontinuedMutation,
-    // useDeleteInventoryRecordMutation,
+    useDeleteInventoryRecordMutation,
 } = apiSlice;

@@ -1,11 +1,12 @@
 import {type Control, Controller} from "react-hook-form";
 import {Box, FormControl, InputLabel, MenuItem, Select, Typography} from "@mui/material";
-import type {Period as TimePeriod} from "@/types/order-types.ts";
+import type {TimePeriod} from "@/types";
 
 type Props = {
     title: string;
     timePeriod: TimePeriod;
     getTimeTitle: (timePeriod: TimePeriod) => string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     control: Control<any>;
 };
 
@@ -31,7 +32,7 @@ const OverviewHeader = ({title, timePeriod, getTimeTitle, control}: Props) => (
                     {getTimeTitle(timePeriod)}&apos;s {title}
                 </Typography>
                 <Controller
-                    name="period"
+                    name="timePeriod"
                     control={control}
                     render={({field}) => (
                         <FormControl sx={{minWidth: 120}} size="small">

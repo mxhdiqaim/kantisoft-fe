@@ -2,7 +2,7 @@ import Spinner from "@/components/sales-history/spinners";
 import SalesHistoryOverviewCard from "@/components/sales-history/sales-history-overview-card";
 import SalesHistoryTable from "@/components/sales-history/sales-history-table";
 import {useGetOrdersByPeriodQuery} from "@/store/slice";
-import {type Period} from "@/types/order-types";
+import {filterSchema, type TimePeriod} from "@/types";
 import {getTitle, ngnFormatter} from "@/utils";
 import {relativeTime} from "@/utils/get-relative-time";
 import {yupResolver} from "@hookform/resolvers/yup";
@@ -11,19 +11,18 @@ import {Box, Grid, Paper, Typography, useTheme} from "@mui/material";
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import OverviewHeader from "@/components/ui/custom-header.tsx";
-import {filterSchema} from "@/types/dashboard-types.ts";
 
 const SalesHistory = () => {
     const theme = useTheme();
-    const {control, watch} = useForm<{ period: Period }>({
+    const {control, watch} = useForm<{ timePeriod: TimePeriod }>({
         mode: "onChange",
         resolver: yupResolver(filterSchema),
         defaultValues: {
-            period: "today",
+            timePeriod: "today",
         },
     });
 
-    const period = watch("period");
+    const period = watch("timePeriod");
 
     const {data: ordersData, isLoading, isError, fulfilledTimeStamp} = useGetOrdersByPeriodQuery(period);
 
