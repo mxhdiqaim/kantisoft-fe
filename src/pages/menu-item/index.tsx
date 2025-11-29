@@ -20,16 +20,16 @@ import ApiErrorDisplay from "@/components/feedback/api-error-display";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {useAppSelector} from "@/store";
 import MenuItemsPageSkeleton from "@/components/menu-items/loading";
-import CustomCard from "@/components/customs/custom-card.tsx";
 import {getExportFormattedData} from "@/utils/table-export-utils";
 import * as XLSX from "xlsx";
 import {saveAs} from "file-saver";
 
-import {DeleteOutline, EditOutlined, FileDownloadOutlined, MoreVert} from "@mui/icons-material";
+import {DeleteOutline, EditOutlined, MoreVert} from "@mui/icons-material";
 import DataGridTable from "@/components/ui/data-grid-table";
 import type {GridColDef} from "@mui/x-data-grid";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {ngnFormatter} from "@/utils";
+import ExportCard from "@/components/customs/export-card.tsx";
 
 const MenuItems = () => {
     const theme = useTheme();
@@ -45,8 +45,8 @@ const MenuItems = () => {
     const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItemType | null>(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
-    const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
-    const isExportMenuOpen = Boolean(exportAnchorEl);
+    // const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+    // const isExportMenuOpen = Boolean(exportAnchorEl);
 
     const totalMenuItems = useMemo(() => menuItems?.length || 0, [menuItems]);
 
@@ -78,7 +78,7 @@ const MenuItems = () => {
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
             // alert('No data to export.');
-            setExportAnchorEl(null);
+            // setExportAnchorEl(null);
             return;
         }
 
@@ -92,7 +92,7 @@ const MenuItems = () => {
 
         const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
         saveAs(blob, `menu_items_data.csv`);
-        setExportAnchorEl(null);
+        // setExportAnchorEl(null);
     };
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
@@ -260,7 +260,7 @@ const MenuItems = () => {
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
             // alert('No data to export.');
-            setExportAnchorEl(null);
+            // setExportAnchorEl(null);
             return;
         }
 
@@ -273,7 +273,7 @@ const MenuItems = () => {
             .map((col) => ({wch: (col.headerName?.toString().length || 15) + 5}));
 
         XLSX.writeFile(workbook, `menu_items_data.xlsx`);
-        setExportAnchorEl(null);
+        // setExportAnchorEl(null);
     };
 
     if (isLoading) return <MenuItemsPageSkeleton/>;
@@ -303,25 +303,29 @@ const MenuItems = () => {
                     </Grid>
                 )}
             </Grid>
+            <ExportCard
+                onExportCsv={handleExportCsv}
+                onExportXlsx={handleExportXlsx}
+            />
 
-            <CustomCard sx={{borderRadius: 2, mb: 2}}>
-                <Box sx={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
-                    {/* Export Button and Menu */}
-                    <Button
-                        variant="contained"
-                        size="small"
-                        startIcon={<FileDownloadOutlined/>}
-                        sx={{height: 45, minWidth: 200}}
-                        onClick={(event) => setExportAnchorEl(event.currentTarget)}
-                    >
-                        Export
-                    </Button>
-                    <Menu anchorEl={exportAnchorEl} open={isExportMenuOpen} onClose={() => setExportAnchorEl(null)}>
-                        <MuiMenuItem onClick={handleExportCsv}>Export as CSV</MuiMenuItem>
-                        <MuiMenuItem onClick={handleExportXlsx}>Export as XLSX</MuiMenuItem>
-                    </Menu>
-                </Box>
-            </CustomCard>
+            {/*<CustomCard sx={{borderRadius: 2, mb: 2}}>*/}
+            {/*    <Box sx={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>*/}
+            {/*        /!* Export Button and Menu *!/*/}
+            {/*        <Button*/}
+            {/*            variant="contained"*/}
+            {/*            size="small"*/}
+            {/*            startIcon={<FileDownloadOutlined/>}*/}
+            {/*            sx={{height: 45, minWidth: 200}}*/}
+            {/*            onClick={(event) => setExportAnchorEl(event.currentTarget)}*/}
+            {/*        >*/}
+            {/*            Export*/}
+            {/*        </Button>*/}
+            {/*        <Menu anchorEl={exportAnchorEl} open={isExportMenuOpen} onClose={() => setExportAnchorEl(null)}>*/}
+            {/*            <MuiMenuItem onClick={handleExportCsv}>Export as CSV</MuiMenuItem>*/}
+            {/*            <MuiMenuItem onClick={handleExportXlsx}>Export as XLSX</MuiMenuItem>*/}
+            {/*        </Menu>*/}
+            {/*    </Box>*/}
+            {/*</CustomCard>*/}
 
             <DataGridTable data={menuItems} columns={columns} loading={isLoading}/>
 

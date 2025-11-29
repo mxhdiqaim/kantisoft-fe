@@ -1,4 +1,3 @@
-import CustomNoRowsOverlay from "@/components/customs/custom-no-rows-overlay";
 import useNotifier from "@/hooks/useNotifier.ts";
 import {useAppSelector} from "@/store";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
@@ -7,17 +6,10 @@ import {UserRoleEnum} from "@/types/user-types";
 import {ngnFormatter} from "@/utils";
 import {relativeTime} from "@/utils/get-relative-time";
 import {getExportFormattedData} from "@/utils/table-export-utils";
-import {
-    EditOutlined,
-    FileDownloadOutlined,
-    MoreVert,
-    PrintOutlined,
-    Search as SearchIcon,
-    VisibilityOutlined,
-} from "@mui/icons-material";
+import {EditOutlined, MoreVert, PrintOutlined, Search as SearchIcon, VisibilityOutlined,} from "@mui/icons-material";
 import {
     Box,
-    Button,
+    Grid,
     IconButton,
     InputAdornment,
     Menu,
@@ -25,9 +17,9 @@ import {
     TextField,
     Tooltip,
     Typography,
-    useTheme,
+    useTheme
 } from "@mui/material";
-import {DataGrid, type GridColDef} from "@mui/x-data-grid";
+import {type GridColDef} from "@mui/x-data-grid";
 import {saveAs} from "file-saver";
 import {type MouseEvent, useEffect, useMemo, useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
@@ -39,6 +31,8 @@ import Receipt from "./receipt";
 import {useGetAllStoresQuery} from "@/store/slice";
 import {useDispatch, useSelector} from "react-redux";
 import {selectActiveStore, setActiveStore} from "@/store/slice/store-slice";
+import DataGridTable from "@/components/ui/data-grid-table";
+import ExportCard from "@/components/customs/export-card.tsx";
 
 export interface Props {
     orders: OrderType[];
@@ -55,9 +49,6 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
     const [searchText, setSearchText] = useState("");
-
-    const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
-    const isExportMenuOpen = Boolean(exportAnchorEl);
 
     const [orderToPrint, setOrderToPrint] = useState<OrderType | null>(null);
     const componentRef = useRef<HTMLDivElement>(null);
@@ -118,8 +109,6 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
 
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
-            // alert('No data to export.');
-            setExportAnchorEl(null);
             return;
         }
 
@@ -133,7 +122,6 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
 
         const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
         saveAs(blob, `sales_history_${period.toLowerCase().replace(" ", "_")}.csv`);
-        setExportAnchorEl(null);
     };
 
     // Export to XLSX function
@@ -144,7 +132,6 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
             // alert('No data to export.');
-            setExportAnchorEl(null);
             return;
         }
 
@@ -152,14 +139,11 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sales History");
 
-        const colWidths = columns
+        worksheet["!cols"] = columns
             .filter((col) => col.field !== "actions" && col.headerName)
             .map((col) => ({wch: (col.headerName?.toString().length || 15) + 5}));
 
-        worksheet["!cols"] = colWidths;
-
         XLSX.writeFile(workbook, `sales_history_${period.toLowerCase().replace(" ", "_")}.xlsx`);
-        setExportAnchorEl(null);
     };
 
     const columns: GridColDef[] = useMemo(
@@ -346,69 +330,32 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                     </div>
                 )}
             </div>
-            <Box sx={{p: 2, display: "flex", justifyContent: "flex-start"}}>
-                <TextField
-                    variant="outlined"
-                    size="small"
-                    placeholder="Search by reference..."
-                    value={searchText}
-                    fullWidth
-                    sx={{height: 45}}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon/>
-                            </InputAdornment>
-                        ),
-                    }}
-                />
-                {/* Export Button and Menu */}
-                <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<FileDownloadOutlined/>}
-                    onClick={(event) => setExportAnchorEl(event.currentTarget)}
-                    sx={{ml: 2, height: 45, minWidth: 200}}
-                >
-                    Export
-                </Button>
-                <Menu anchorEl={exportAnchorEl} open={isExportMenuOpen} onClose={() => setExportAnchorEl(null)}>
-                    <MenuItem onClick={handleExportCsv}>Export as CSV</MenuItem>
-                    <MenuItem onClick={handleExportXlsx}>Export as XLSX</MenuItem>
-                </Menu>
-            </Box>
-            <DataGrid
-                rows={filteredOrders}
-                columns={columns}
-                loading={loading}
-                slots={{
-                    noRowsOverlay: CustomNoRowsOverlay,
-                }}
-                slotProps={{
-                    loadingOverlay: {
-                        variant: "skeleton",
-                        noRowsVariant: "skeleton",
-                    },
-                    noRowsOverlay: {
-                        period: period ? `No sales yet for this ${period}.` : "No sales yet.",
-                    },
-                }}
-                initialState={{
-                    pagination: {
-                        paginationModel: {pageSize: 10},
-                    },
-                }}
-                disableColumnResize
-                pageSizeOptions={[10, 25, 50]}
-                disableRowSelectionOnClick
-                sx={{
-                    border: "none",
-                    "& .MuiDataGrid-columnHeaderTitle": {
-                        fontWeight: 600,
-                    },
+            <ExportCard
+                onExportCsv={handleExportCsv}
+                onExportXlsx={handleExportXlsx}
+            />
+
+            <TextField
+                variant="outlined"
+                size="small"
+                placeholder="Search by reference..."
+                value={searchText}
+                fullWidth
+                sx={{height: 45}}
+                onChange={(e) => setSearchText(e.target.value)}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon/>
+                        </InputAdornment>
+                    ),
                 }}
             />
+            <Grid container spacing={2} sx={{mt: 2}}>
+                <Grid size={12}>
+                    <DataGridTable data={filteredOrders ?? []} columns={columns} loading={loading}/>
+                </Grid>
+            </Grid>
         </Box>
     );
 };
