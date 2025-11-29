@@ -5,16 +5,12 @@ import type {OrderType} from "@/types/order-types";
 import {UserRoleEnum} from "@/types/user-types";
 import {ngnFormatter} from "@/utils";
 import {relativeTime} from "@/utils/get-relative-time";
-import {getExportFormattedData} from "@/utils/table-export-utils";
 import {EditOutlined, MoreVert, PrintOutlined, VisibilityOutlined,} from "@mui/icons-material";
 import {Box, Grid, IconButton, Menu, MenuItem, Tooltip, Typography, useTheme} from "@mui/material";
 import {type GridColDef} from "@mui/x-data-grid";
-import {saveAs} from "file-saver";
 import {type MouseEvent, useEffect, useMemo, useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useReactToPrint} from "react-to-print";
-
-import * as XLSX from "xlsx";
 import TableStyledBox from "../ui/data-grid-table/table-styled-box.tsx";
 import Receipt from "./receipt";
 import {useGetAllStoresQuery} from "@/store/slice";
@@ -23,6 +19,7 @@ import {selectActiveStore, setActiveStore} from "@/store/slice/store-slice";
 import DataGridTable from "@/components/ui/data-grid-table";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 import {useSearch} from "@/use-search.ts";
+import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils";
 
 export interface Props {
     orders: OrderType[];
@@ -69,12 +66,6 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
         `,
     });
 
-    // const filteredOrders = useMemo(() => {
-    //     if (!searchText) return orders;
-    //
-    //     return orders.filter((order) => (order.reference || order.id).toLowerCase().includes(searchText.toLowerCase()));
-    // }, [orders, searchText]);
-
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
         setAnchorEl(event.currentTarget);
         setSelectedRowId(rowId);
@@ -98,49 +89,82 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
         [],
     );
 
-    // Export to CSV function
+    const prepareExportData = () => {
+        return getExportFormattedData(
+            filteredData, // Your data source
+            columns,      // Your column definitions
+            salesHistoryFieldFormatters // Your specific formatters
+        );
+    };
+
     const handleExportCsv = () => {
-        // Use the generic utility function with specific formatters
-        const dataToExport = getExportFormattedData(filteredData, columns, salesHistoryFieldFormatters);
+        const dataToExport = prepareExportData();
 
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
             return;
         }
 
-        const header = Object.keys(dataToExport[0]);
-        const csvContent = [
-            header.join(","),
-            ...dataToExport.map((row) =>
-                header.map((key) => `"${String(row[key] || "").replace(/"/g, '""')}"`).join(","),
-            ),
-        ].join("\n");
-
-        const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
-        saveAs(blob, `sales_history_${period.toLowerCase().replace(" ", "_")}.csv`);
+        const filename = `sales_history_${period.toLowerCase().replace(" ", "_")}.csv`;
+        exportToCsv(dataToExport, filename); // Uses generic utility
     };
 
     // Export to XLSX function
     const handleExportXlsx = () => {
-        // Use the generic utility function with specific formatters
-        const dataToExport = getExportFormattedData(filteredData, columns, salesHistoryFieldFormatters);
+        const dataToExport = prepareExportData();
 
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
-            // alert('No data to export.');
             return;
         }
 
-        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Sales History");
-
-        worksheet["!cols"] = columns
-            .filter((col) => col.field !== "actions" && col.headerName)
-            .map((col) => ({wch: (col.headerName?.toString().length || 15) + 5}));
-
-        XLSX.writeFile(workbook, `sales_history_${period.toLowerCase().replace(" ", "_")}.xlsx`);
+        const filename = `sales_history_${period.toLowerCase().replace(" ", "_")}.xlsx`;
+        exportToXlsx(dataToExport, filename, "Sales History", columns); // Uses generic utility
     };
+
+    // // Export to CSV function
+    // const handleExportCsv = () => {
+    //     // Use the generic utility function with specific formatters
+    //     const dataToExport = getExportFormattedData(filteredData, columns, salesHistoryFieldFormatters);
+    //
+    //     if (dataToExport.length === 0) {
+    //         notify("No data to export.", "error");
+    //         return;
+    //     }
+    //
+    //     const header = Object.keys(dataToExport[0]);
+    //     const csvContent = [
+    //         header.join(","),
+    //         ...dataToExport.map((row) =>
+    //             header.map((key) => `"${String(row[key] || "").replace(/"/g, '""')}"`).join(","),
+    //         ),
+    //     ].join("\n");
+    //
+    //     const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
+    //     saveAs(blob, `sales_history_${period.toLowerCase().replace(" ", "_")}.csv`);
+    // };
+    //
+    // // Export to XLSX function
+    // const handleExportXlsx = () => {
+    //     // Use the generic utility function with specific formatters
+    //     const dataToExport = getExportFormattedData(filteredData, columns, salesHistoryFieldFormatters);
+    //
+    //     if (dataToExport.length === 0) {
+    //         notify("No data to export.", "error");
+    //         // alert('No data to export.');
+    //         return;
+    //     }
+    //
+    //     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    //     const workbook = XLSX.utils.book_new();
+    //     XLSX.utils.book_append_sheet(workbook, worksheet, "Sales History");
+    //
+    //     worksheet["!cols"] = columns
+    //         .filter((col) => col.field !== "actions" && col.headerName)
+    //         .map((col) => ({wch: (col.headerName?.toString().length || 15) + 5}));
+    //
+    //     XLSX.writeFile(workbook, `sales_history_${period.toLowerCase().replace(" ", "_")}.xlsx`);
+    // };
 
     const columns: GridColDef[] = useMemo(
         () => [
