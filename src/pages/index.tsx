@@ -3,7 +3,7 @@ export {default as HomeScreen} from "./home";
 export {default as DashboardScreen} from "./dashboard";
 
 // Order Tracking and Sales
-export {default as OrderTrackingScreen} from "./order-tracking";
+export {default as PointOfSaleScreen} from "./point-of-sale";
 export {default as SalesHistoryScreen} from "./sales-history";
 export {default as ViewSalesHistoryScreen} from "./sales-history/view-sales-history";
 export {default as MenuItemScreen} from "./menu-item";

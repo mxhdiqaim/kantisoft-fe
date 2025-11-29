@@ -17,11 +17,13 @@ import Icon from "@/components/ui/icon.tsx";
 import SearchSvgIcon from "@/assets/icons/search.svg";
 import {iconStyle} from "@/styles";
 
-const OrderTracking = () => {
+const PointOfSale = () => {
     const notify = useNotifier();
     const theme = useTheme();
     const {t} = useTranslation();
     const {data: menuItems, isLoading: isLoadingMenuItems, isError} = useGetMenuItemsQuery({});
+
+    console.log("menuItems", menuItems);
 
     const [createOrder, {isLoading: isCreatingOrder}] = useCreateOrderMutation();
 
@@ -185,4 +187,4 @@ const OrderTracking = () => {
     );
 };
 
-export default OrderTracking;
+export default PointOfSale;

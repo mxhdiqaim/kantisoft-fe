@@ -15,6 +15,7 @@ const EachMenuItem = ({item, onAddToCart}: Props) => {
             <Box>
                 <Typography variant="h4">{item.name}</Typography>
                 <Typography color="text.secondary">{ngnFormatter.format(item.price)} </Typography>
+                <Typography>{!!item.inventory && `In Stock ${item.inventory.quantity}`}</Typography>
                 <Divider/>
                 <CustomButton
                     sx={{mt: 1}}
@@ -22,6 +23,7 @@ const EachMenuItem = ({item, onAddToCart}: Props) => {
                     variant={"contained"}
                     size="small"
                     onClick={() => onAddToCart(item)}
+                    disabled={!item.inventory || item.inventory.status === "outOfStock"}
                 />
             </Box>
         </CustomCard>

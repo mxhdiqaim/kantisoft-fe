@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { extendBaseSchema } from "@/types";
+import {extendBaseSchema} from "@/types";
 import * as yup from "yup";
 
 const coreMenuItemSchema = yup.object({
@@ -16,6 +16,7 @@ const coreMenuItemSchema = yup.object({
 // Schema for a full menu item object, including base fields like id and timestamps
 export const menuItemSchema = extendBaseSchema({
     name: yup.string().required("Name is required").min(2, "Name must be at least 2 characters"),
+    description: yup.string().optional(),
     itemCode: yup.number().optional().min(100, "Item code must be at least 100"),
     price: yup
         .number()
@@ -23,6 +24,16 @@ export const menuItemSchema = extendBaseSchema({
         .positive("Price must be greater than 0")
         .required("Price is required"),
     isAvailable: yup.boolean().required().default(true),
+    storeId: yup.string().uuid().required(),
+    store: yup.object({
+        name: yup.string().required(),
+    }),
+    inventory: yup.object({
+        quantity: yup.number().integer().min(0).required(),
+        status: yup.string().required(),
+        minStockLevel: yup.number().integer().min(0).optional(),
+        lastCountDate: yup.string().required(),
+    }).optional().nullable(),
 });
 
 // The schema for creating a new menu item is the same as the core schema
@@ -31,8 +42,8 @@ export const createMenuItemSchema = coreMenuItemSchema;
 export type CreateMenuItemType = yup.InferType<typeof createMenuItemSchema>;
 
 // Inferred type for a full menu item object
-// export type MenuItemType = yup.InferType<typeof menuItemSchema>;
-export type MenuItemType = any;
+export type MenuItemType = yup.InferType<typeof menuItemSchema>;
+// export type MenuItemType = any;
 // Inferred type for creating a menu item, ensuring consistency
 export type AddMenuItemType = Pick<MenuItemType, "name" | "price" | "isAvailable"> & {
     itemCode?: number;

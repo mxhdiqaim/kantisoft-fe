@@ -12,7 +12,7 @@ import {
     LoginScreen,
     MenuItemScreen,
     NotFoundScreen,
-    OrderTrackingScreen,
+    PointOfSaleScreen,
     ProfileScreen,
     RegisterScreen,
     SalesHistoryScreen,
@@ -77,9 +77,9 @@ export const appRoutes: AppRouteType[] = [
     // POS Management
     // ---------------------------------
     {
-        to: "/order-tracking",
+        to: "/point-of-sale",
         title: "orderTracking",
-        element: OrderTrackingScreen,
+        element: PointOfSaleScreen,
         icon: (
             <IconButton size={"medium"}>
                 <AddAlertOutlinedIcon/>
