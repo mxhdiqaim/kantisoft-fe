@@ -20,16 +20,15 @@ import ApiErrorDisplay from "@/components/feedback/api-error-display";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {useAppSelector} from "@/store";
 import MenuItemsPageSkeleton from "@/components/menu-items/loading";
-import {getExportFormattedData} from "@/utils/table-export-utils";
-import * as XLSX from "xlsx";
-import {saveAs} from "file-saver";
 
 import {DeleteOutline, EditOutlined, MoreVert} from "@mui/icons-material";
 import DataGridTable from "@/components/ui/data-grid-table";
 import type {GridColDef} from "@mui/x-data-grid";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {ngnFormatter} from "@/utils";
-import ExportCard from "@/components/customs/export-card.tsx";
+import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
+import {useSearch} from "@/use-search.ts";
+import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils.ts";
 
 const MenuItems = () => {
     const theme = useTheme();
@@ -40,6 +39,13 @@ const MenuItems = () => {
 
     const {data: menuItems, isLoading, isError, error} = useGetMenuItemsQuery({});
     const [deleteMenuItem, {isLoading: isDeleting}] = useDeleteMenuItemMutation();
+
+    const memoizedMenuItems = useMemo(() => menuItems ?? [], [menuItems]);
+
+    const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
+        initialData: memoizedMenuItems,
+        searchKeys: ["name", "itemCode"],
+    });
 
     const [formModalOpen, setFormModalOpen] = useState(false);
     const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItemType | null>(null);
@@ -71,28 +77,37 @@ const MenuItems = () => {
         [],
     );
 
-    // Export to CSV function
+    const prepareExportData = () => {
+        return getExportFormattedData(
+            filteredData, // Your data source
+            columns,      // Your column definitions
+            menuItemsFieldFormatters // Your specific formatters
+        );
+    };
+
     const handleExportCsv = () => {
-        const dataToExport = getExportFormattedData(menuItems, columns, menuItemsFieldFormatters);
+        const dataToExport = prepareExportData();
 
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
-            // alert('No data to export.');
-            // setExportAnchorEl(null);
             return;
         }
 
-        const header = Object.keys(dataToExport[0]);
-        const csvContent = [
-            header.join(","),
-            ...dataToExport.map((row) =>
-                header.map((key) => `"${String(row[key] || "").replace(/"/g, '""')}"`).join(","),
-            ),
-        ].join("\n");
+        const filename = `menu_items_data.csv`;
+        exportToCsv(dataToExport, filename); // Uses generic utility
+    };
 
-        const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
-        saveAs(blob, `menu_items_data.csv`);
-        // setExportAnchorEl(null);
+    // Export to XLSX function
+    const handleExportXlsx = () => {
+        const dataToExport = prepareExportData();
+
+        if (dataToExport.length === 0) {
+            notify("No data to export.", "error");
+            return;
+        }
+
+        const filename = `menu_items_data.xlsx`;
+        exportToXlsx(dataToExport, filename, "Sales History", columns); // Uses generic utility
     };
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
@@ -253,29 +268,6 @@ const MenuItems = () => {
         [theme, anchorEl, selectedRowId, currentUser, handleOpenFormModal],
     );
 
-    // Export to XLSX function
-    const handleExportXlsx = () => {
-        const dataToExport = getExportFormattedData(menuItems, columns, menuItemsFieldFormatters);
-
-        if (dataToExport.length === 0) {
-            notify("No data to export.", "error");
-            // alert('No data to export.');
-            // setExportAnchorEl(null);
-            return;
-        }
-
-        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Menu Items Data");
-
-        worksheet["!cols"] = columns
-            .filter((col) => col.field !== "actions" && col.headerName)
-            .map((col) => ({wch: (col.headerName?.toString().length || 15) + 5}));
-
-        XLSX.writeFile(workbook, `menu_items_data.xlsx`);
-        // setExportAnchorEl(null);
-    };
-
     if (isLoading) return <MenuItemsPageSkeleton/>;
 
     if (isError) {
@@ -303,31 +295,20 @@ const MenuItems = () => {
                     </Grid>
                 )}
             </Grid>
-            <ExportCard
+
+            <TableSearchActions
+                searchControl={searchControl}
+                searchSubmit={searchSubmit}
+                handleSearch={handleSearch}
                 onExportCsv={handleExportCsv}
                 onExportXlsx={handleExportXlsx}
             />
 
-            {/*<CustomCard sx={{borderRadius: 2, mb: 2}}>*/}
-            {/*    <Box sx={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>*/}
-            {/*        /!* Export Button and Menu *!/*/}
-            {/*        <Button*/}
-            {/*            variant="contained"*/}
-            {/*            size="small"*/}
-            {/*            startIcon={<FileDownloadOutlined/>}*/}
-            {/*            sx={{height: 45, minWidth: 200}}*/}
-            {/*            onClick={(event) => setExportAnchorEl(event.currentTarget)}*/}
-            {/*        >*/}
-            {/*            Export*/}
-            {/*        </Button>*/}
-            {/*        <Menu anchorEl={exportAnchorEl} open={isExportMenuOpen} onClose={() => setExportAnchorEl(null)}>*/}
-            {/*            <MuiMenuItem onClick={handleExportCsv}>Export as CSV</MuiMenuItem>*/}
-            {/*            <MuiMenuItem onClick={handleExportXlsx}>Export as XLSX</MuiMenuItem>*/}
-            {/*        </Menu>*/}
-            {/*    </Box>*/}
-            {/*</CustomCard>*/}
-
-            <DataGridTable data={menuItems} columns={columns} loading={isLoading}/>
+            <Grid container spacing={2} sx={{mt: 2}}>
+                <Grid size={12}>
+                    <DataGridTable data={filteredData} columns={columns} loading={isLoading}/>
+                </Grid>
+            </Grid>
 
             <MenuItemFormModal open={formModalOpen} onClose={handleCloseFormModal} menuItemToEdit={selectedMenuItem}/>
         </Box>
