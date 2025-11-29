@@ -1,3 +1,4 @@
+import {type ComponentType, type ReactNode} from "react";
 import {
     ActivityLogScreen,
     AddUserScreen,
@@ -6,8 +7,9 @@ import {
     EditUserScreen,
     ForgetPasswordScreen,
     HomeScreen,
-    InventoryScreen,
+    InventoryManagementScreen,
     InventoryTransactionScreen,
+    InventoryTransactionsScreen,
     LoginScreen,
     MenuItemScreen,
     NotFoundScreen,
@@ -33,7 +35,6 @@ import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 
 import {IconButton} from "@mui/material";
-import {type ComponentType, type ReactNode} from "react";
 
 export interface AppRouteType {
     to: string;
@@ -131,8 +132,8 @@ export const appRoutes: AppRouteType[] = [
     // ---------------------------------
     {
         to: "/inventory",
-        title: "inventory",
-        element: InventoryScreen,
+        title: "Inventory",
+        element: InventoryManagementScreen,
         icon: (
             <IconButton size={"medium"}>
                 <InventoryOutlinedIcon/>
@@ -141,10 +142,22 @@ export const appRoutes: AppRouteType[] = [
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
         children: [
             {
+                to: "management",
+                title: "Inventory Management",
+                element: InventoryManagementScreen,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+            },
+            {
                 to: ":id/transactions",
-                title: "inventoryTransactions",
+                title: "menuItemTransactions",
                 element: InventoryTransactionScreen,
                 hidden: true,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+            },
+            {
+                to: "transactions",
+                title: "Transactions",
+                element: InventoryTransactionsScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
             }
         ]

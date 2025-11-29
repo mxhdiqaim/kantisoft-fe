@@ -29,6 +29,7 @@ import type {
     AdjustStockResponseType,
     AdjustStockType,
     CreateInventoryType,
+    InventoryTransactionResponseType,
     InventoryTransactionType,
     InventoryType
 } from "@/types/inventory-types.ts";
@@ -128,7 +129,8 @@ export const apiSlice = createApi({
         "ActivityLog",
         "Inventory",
         "InventoryReport",
-        "InventoryTransaction"
+        "InventoryTransaction",
+        "InventoryTransactions",
     ],
     endpoints: (builder) => ({
         // -------------------------
@@ -438,22 +440,22 @@ export const apiSlice = createApi({
             // providesTags: (_result, _error, {menuItemId}) => [{type: "InventoryTransaction", id: menuItemId}],
         }),
 
-        // getHistoricalStockReport: builder.query<HistoricalStockReportType, {
-        //     timePeriod?: string;
-        //     startDate?: string;
-        //     endDate?: string
-        // }>({
-        //     query: (params) => ({
-        //         url: "/inventory/transactions/report",
-        //         params,
-        //     }),
-        //     providesTags: ["InventoryReport"],
-        // }),
+        getInventoryTransactions: builder.query<InventoryTransactionResponseType, {
+            timePeriod?: string;
+            startDate?: string;
+            endDate?: string
+        }>({
+            query: (params) => ({
+                url: "/inventory/transactions",
+                params,
+            }),
+            providesTags: ["InventoryTransactions"],
+        }),
 
-        // getInventoryByMenuItem: builder.query<InventoryType, string>({
-        //     query: (menuItemId) => `/inventory/${menuItemId}`,
-        //     providesTags: (_result, _error, menuItemId) => [{type: "Inventory", id: menuItemId}],
-        // }),
+        getInventoryByMenuItem: builder.query<InventoryType, string>({
+            query: (menuItemId) => `/inventory/${menuItemId}`,
+            providesTags: (_result, _error, menuItemId) => [{type: "Inventory", id: menuItemId}],
+        }),
 
         createInventoryRecord: builder.mutation<InventoryType, CreateInventoryType>({
             query: (body) => ({
@@ -545,7 +547,7 @@ export const {
     // Inventory Hooks
     useGetAllInventoryQuery,
     useGetTransactionsByMenuItemQuery,
-    // useGetHistoricalStockReportQuery,
+    useGetInventoryTransactionsQuery,
     // useGetInventoryByMenuItemQuery,
     useCreateInventoryRecordMutation,
     useAdjustStockMutation,

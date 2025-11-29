@@ -19,7 +19,7 @@ import {useNavigate} from "react-router-dom";
 import {useSearch} from "@/use-search.ts";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 
-const InventoryScreen = () => {
+const InventoryManagement = () => {
     const {t} = useTranslation();
     const theme = useTheme();
     const notify = useNotifier();
@@ -253,4 +253,4 @@ const InventoryScreen = () => {
     );
 };
 
-export default InventoryScreen;
+export default InventoryManagement;
