@@ -1,25 +1,29 @@
-import MenuItem from "@/components/order-tracking/menu-item";
-import MenuIteFormmModal from "@/components/order-tracking/menu-item-form-modal";
+import EachMenuItem from "@/components/order-tracking/each-menu-item.tsx";
+import MenuIteFormModal from "@/components/order-tracking/menu-item-form-modal";
 import OrderCart from "@/components/order-tracking/order-cart";
 import PaymentModal from "@/components/order-tracking/payment-modal";
 import MenuItemSkeleton from "@/components/spinners/manu-item-skeleton";
 import OrderCartSkeleton from "@/components/spinners/order-cart-skeleton";
-import { getApiError } from "@/helpers/get-api-error";
+import {getApiError} from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
-import { useCreateOrderMutation, useGetMenuItemsQuery } from "@/store/slice";
-import type { CartItem } from "@/types/cart-item-type";
-import type { MenuItemType } from "@/types/menu-item-type";
-import type { CreateOrderType } from "@/types/order-types";
-import { Box, Grid, Skeleton, TextField, Typography } from "@mui/material";
-import { useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import {useCreateOrderMutation, useGetMenuItemsQuery} from "@/store/slice";
+import type {CartItem} from "@/types/cart-item-type";
+import type {MenuItemType} from "@/types/menu-item-type";
+import type {CreateOrderType} from "@/types/order-types";
+import {Box, Grid, Skeleton, TextField, Typography, useTheme} from "@mui/material";
+import {useMemo, useState} from "react";
+import {useTranslation} from "react-i18next";
+import Icon from "@/components/ui/icon.tsx";
+import SearchSvgIcon from "@/assets/icons/search.svg";
+import {iconStyle} from "@/styles";
 
 const OrderTracking = () => {
     const notify = useNotifier();
-    const { t } = useTranslation();
-    const { data: menuItems, isLoading: isLoadingMenuItems, isError } = useGetMenuItemsQuery();
+    const theme = useTheme();
+    const {t} = useTranslation();
+    const {data: menuItems, isLoading: isLoadingMenuItems, isError} = useGetMenuItemsQuery({});
 
-    const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
+    const [createOrder, {isLoading: isCreatingOrder}] = useCreateOrderMutation();
 
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
@@ -31,10 +35,10 @@ const OrderTracking = () => {
             const existingItem = prev.find((cartItem) => cartItem.id === item.id);
             if (existingItem) {
                 return prev.map((cartItem) =>
-                    cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem,
+                    cartItem.id === item.id ? {...cartItem, quantity: cartItem.quantity + 1} : cartItem,
                 );
             }
-            return [...prev, { ...item, quantity: 1 }];
+            return [...prev, {...item, quantity: 1}];
         });
     };
 
@@ -42,7 +46,7 @@ const OrderTracking = () => {
         if (quantity === 0) {
             handleRemoveItem(itemId);
         } else {
-            setCartItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, quantity } : item)));
+            setCartItems((prev) => prev.map((item) => (item.id === itemId ? {...item, quantity} : item)));
         }
     };
 
@@ -84,20 +88,20 @@ const OrderTracking = () => {
         return (
             <Box>
                 <Grid container spacing={3} mb={2}>
-                    <Grid size={{ xs: 12, md: 8 }}>
+                    <Grid size={{xs: 12, md: 8}}>
                         <Grid size={12} mb={2}>
-                            <Skeleton variant="rectangular" height={56} />
+                            <Skeleton variant="rectangular" height={56}/>
                         </Grid>
                         <Grid container spacing={2}>
                             {Array.from(new Array(9)).map((_, index) => (
-                                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-                                    <MenuItemSkeleton />
+                                <Grid size={{xs: 12, sm: 6, md: 4}} key={index}>
+                                    <MenuItemSkeleton/>
                                 </Grid>
                             ))}
                         </Grid>
                     </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                        <OrderCartSkeleton />
+                    <Grid size={{xs: 12, md: 4}}>
+                        <OrderCartSkeleton/>
                     </Grid>
                 </Grid>
             </Box>
@@ -111,21 +115,36 @@ const OrderTracking = () => {
     return (
         <Box>
             <Grid container spacing={3} mb={2}>
-                <Grid size={{ xs: 12, md: 8 }}>
-                    <Grid size={{ xs: 12 }}>
+                <Grid size={{xs: 12, md: 8}}>
+                    <Grid size={{xs: 12}}>
                         <TextField
-                            label="Search Menu Items"
+                            placeholder="Search by name"
                             variant="outlined"
                             fullWidth
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            slotProps={{
+                                input: {
+                                    startAdornment: <Icon src={SearchSvgIcon} alt={"Search Icon"} sx={{...iconStyle}}/>,
+                                }
+                            }}
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    height: 40,
+                                    // maxWidth: {xs: "100%", md: 500},
+                                    borderRadius: theme.borderRadius.small - 2,
+                                },
+                                "& .MuiInputBase-input": {
+                                    textAlign: "left",
+                                },
+                            }}
                         />
                     </Grid>
                     <Grid container spacing={2} mt={2}>
                         {filteredMenuItems.length > 0 ? (
                             filteredMenuItems.map((item) => (
-                                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.id}>
-                                    <MenuItem item={item} onAddToCart={handleAddToCart} />
+                                <Grid size={{xs: 12, sm: 6, md: 4}} key={item.id}>
+                                    <EachMenuItem item={item} onAddToCart={handleAddToCart}/>
                                 </Grid>
                             ))
                         ) : (
@@ -145,7 +164,7 @@ const OrderTracking = () => {
                         )}
                     </Grid>
                 </Grid>
-                <Grid size={{ xs: 12, md: 4 }}>
+                <Grid size={{xs: 12, md: 4}}>
                     <OrderCart
                         cartItems={cartItems}
                         onUpdateQuantity={handleUpdateQuantity}
@@ -161,7 +180,7 @@ const OrderTracking = () => {
                 cartItems={cartItems}
                 isLoading={isCreatingOrder}
             />
-            <MenuIteFormmModal open={addMenuItemOpen} onClose={() => setAddMenuItemOpen(false)} />
+            <MenuIteFormModal open={addMenuItemOpen} onClose={() => setAddMenuItemOpen(false)}/>
         </Box>
     );
 };

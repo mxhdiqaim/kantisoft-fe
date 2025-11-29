@@ -1,12 +1,11 @@
 import {useDeleteInventoryRecordMutation, useGetAllInventoryQuery, useMarkAsDiscontinuedMutation} from "@/store/slice";
 import type {InventoryType} from "@/types/inventory-types.ts";
-import {Box, Button, Chip, Grid, MenuItem, Skeleton, Tooltip, Typography, useTheme} from "@mui/material";
+import {Box, Chip, Grid, MenuItem, Skeleton, Tooltip, Typography, useTheme} from "@mui/material";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
 import {type MouseEvent, useMemo, useState} from "react";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DataGridTable from "@/components/ui/data-grid-table";
-import {format} from "date-fns";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import CreateInventoryRecord from "@/components/inventory/create-inventory-record.tsx";
 import {useTranslation} from "react-i18next";
@@ -14,13 +13,14 @@ import CustomButton from "@/components/ui/button.tsx";
 import useNotifier from "@/hooks/useNotifier.ts";
 import {getApiError} from "@/helpers/get-api-error.ts";
 import AdjustStock from "@/components/inventory/adjust-stock.tsx";
-import {getStatusChipColor} from "@/styles";
 import {useNavigate} from "react-router-dom";
 import {useSearch} from "@/use-search.ts";
 import {useSelector} from "react-redux";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 import {UserRoleEnum, UserStatusEnum} from "@/types/user-types.ts";
+import {relativeTime} from "@/utils/get-relative-time.ts";
+import {getInventoryStatusChipColor} from "@/components/ui";
 
 const InventoryManagement = () => {
     const {t} = useTranslation();
@@ -169,7 +169,7 @@ const InventoryManagement = () => {
                 <TableStyledBox>
                     <Chip
                         label={params.value}
-                        color={getStatusChipColor(params.value ?? "")}
+                        color={getInventoryStatusChipColor(params.value ?? "")}
                         size="small"
                         sx={{textTransform: "capitalize"}}
                     />
@@ -185,7 +185,7 @@ const InventoryManagement = () => {
             headerAlign: "left",
             renderCell: (params) => (
                 <TableStyledBox>
-                    <Typography variant="body2">{format(new Date(params.value), "MMM dd, yyyy, h:mm a")}</Typography>
+                    <Typography variant="body2">{relativeTime(new Date(), new Date(params.value))}</Typography>
                 </TableStyledBox>
             ),
         },
@@ -215,7 +215,8 @@ const InventoryManagement = () => {
                                   sx={{borderRadius: theme.borderRadius.small, mx: 1}}>
                             Adjust Stock
                         </MenuItem>
-                        <MenuItem onClick={handleMenuClose} sx={{borderRadius: theme.borderRadius.small, mx: 1}}>
+                        <MenuItem onClick={handleMenuClose} disabled={true}
+                                  sx={{borderRadius: theme.borderRadius.small, mx: 1}}>
                             Edit
                         </MenuItem>
                         <MenuItem onClick={handleDiscontinue}
@@ -230,10 +231,17 @@ const InventoryManagement = () => {
                         <MenuItem onClick={handleDelete} disabled={isDeleting}
                                   sx={{
                                       mt: 1,
-                                      border: `1px solid ${theme.palette.error.main}`,
-                                      color: theme.palette.error.main,
-                                      borderRadius: theme.borderRadius.small,
                                       mx: 1,
+                                      border: `1px solid ${theme.palette.error.main}`,
+                                      // background: theme.palette.error.main,
+                                      borderRadius: theme.borderRadius.small,
+                                      color: theme.palette.error.main,
+
+                                      // // Hover Styles
+                                      // ":hover": {
+                                      //     background: theme.palette.error.main,
+                                      //     // color: 'white',
+                                      // }
                                   }}>
                             Delete
                         </MenuItem>
@@ -270,13 +278,12 @@ const InventoryManagement = () => {
                 <Typography variant="h4" component="h1">
                     Inventory Management
                 </Typography>
-                <Button
+                <CustomButton
+                    title={"Add Record"}
                     variant="contained"
                     startIcon={<AddIcon/>}
                     onClick={handleOpenFormModal}
-                >
-                    Add Record
-                </Button>
+                />
             </Box>
             <TableSearchActions
                 searchControl={searchControl}

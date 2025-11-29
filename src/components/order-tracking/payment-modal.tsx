@@ -5,10 +5,11 @@ import type {CartItem} from "@/types/cart-item-type";
 import {createOrderSchema, type CreateOrderType} from "@/types/order-types.ts";
 import {ngnFormatter} from "@/utils";
 import {yupResolver} from "@hookform/resolvers/yup";
-import {Button, DialogActions, FormControl, FormControlLabel, FormHelperText, Radio, RadioGroup,} from "@mui/material";
+import {DialogActions, FormControl, FormControlLabel, FormHelperText, Radio, RadioGroup,} from "@mui/material";
 import {useEffect} from "react";
 import {Controller, useForm} from "react-hook-form";
 import {useSelector} from "react-redux";
+import CustomButton from "@/components/ui/button.tsx";
 
 interface Props {
     open: boolean;
@@ -150,15 +151,14 @@ const PaymentModal = ({open, onClose, onCompleteSale, cartItems, isLoading}: Pro
                     {/*)}*/}
                 </FormControl>
                 <DialogActions sx={{mt: 2, px: 0}}>
-                    <Button onClick={onClose}>Cancel</Button>
-                    <Button
+                    <CustomButton title={"Cancel"} onClick={onClose}/>
+                    <CustomButton
+                        title={isLoading ? "Processing..." : "Complete Order"}
                         type="submit"
                         variant="contained"
                         color="primary"
                         disabled={!isValid || /* isCashPaymentInsufficient || */ isLoading}
-                    >
-                        {isLoading ? "Processing..." : "Complete Order"}
-                    </Button>
+                    />
                 </DialogActions>
             </form>
         </CustomModal>

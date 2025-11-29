@@ -107,6 +107,7 @@ const AppbarComponent: FC<Props> = ({toggleDrawer, drawerState}) => {
                         sx={{
                             background: theme.palette.background.default,
                         }}
+                        disabled={true}
                     >
                         <NotificationsNoneOutlinedIcon/>
                     </IconButton>

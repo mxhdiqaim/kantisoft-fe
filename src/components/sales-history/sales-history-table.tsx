@@ -157,7 +157,7 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 headerAlign: "center",
                 width: 150,
                 renderCell: (params) => (
-                    <TableStyledBox sx={{alignItems: "center", justifyContent: "center"}}>
+                    <TableStyledBox>
                         <Typography variant="body2">{relativeTime(new Date(), new Date(params.value))}</Typography>
                     </TableStyledBox>
                 ),
@@ -171,7 +171,7 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{alignItems: "center", justifyContent: "center"}}>
+                    <TableStyledBox>
                         <Typography variant="body2" fontWeight="medium">
                             {ngnFormatter.format(params.value)}{" "}
                         </Typography>
@@ -185,7 +185,14 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 width: 180,
                 align: "center",
                 headerAlign: "center",
-                cellClassName: "capitalize-cell",
+                // cellClassName: "capitalize-cell",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography>
+                            {params.value.charAt(0).toUpperCase() + params.value.slice(1)}
+                        </Typography>
+                    </TableStyledBox>
+                )
             },
             {
                 flex: 1,
@@ -195,7 +202,7 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{alignItems: "center", justifyContent: "center"}}>
+                    <TableStyledBox>
                         <Typography
                             variant="body2"
                             className="capitalize"

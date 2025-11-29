@@ -9,7 +9,7 @@ import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {roleHierarchy, UserRoleEnum, UserStatusEnum, type UserType} from "@/types/user-types.ts";
 
 import {AddOutlined, EditOutlined, MoreVert, StorefrontOutlined, VisibilityOutlined} from "@mui/icons-material";
-import {Avatar, Box, Button, Chip, Grid, IconButton, Menu, MenuItem, Tooltip, Typography,} from "@mui/material";
+import {Avatar, Box, Chip, Grid, IconButton, Menu, MenuItem, Tooltip, Typography,} from "@mui/material";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
 import {type MouseEvent, useMemo, useState} from "react";
 import {useNavigate} from "react-router-dom";
@@ -20,6 +20,7 @@ import ChangeStoreDialog from "@/components/users/change-store-modal.tsx";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 import {useSearch} from "@/use-search.ts";
 import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils";
+import CustomButton from "@/components/ui/button.tsx";
 
 const UsersPage = () => {
     const notify = useNotifier();
@@ -313,9 +314,12 @@ const UsersPage = () => {
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
                 <Typography variant="h4">User Management</Typography>
                 {currentUser && (currentUser.role === UserRoleEnum.MANAGER || currentUser.role === UserRoleEnum.ADMIN) && (
-                    <Button variant="contained" startIcon={<AddOutlined/>} onClick={() => navigate("/users/new")}>
-                        New User
-                    </Button>
+                    <CustomButton
+                        title={"New User"}
+                        variant="contained"
+                        startIcon={<AddOutlined/>}
+                        onClick={() => navigate("/users/new")}
+                    />
                 )}
             </Box>
             <TableSearchActions

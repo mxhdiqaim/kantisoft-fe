@@ -1,7 +1,7 @@
 import StoresPageLoading from "@/components/stores/loading";
 import {useDeleteStoreMutation, useGetAllStoresQuery} from "@/store/slice";
 import {AddOutlined, DeleteOutline, EditOutlined, MoreVert, VisibilityOutlined} from "@mui/icons-material";
-import {Box, Button, Chip, Grid, IconButton, Menu, MenuItem, Tooltip, Typography, useTheme} from "@mui/material";
+import {Box, Chip, Grid, IconButton, Menu, MenuItem, Tooltip, Typography, useTheme} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
@@ -14,6 +14,7 @@ import {getApiError} from "@/helpers/get-api-error.ts";
 import DataGridTable from "@/components/ui/data-grid-table";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 import {useSearch} from "@/use-search.ts";
+import CustomButton from "@/components/ui/button.tsx";
 
 const StoresPage = () => {
     const theme = useTheme();
@@ -228,9 +229,8 @@ const StoresPage = () => {
         <Box>
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
                 <Typography variant="h4">{t("store")} Management</Typography>
-                <Button variant="contained" startIcon={<AddOutlined/>} onClick={() => navigate("/stores/new")}>
-                    New {t("store")}
-                </Button>
+                <CustomButton title={`New ${t("store")}`} variant="contained" startIcon={<AddOutlined/>}
+                              onClick={() => navigate("/stores/new")}/>
             </Box>
             <TableSearchActions
                 searchControl={searchControl}

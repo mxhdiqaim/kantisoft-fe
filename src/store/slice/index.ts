@@ -273,7 +273,7 @@ export const apiSlice = createApi({
         // -------------------------
         getMenuItems: builder.query<MenuItemType[], { page?: number; limit?: number; targetStoreId?: string }>({
             query: (params = {}) => ({
-                url: "/menu-items/",
+                url: "/menu-items",
                 params,
             }),
             transformResponse: (response: { data: MenuItemType[] }) => response.data,

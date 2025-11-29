@@ -2,19 +2,20 @@
 // @ts-nocheck
 
 import CustomModal from "@/components/customs/custom-modal";
-import { getApiError } from "@/helpers/get-api-error";
+import {getApiError} from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
-import { useCreateMenuItemMutation, useUpdateMenuItemMutation } from "@/store/slice";
+import {useCreateMenuItemMutation, useUpdateMenuItemMutation} from "@/store/slice";
 import {
     type AddMenuItemType,
     createMenuItemSchema,
     type EditMenuItemType,
     type MenuItemType,
 } from "@/types/menu-item-type";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
-import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {Box, Grid, TextField, Typography} from "@mui/material";
+import {useEffect} from "react";
+import {Controller, useForm} from "react-hook-form";
+import CustomButton from "@/components/ui/button.tsx";
 
 interface Props {
     open: boolean;
@@ -29,10 +30,10 @@ const defaultValues: AddMenuItemType = {
     itemCode: undefined,
 };
 
-const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
+const MenuItemFormModal = ({open, onClose, menuItemToEdit}: Props) => {
     const notify = useNotifier();
-    const [createMenuItem, { isLoading: isCreating }] = useCreateMenuItemMutation();
-    const [updateMenuItem, { isLoading: isUpdating }] = useUpdateMenuItemMutation();
+    const [createMenuItem, {isLoading: isCreating}] = useCreateMenuItemMutation();
+    const [updateMenuItem, {isLoading: isUpdating}] = useUpdateMenuItemMutation();
 
     const isEditMode = !!menuItemToEdit;
     const isLoading = isCreating || isUpdating;
@@ -41,7 +42,7 @@ const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
         control,
         handleSubmit,
         reset,
-        formState: { errors },
+        formState: {errors},
     } = useForm({
         defaultValues,
         mode: "onBlur",
@@ -52,7 +53,7 @@ const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
 
     const onSubmit = async (data: AddMenuItemType | EditMenuItemType) => {
         try {
-            const payload = { ...data, itemCode: data.itemCode || undefined };
+            const payload = {...data, itemCode: data.itemCode || undefined};
             if (isEditMode && menuItemToEdit) {
                 await updateMenuItem({
                     id: menuItemToEdit.id,
@@ -86,16 +87,16 @@ const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
     return (
         <CustomModal open={open} onClose={onClose}>
             <Box>
-                <Typography variant="h6" sx={{ mb: 2 }}>
+                <Typography variant="h6" sx={{mb: 2}}>
                     {isEditMode ? "Edit Menu Item" : "Add Menu Item"}
                 </Typography>
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>
                     <Grid container spacing={2}>
                         <Grid size={12}>
                             <Controller
                                 name="name"
                                 control={control}
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <TextField
                                         {...field}
                                         fullWidth
@@ -110,7 +111,7 @@ const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
                             <Controller
                                 name="price"
                                 control={control}
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <TextField
                                         {...field}
                                         fullWidth
@@ -130,7 +131,7 @@ const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
                             <Controller
                                 name="itemCode"
                                 control={control}
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <TextField
                                         {...field}
                                         fullWidth
@@ -147,16 +148,21 @@ const MenuItemFormModal = ({ open, onClose, menuItemToEdit }: Props) => {
                             />
                         </Grid>
                     </Grid>
-                    <Button sx={{ mt: 2 }} variant="contained" type="submit" disabled={isLoading}>
-                        {isLoading
+                    <CustomButton
+                        title={isLoading
                             ? isEditMode
                                 ? "Saving..."
                                 : "Adding..."
                             : isEditMode
-                              ? "Save Changes"
-                              : "Add Menu"}
-                    </Button>
-                </form>
+                                ? "Save Changes"
+                                : "Add Menu"}
+                        sx={{mt: 2}}
+                        variant="contained"
+                        type="submit"
+                        disabled={isLoading}
+                    />
+
+                </Box>
             </Box>
         </CustomModal>
     );

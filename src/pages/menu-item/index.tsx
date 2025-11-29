@@ -1,15 +1,5 @@
 import {type MouseEvent, useMemo, useState} from "react";
-import {
-    Box,
-    Button,
-    Grid,
-    IconButton,
-    Menu,
-    MenuItem as MuiMenuItem,
-    Tooltip,
-    Typography,
-    useTheme
-} from "@mui/material";
+import {Box, Grid, IconButton, Menu, MenuItem as MuiMenuItem, Tooltip, Typography, useTheme} from "@mui/material";
 import {useDeleteMenuItemMutation, useGetMenuItemsQuery} from "@/store/slice";
 import useNotifier from "@/hooks/useNotifier";
 import MenuItemFormModal from "@/components/order-tracking/menu-item-form-modal";
@@ -29,6 +19,7 @@ import {ngnFormatter} from "@/utils";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 import {useSearch} from "@/use-search.ts";
 import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils.ts";
+import CustomButton from "@/components/ui/button.tsx";
 
 const MenuItems = () => {
     const theme = useTheme();
@@ -288,9 +279,11 @@ const MenuItems = () => {
                 {currentUser && (currentUser.role === "manager" || currentUser.role === "admin") && (
                     <Grid size={{xs: 12, md: 6}}>
                         <Box display="flex" justifyContent="flex-end">
-                            <Button variant="contained" onClick={() => handleOpenFormModal()}>
-                                Add {t("item")}
-                            </Button>
+                            <CustomButton
+                                title={`Add ${t("item")}`}
+                                variant="contained"
+                                onClick={() => handleOpenFormModal()}
+                            />
                         </Box>
                     </Grid>
                 )}

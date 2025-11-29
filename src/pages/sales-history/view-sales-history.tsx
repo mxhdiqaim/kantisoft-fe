@@ -1,17 +1,18 @@
 import Receipt from "@/components/sales-history/receipt";
 import ViewSalesHistoryLoading from "@/components/sales-history/spinners/view-sales-history-loading";
-import { useGetAllStoresQuery, useGetOrderByIdQuery } from "@/store/slice";
-import { selectActiveStore, setActiveStore } from "@/store/slice/store-slice";
-import { ArrowBackIosNewOutlined, LocalPrintshopOutlined } from "@mui/icons-material";
-import { Box, Button, Typography } from "@mui/material";
-import { useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import {useGetAllStoresQuery, useGetOrderByIdQuery} from "@/store/slice";
+import {selectActiveStore, setActiveStore} from "@/store/slice/store-slice";
+import {ArrowBackIosNewOutlined, LocalPrintshopOutlined} from "@mui/icons-material";
+import {Box, Typography} from "@mui/material";
+import {useEffect, useRef} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {useNavigate, useParams} from "react-router-dom";
+import CustomButton from "@/components/ui/button.tsx";
 
 const ViewSalesHistory = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { id } = useParams();
+    const {id} = useParams();
     const printRef = useRef<HTMLDivElement>(null);
 
     const {
@@ -22,7 +23,7 @@ const ViewSalesHistory = () => {
         skip: !id,
     });
 
-    const { data: stores, isLoading: isLoadingStores } = useGetAllStoresQuery();
+    const {data: stores, isLoading: isLoadingStores} = useGetAllStoresQuery();
     const activeStore = useSelector(selectActiveStore);
 
     const loading = isOrdersLoading || isLoadingStores;
@@ -37,7 +38,7 @@ const ViewSalesHistory = () => {
         }
     }, [activeStore, stores, dispatch]);
 
-    if (loading) return <ViewSalesHistoryLoading />;
+    if (loading) return <ViewSalesHistoryLoading/>;
 
     if (isError || !order) {
         return <Typography>Failed to load order details.</Typography>;
@@ -46,19 +47,24 @@ const ViewSalesHistory = () => {
     return (
         <Box>
             {/* --- Action Buttons --- */}
-            <Box className="no-print" sx={{ mb: 3, display: "flex", gap: 1 }}>
-                <Button variant="outlined" size="small" onClick={() => navigate(-1)}>
-                    <ArrowBackIosNewOutlined fontSize="small" sx={{ height: 16, mr: 0.5 }} />
-                    Go Back
-                </Button>
-                <Button variant="contained" size="small" onClick={handlePrint}>
-                    <LocalPrintshopOutlined fontSize="small" sx={{ height: 16, mr: 0.5 }} />
-                    Print Receipt
-                </Button>
+            <Box className="no-print" sx={{mb: 3, display: "flex", gap: 1}}>
+                <CustomButton
+                    title={"Go Back"}
+                    variant="outlined"
+                    size="small"
+                    onClick={() => navigate(-1)}
+                    startIcon={<ArrowBackIosNewOutlined fontSize="small" sx={{height: 16, mr: 0.5}}/>}
+                />
+                <CustomButton
+                    title={"Print Receipt"}
+                    variant="contained"
+                    size="small"
+                    onClick={handlePrint}
+                    startIcon={<LocalPrintshopOutlined fontSize="small" sx={{height: 16, mr: 0.5}}/>}/>
             </Box>
 
             {/* --- Printable Receipt Area --- */}
-            <Receipt order={order} storeData={activeStore} ref={printRef} />
+            <Receipt order={order} storeData={activeStore} ref={printRef}/>
         </Box>
     );
 };

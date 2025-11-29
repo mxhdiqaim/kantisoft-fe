@@ -1,7 +1,8 @@
-import type { CartItem } from "@/types/cart-item-type";
-import { ngnFormatter } from "@/utils";
-import { Add, Delete, Remove } from "@mui/icons-material";
-import { Box, Button, Divider, IconButton, List, ListItem, ListItemText, Typography, useTheme } from "@mui/material";
+import type {CartItem} from "@/types/cart-item-type";
+import {ngnFormatter} from "@/utils";
+import {Add, Delete, Remove} from "@mui/icons-material";
+import {Box, Divider, IconButton, List, ListItem, ListItemText, Typography, useTheme} from "@mui/material";
+import CustomButton from "@/components/ui/button.tsx";
 
 interface Props {
     cartItems: CartItem[];
@@ -10,7 +11,7 @@ interface Props {
     onOpenPaymentDialog: () => void;
 }
 
-const OrderCart = ({ cartItems, onUpdateQuantity, onRemoveItem, onOpenPaymentDialog }: Props) => {
+const OrderCart = ({cartItems, onUpdateQuantity, onRemoveItem, onOpenPaymentDialog}: Props) => {
     const theme = useTheme();
     const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -27,13 +28,13 @@ const OrderCart = ({ cartItems, onUpdateQuantity, onRemoveItem, onOpenPaymentDia
                 Order Cart
             </Typography>
             {cartItems.length === 0 ? (
-                <Typography sx={{ my: 2 }}>Cart is empty</Typography>
+                <Typography sx={{my: 2}}>Cart is empty</Typography>
             ) : (
                 <>
                     <List>
                         {cartItems.map((item) => (
                             <>
-                                <Divider />
+                                <Divider/>
                                 <ListItem
                                     key={item.id}
                                     secondaryAction={
@@ -42,7 +43,7 @@ const OrderCart = ({ cartItems, onUpdateQuantity, onRemoveItem, onOpenPaymentDia
                                             aria-label="delete"
                                             onClick={() => onRemoveItem(item.id)}
                                         >
-                                            <Delete />
+                                            <Delete/>
                                         </IconButton>
                                     }
                                 >
@@ -66,34 +67,34 @@ const OrderCart = ({ cartItems, onUpdateQuantity, onRemoveItem, onOpenPaymentDia
                                     />
                                     {item.quantity > 1 && (
                                         <IconButton onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}>
-                                            <Remove />
+                                            <Remove/>
                                         </IconButton>
                                     )}
-                                    <Typography sx={{ mx: 1 }}>{item.quantity}</Typography>
+                                    <Typography sx={{mx: 1}}>{item.quantity}</Typography>
                                     <IconButton onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}>
-                                        <Add />
+                                        <Add/>
                                     </IconButton>
                                 </ListItem>
                             </>
                         ))}
                     </List>
-                    <Divider />
-                    <Box sx={{ mt: 2 }}>
+                    <Divider/>
+                    <Box sx={{mt: 2}}>
                         <Typography variant="h3" color={theme.palette.success.main} mt={1}>
                             Total: {ngnFormatter.format(total)}{" "}
                         </Typography>
                     </Box>
                 </>
             )}
-            <Button
+            <CustomButton
+                title={"Place Order"}
                 variant="contained"
                 color="primary"
                 fullWidth
                 disabled={cartItems.length === 0}
                 onClick={onOpenPaymentDialog}
-            >
-                Place Order
-            </Button>
+                sx={{mt: 1, width: "100%"}}
+            />
         </Box>
     );
 };

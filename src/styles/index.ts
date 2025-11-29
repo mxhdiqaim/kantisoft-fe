@@ -6,21 +6,6 @@ export const iconStyle: SxProps = {
     height: {xs: 15, md: 18},
 };
 
-export const getStatusChipColor = (status: string) => {
-    switch (status) {
-        case "inStock":
-            return "success";
-        case "lowStock":
-            return "warning";
-        case "outOfStock":
-            return "error";
-        case "discontinued":
-            return "default";
-        default:
-            return "default";
-    }
-};
-
 export const getTransactionChipColor = (status: string) => {
     switch (status) {
         case TransactionTypeEnum.ADJUSTMENT_IN:

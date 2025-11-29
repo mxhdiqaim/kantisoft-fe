@@ -4,7 +4,9 @@ import * as yup from "yup";
 export const InventoryStatusEnum = {
     IN_STOCK: "inStock",
     LOW_STOCK: "lowStock",
-    OUT_OF_STOCK: "outOfStock"
+    OUT_OF_STOCK: "outOfStock",
+    ADJUSTMENT: "adjustment",
+    DISCONTINUED: "discontinued",
 } as const;
 
 export const TransactionTypeEnum = {

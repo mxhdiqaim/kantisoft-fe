@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type OrderType } from "@/types/order-types"; // Assuming you have an OrderType
-import type { StoreType } from "@/types/store-types";
-import { ngnFormatter } from "@/utils";
+import {type OrderType} from "@/types/order-types"; // Assuming you have an OrderType
+import type {StoreType} from "@/types/store-types";
+import {ngnFormatter} from "@/utils";
 import {
     Box,
     Chip,
@@ -17,28 +17,16 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import { forwardRef } from "react";
+import {forwardRef} from "react";
+import {getPaymentStatusChipColor} from "@/components/ui";
 
 interface Props {
     order: OrderType;
     storeData: StoreType;
 }
 
-const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) => {
+const Receipt = forwardRef<HTMLDivElement, Props>(({order, storeData}, ref) => {
     const theme = useTheme();
-
-    const getStatusChipColor = (status: string) => {
-        switch (status) {
-            case "completed":
-                return "success";
-            case "pending":
-                return "warning";
-            case "cancelled":
-                return "error";
-            default:
-                return "default";
-        }
-    };
 
     return (
         <Paper
@@ -46,7 +34,7 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
             className="print-area"
             elevation={0}
             sx={{
-                p: { xs: 2, md: 2 }, // Reduced padding slightly for narrow receipt
+                p: {xs: 2, md: 2}, // Reduced padding slightly for narrow receipt
                 border: `1px solid ${theme.palette.divider}`,
                 borderRadius: theme.shape?.borderRadius ?? 1,
             }}
@@ -175,11 +163,11 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
             </style>
 
             {/* --- Print-Only Header (Store Info & Logo) --- */}
-            <Box className="print-only" sx={{ textAlign: "center", mb: 2 }}>
+            <Box className="print-only" sx={{textAlign: "center", mb: 2}}>
                 {/* Placeholder for Logo */}
                 {/* If you have a logo URL, use it here: */}
                 {/* <img src="/path/to/your/logo.png" alt="Store Logo" style={{ maxWidth: '60mm', height: 'auto', marginBottom: '5mm' }} /> */}
-                <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
+                <Typography variant="h5" sx={{fontWeight: "bold", mb: 0.5}}>
                     {storeData?.name}
                 </Typography>
                 <Typography variant="body2">{storeData?.address}</Typography>
@@ -187,13 +175,13 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
                 {storeData?.website && (
                     <Typography variant="body2">{`Web: ${storeData.website} | Email: ${storeData.email}`}</Typography>
                 )}
-                <Divider sx={{ my: 1 }} />
+                <Divider sx={{my: 1}}/>
             </Box>
 
             {/* --- Receipt Header (Order Reference & Status) --- */}
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", my: 1 }}>
+            <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "flex-start", my: 1}}>
                 <Box>
-                    <Typography variant="h6" sx={{ fontWeight: "bold", color: theme.palette.text.primary }}>
+                    <Typography variant="h6" sx={{fontWeight: "bold", color: theme.palette.text.primary}}>
                         RECEIPT
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -202,17 +190,17 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
                 </Box>
                 <Chip
                     label={order.orderStatus}
-                    color={getStatusChipColor(order.orderStatus)}
+                    color={getPaymentStatusChipColor(order.orderStatus)}
                     size="small"
-                    sx={{ textTransform: "uppercase", fontWeight: "bold", p: 2 }}
+                    sx={{textTransform: "uppercase", fontWeight: "bold", p: 2}}
                 />
             </Box>
 
-            <Divider sx={{ mb: 1 }} />
+            <Divider sx={{mb: 1}}/>
 
             {/* --- Order Details Grid (Stacked Vertically) --- */}
-            <Grid container spacing={0.5} sx={{ mb: 1 }}>
-                <Grid size={{ xs: 12, sm: 6 }} sx={{ my: 1 }}>
+            <Grid container spacing={0.5} sx={{mb: 1}}>
+                <Grid size={{xs: 12, sm: 6}} sx={{my: 1}}>
                     <Typography variant="body2" color="text.secondary">
                         Date
                     </Typography>
@@ -220,7 +208,7 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
                         {new Date(order.orderDate).toLocaleString()}
                     </Typography>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }} sx={{ my: 1 }}>
+                <Grid size={{xs: 12, sm: 6}} sx={{my: 1}}>
                     <Typography variant="body2" color="text.secondary">
                         Cashier
                     </Typography>
@@ -229,17 +217,17 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
                         fontWeight="500"
                     >{`${order.seller?.firstName} ${order.seller?.lastName}`}</Typography>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }} sx={{ my: 1 }}>
+                <Grid size={{xs: 12, sm: 6}} sx={{my: 1}}>
                     <Typography variant="body2" color="text.secondary">
                         Payment Method
                     </Typography>
-                    <Typography variant="body1" fontWeight="500" sx={{ textTransform: "capitalize" }}>
+                    <Typography variant="body1" fontWeight="500" sx={{textTransform: "capitalize"}}>
                         {order.paymentMethod}
                     </Typography>
                 </Grid>
                 {order.paymentDetails?.amountPaid && (
                     <>
-                        <Grid size={{ xs: 12, sm: 6 }} sx={{ my: 1 }}>
+                        <Grid size={{xs: 12, sm: 6}} sx={{my: 1}}>
                             <Typography variant="body2" color="text.secondary">
                                 Amount Paid
                             </Typography>
@@ -248,7 +236,7 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
                             </Typography>
                         </Grid>
                         {order.paymentDetails.changeGiven > 0 && (
-                            <Grid size={{ xs: 12, sm: 6 }} sx={{ my: 1 }}>
+                            <Grid size={{xs: 12, sm: 6}} sx={{my: 1}}>
                                 <Typography variant="body2" color="text.secondary">
                                     Change Given
                                 </Typography>
@@ -262,13 +250,13 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
             </Grid>
 
             {/* --- Order Items Table --- */}
-            <Typography variant="body1" sx={{ mb: 0.5, fontWeight: "bold" }}>
+            <Typography variant="body1" sx={{mb: 0.5, fontWeight: "bold"}}>
                 Items
             </Typography>
             <TableContainer>
                 <Table size="small">
                     {" "}
-                    {/* Use small table size */}
+                    {/* Use a small table size */}
                     <TableHead>
                         <TableRow
                             sx={{
@@ -278,21 +266,21 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
                                 },
                             }}
                         >
-                            <TableCell sx={{ width: "30%" }}>Item</TableCell> {/* Allocate width to item name */}
-                            <TableCell align="center" sx={{ width: "10%" }}>
+                            <TableCell sx={{width: "30%"}}>Item</TableCell> {/* Allocate width to item name */}
+                            <TableCell align="center" sx={{width: "10%"}}>
                                 Qty
                             </TableCell>
-                            <TableCell align="right" sx={{ width: "30%" }}>
+                            <TableCell align="right" sx={{width: "30%"}}>
                                 Price
                             </TableCell>
-                            <TableCell align="right" sx={{ width: "30%" }}>
+                            <TableCell align="right" sx={{width: "30%"}}>
                                 Sub-Total
                             </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {order.orderItems?.map((item: any) => (
-                            <TableRow key={item.id} sx={{ "&:nth-of-type(odd)": { backgroundColor: "transparent" } }}>
+                            <TableRow key={item.id} sx={{"&:nth-of-type(odd)": {backgroundColor: "transparent"}}}>
                                 <TableCell>{item.menuItem?.name}</TableCell>
                                 <TableCell align="center">{item.quantity}</TableCell>
                                 <TableCell align="right">{ngnFormatter.format(item.priceAtOrder)}</TableCell>
@@ -303,11 +291,11 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
                 </Table>
             </TableContainer>
 
-            <Divider sx={{ my: 1 }} />
+            <Divider sx={{my: 1}}/>
 
             {/* --- Grand Total --- */}
-            <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
-                <Box sx={{ textAlign: "right" }}>
+            <Box sx={{display: "flex", justifyContent: "flex-end", mb: 1}}>
+                <Box sx={{textAlign: "right"}}>
                     <Typography variant="body1" color="text.secondary">
                         TOTAL
                     </Typography>
@@ -318,8 +306,8 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
             </Box>
             {/* Optional: Add "Amount Due" if applicable for partial payments */}
             {order.paymentDetails?.amountDue > 0 && (
-                <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5 }}>
-                    <Box sx={{ textAlign: "right" }}>
+                <Box sx={{display: "flex", justifyContent: "flex-end", mt: 0.5}}>
+                    <Box sx={{textAlign: "right"}}>
                         <Typography variant="body2" color="error.main">
                             Amount Due
                         </Typography>
@@ -330,14 +318,14 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
                 </Box>
             )}
 
-            <Divider sx={{ my: 1 }} />
+            <Divider sx={{my: 1}}/>
 
             {/* --- Thank You Message & Refund Policy --- */}
-            <Box className="print-only" sx={{ textAlign: "center", my: 2 }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", mb: 0.5 }}>
+            <Box className="print-only" sx={{textAlign: "center", my: 2}}>
+                <Typography variant="body1" sx={{fontWeight: "bold", mb: 0.5}}>
                     THANK YOU FOR YOUR BUSINESS!
                 </Typography>
-                <Typography variant="caption" sx={{ display: "block", mb: 1 }}>
+                <Typography variant="caption" sx={{display: "block", mb: 1}}>
                     We appreciate your patronage. Please come again!
                 </Typography>
             </Box>
@@ -345,10 +333,10 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({ order, storeData }, ref) =>
             {/* --- Print-Only Footer (Application Owner) --- */}
             <Box
                 className="print-only"
-                sx={{ textAlign: "center", mt: 2, pt: 1, borderTop: `1px dashed ${theme.palette.divider}` }}
+                sx={{textAlign: "center", mt: 2, pt: 1, borderTop: `1px dashed ${theme.palette.divider}`}}
             >
                 <Typography variant="caption" color="text.secondary">
-                    Powered by Haxene Limited | www.haxene.com
+                    Powered by Kantisoft subsidiary of Haxene Limited | www.kantisoft.com
                 </Typography>
             </Box>
         </Paper>

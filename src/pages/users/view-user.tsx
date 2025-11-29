@@ -5,32 +5,13 @@ import useNotifier from "@/hooks/useNotifier";
 import {useAppSelector} from "@/store";
 import {useDeleteUserMutation, useGetUserByIdQuery, useUpdateUserMutation} from "@/store/slice";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
-import {roleHierarchy, type UserRoleType, type UserStatus, type UserType} from "@/types/user-types";
+import {roleHierarchy, type UserRoleType, type UserType} from "@/types/user-types";
 import {ArrowBackIosNewOutlined, BlockOutlined, DeleteOutline, EditOutlined} from "@mui/icons-material";
 import {Avatar, Box, Button, Card, CardContent, Chip, Divider, Grid, Typography} from "@mui/material";
 import {format} from "date-fns";
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-
-const getRoleChipColor = (role: UserRoleType) => {
-    const colors: Record<UserRoleType, "secondary" | "primary" | "info" | "default"> = {
-        manager: "secondary",
-        admin: "primary",
-        user: "info",
-        guest: "default",
-    };
-    return colors[role] || "default";
-};
-
-const getStatusChipColor = (status: UserStatus) => {
-    const colors: Record<UserStatus, "success" | "warning" | "error"> = {
-        active: "success",
-        inactive: "warning",
-        banned: "error",
-        deleted: "error",
-    };
-    return colors[status] || "default";
-};
+import {getUserRoleChipColor, getUserStatusChipColor} from "@/components/ui";
 
 const getInitials = (firstName: string, lastName: string) => `${firstName[0] || ""}${lastName[0] || ""}`.toUpperCase();
 
@@ -140,7 +121,7 @@ const ViewUser = () => {
                             </Typography>
                             <Chip
                                 label={user.role}
-                                color={getRoleChipColor(user.role)}
+                                color={getUserRoleChipColor(user.role)}
                                 size="medium"
                                 sx={{textTransform: "capitalize"}}
                             />
@@ -250,7 +231,7 @@ const ViewUser = () => {
                                     </Typography>
                                     <Chip
                                         label={user.status}
-                                        color={getStatusChipColor(user.status)}
+                                        color={getUserStatusChipColor(user.status)}
                                         size="medium"
                                         sx={{textTransform: "capitalize"}}
                                     />
