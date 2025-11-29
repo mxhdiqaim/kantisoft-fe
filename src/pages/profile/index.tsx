@@ -23,7 +23,7 @@ const ProfilePage = () => {
 
     const activeStore = useSelector(selectActiveStore);
 
-    // Fetch the latest user data to ensure it's up-to-date
+    // Fetch the latest user data to ensure it's up to date
     const {
         data: user,
         isLoading,
@@ -62,7 +62,7 @@ const ProfilePage = () => {
                                     height: 120,
                                     margin: "auto",
                                     mb: 2,
-                                    bgcolor: "primary.main",
+                                    backgroundColor: "primary.main",
                                     fontSize: "3rem",
                                 }}
                             >

@@ -22,6 +22,7 @@ import {useSearch} from "@/use-search.ts";
 import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils";
 import CustomButton from "@/components/ui/button.tsx";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
+import {getUserStatusChipColor} from "@/components/ui";
 
 const UsersPage = () => {
     const notify = useNotifier();
@@ -195,7 +196,7 @@ const UsersPage = () => {
                     <TableStyledBox>
                         <Chip
                             label={params.value}
-                            color={params.value === "active" ? "success" : "error"}
+                            color={getUserStatusChipColor(params.value)}
                             size="medium"
                             sx={{textTransform: "capitalize", fontWeight: "bold"}}
                         />
@@ -261,6 +262,8 @@ const UsersPage = () => {
                     const isEditDisabled =
                         params.row.status === UserStatusEnum.DELETED || params.row.status === UserStatusEnum.INACTIVE || !canEdit();
 
+                    const isViewDisabled = !canEdit();
+
                     const canChangeStore =
                         currentUser?.role === UserRoleEnum.MANAGER &&
                         params.row.id !== currentUser.id &&
@@ -281,7 +284,7 @@ const UsersPage = () => {
                                 </Tooltip>
                             }
                         >
-                            <TableStyledMenuItem onClick={handleView} disabled={isEditDisabled}>
+                            <TableStyledMenuItem onClick={handleView} disabled={isViewDisabled}>
                                 <VisibilityOutlined sx={{mr: 1}}/>
                                 View
                             </TableStyledMenuItem>
