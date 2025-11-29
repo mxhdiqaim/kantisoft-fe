@@ -11,13 +11,8 @@ import {Box, Grid, Typography} from "@mui/material";
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import OverviewHeader from "@/components/ui/custom-header.tsx";
-import ExportCard from "@/components/customs/export-card.tsx";
-import {getExportFormattedData} from "@/utils/table-export-utils.ts";
-import useNotifier from "@/hooks/useNotifier.ts";
-import {saveAs} from "file-saver";
 
 const SalesHistory = () => {
-    const notify = useNotifier();
     const {control, watch} = useForm<{ timePeriod: TimePeriod }>({
         mode: "onChange",
         resolver: yupResolver(filterSchema),
@@ -31,28 +26,6 @@ const SalesHistory = () => {
     const {data: ordersData, isLoading, isError, fulfilledTimeStamp} = useGetOrdersByPeriodQuery(period);
 
     const [lastFetched, setLastFetched] = useState<Date | null>(null);
-
-    // Export to CSV function
-    const handleExportCsv = () => {
-        // Use the generic utility function with specific formatters
-        const dataToExport = getExportFormattedData(filteredOrders, columns, salesHistoryFieldFormatters);
-
-        if (dataToExport.length === 0) {
-            notify("No data to export.", "error");
-            return;
-        }
-
-        const header = Object.keys(dataToExport[0]);
-        const csvContent = [
-            header.join(","),
-            ...dataToExport.map((row) =>
-                header.map((key) => `"${String(row[key] || "").replace(/"/g, '""')}"`).join(","),
-            ),
-        ].join("\n");
-
-        const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
-        saveAs(blob, `sales_history_${period.toLowerCase().replace(" ", "_")}.csv`);
-    };
 
     useEffect(() => {
         if (fulfilledTimeStamp) {
@@ -128,10 +101,6 @@ const SalesHistory = () => {
                     />
                 </Grid>
             </Grid>
-            <ExportCard
-                onExportCsv={handleExportCsv}
-                onExportXlsx={handleExportXlsx}
-            />
             <SalesHistoryTable orders={ordersData?.orders ?? []} loading={isLoading} period={period}/>
         </Box>
     );

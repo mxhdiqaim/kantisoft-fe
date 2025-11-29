@@ -6,19 +6,8 @@ import {UserRoleEnum} from "@/types/user-types";
 import {ngnFormatter} from "@/utils";
 import {relativeTime} from "@/utils/get-relative-time";
 import {getExportFormattedData} from "@/utils/table-export-utils";
-import {EditOutlined, MoreVert, PrintOutlined, Search as SearchIcon, VisibilityOutlined,} from "@mui/icons-material";
-import {
-    Box,
-    Grid,
-    IconButton,
-    InputAdornment,
-    Menu,
-    MenuItem,
-    TextField,
-    Tooltip,
-    Typography,
-    useTheme
-} from "@mui/material";
+import {EditOutlined, MoreVert, PrintOutlined, VisibilityOutlined,} from "@mui/icons-material";
+import {Box, Grid, IconButton, Menu, MenuItem, Tooltip, Typography, useTheme} from "@mui/material";
 import {type GridColDef} from "@mui/x-data-grid";
 import {saveAs} from "file-saver";
 import {type MouseEvent, useEffect, useMemo, useRef, useState} from "react";
@@ -32,7 +21,8 @@ import {useGetAllStoresQuery} from "@/store/slice";
 import {useDispatch, useSelector} from "react-redux";
 import {selectActiveStore, setActiveStore} from "@/store/slice/store-slice";
 import DataGridTable from "@/components/ui/data-grid-table";
-import ExportCard from "@/components/customs/export-card.tsx";
+import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
+import {useSearch} from "@/use-search.ts";
 
 export interface Props {
     orders: OrderType[];
@@ -48,7 +38,13 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
     const currentUser = useAppSelector(selectCurrentUser);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
-    const [searchText, setSearchText] = useState("");
+
+    const memoizedOrders = useMemo(() => orders ?? [], [orders]);
+
+    const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
+        initialData: memoizedOrders,
+        searchKeys: ["reference", "id"],
+    });
 
     const [orderToPrint, setOrderToPrint] = useState<OrderType | null>(null);
     const componentRef = useRef<HTMLDivElement>(null);
@@ -66,18 +62,18 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
             setOrderToPrint(null);
             handleMenuClose();
         },
-        // For thermal printers, adjust the page style, the Receipt component's internal CSS handles this
+        // For thermal printers, adjust the page style; the Receipt component's internal CSS handles this
         pageStyle: `
             @page { size: 80mm auto; margin: 0; padding: 0; }
             body { margin: 0; padding: 0; overflow: hidden; } /* Hide scrollbars during print preview */
         `,
     });
 
-    const filteredOrders = useMemo(() => {
-        if (!searchText) return orders;
-
-        return orders.filter((order) => (order.reference || order.id).toLowerCase().includes(searchText.toLowerCase()));
-    }, [orders, searchText]);
+    // const filteredOrders = useMemo(() => {
+    //     if (!searchText) return orders;
+    //
+    //     return orders.filter((order) => (order.reference || order.id).toLowerCase().includes(searchText.toLowerCase()));
+    // }, [orders, searchText]);
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
         setAnchorEl(event.currentTarget);
@@ -105,7 +101,7 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
     // Export to CSV function
     const handleExportCsv = () => {
         // Use the generic utility function with specific formatters
-        const dataToExport = getExportFormattedData(filteredOrders, columns, salesHistoryFieldFormatters);
+        const dataToExport = getExportFormattedData(filteredData, columns, salesHistoryFieldFormatters);
 
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
@@ -127,7 +123,7 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
     // Export to XLSX function
     const handleExportXlsx = () => {
         // Use the generic utility function with specific formatters
-        const dataToExport = getExportFormattedData(filteredOrders, columns, salesHistoryFieldFormatters);
+        const dataToExport = getExportFormattedData(filteredData, columns, salesHistoryFieldFormatters);
 
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
@@ -330,30 +326,17 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                     </div>
                 )}
             </div>
-            <ExportCard
+
+            <TableSearchActions
+                searchControl={searchControl}
+                searchSubmit={searchSubmit}
+                handleSearch={handleSearch}
                 onExportCsv={handleExportCsv}
                 onExportXlsx={handleExportXlsx}
             />
-
-            <TextField
-                variant="outlined"
-                size="small"
-                placeholder="Search by reference..."
-                value={searchText}
-                fullWidth
-                sx={{height: 45}}
-                onChange={(e) => setSearchText(e.target.value)}
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon/>
-                        </InputAdornment>
-                    ),
-                }}
-            />
             <Grid container spacing={2} sx={{mt: 2}}>
                 <Grid size={12}>
-                    <DataGridTable data={filteredOrders ?? []} columns={columns} loading={loading}/>
+                    <DataGridTable data={filteredData ?? []} columns={columns} loading={loading}/>
                 </Grid>
             </Grid>
         </Box>

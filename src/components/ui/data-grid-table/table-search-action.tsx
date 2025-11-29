@@ -1,8 +1,10 @@
-import type {BaseSyntheticEvent} from "react";
-import {Box, Grid, type SxProps, type Theme, useTheme} from "@mui/material";
-import CustomButton from "@/components/ui/button.tsx";
+import {type BaseSyntheticEvent} from "react";
+import {Box, Grid, MenuItem, type SxProps, type Theme} from "@mui/material";
 import SearchField from "@/components/ui/search-field.tsx";
 import type {Control} from "react-hook-form";
+import CustomCard from "@/components/customs/custom-card.tsx";
+import CustomButton from "@/components/ui/button.tsx";
+import {FileDownloadOutlined} from "@mui/icons-material";
 
 interface Props {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,85 +18,80 @@ interface Props {
     onStatusChange?: (newStatus: string) => void;
     showFilterButton?: boolean;
     showColumnsButton?: boolean;
+    onExportCsv: () => void;
+    onExportXlsx: () => void;
+    sx?: SxProps<Theme>;
 }
 
 const TableSearchActions = ({
                                 searchSubmit,
                                 handleSearch,
                                 searchControl,
-                                statusFilterOptions,
-                                selectedStatus,
-                                onStatusChange,
+                                onExportCsv,
+                                onExportXlsx,
+                                sx,
                             }: Props) => {
-    const theme = useTheme();
 
-    const filterButtonStyle: SxProps<Theme> = {
-        fontWeight: 400,
-        height: 30,
-        borderRadius: theme.borderRadius.medium,
-        fontSize: "1rem",
-        width: {xs: "100%", md: "auto"},
+    const handleCsvClick = () => {
+        onExportCsv();
+    };
+
+    const handleXlsxClick = () => {
+        onExportXlsx();
     };
 
     return (
-        <Grid container spacing={2} alignItems={"center"} sx={{my: 2}}>
-            <Grid size={{xs: 12, md: 9}}>
-                <Box sx={{display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap"}}>
-                    <Box
-                        component="form"
-                        autoComplete="on"
-                        onSubmit={searchSubmit(handleSearch)}
-                        sx={{maxWidth: {xs: "100%", md: 400}, flexGrow: 1}}
-                    >
-                        <SearchField
-                            name={"search"}
-                            placeholder={"Search..."}
-                            control={searchControl}
-                            sx={{
-                                "& .MuiOutlinedInput-root": {
-                                    height: 35,
-                                    borderRadius: theme.borderRadius.small,
-                                },
-                                width: "100%",
-                            }}
-                        />
-                    </Box>
-                    {statusFilterOptions && onStatusChange && (
+        <CustomCard
+            sx={{
+                borderRadius: 2,
+                mb: 2,
+                width: "100%",
+                "& .capitalize-cell": {
+                    textTransform: "capitalize",
+                },
+                ...sx,
+            }}
+        >
+            <Grid container spacing={2} alignItems={"center"}>
+                <Grid size={{xs: 12, md: 9}}>
+                    <Box sx={{display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap"}}>
                         <Box
-                            sx={{
-                                display: "flex",
-                                gap: 0.5,
-                                border: `1px solid ${theme.palette.divider}`,
-                                borderRadius: "20px",
-                                p: 0.5,
-                                width: {xs: "100%", md: "auto"},
-                            }}
+                            component="form"
+                            autoComplete="on"
+                            onSubmit={searchSubmit(handleSearch)}
+                            sx={{maxWidth: "100%", flexGrow: 1}}
                         >
-                            {statusFilterOptions.map((status) => (
-                                <CustomButton
-                                    key={status}
-                                    title={status}
-                                    onClick={() => onStatusChange(status)}
-                                    variant={selectedStatus === status ? "contained" : "text"}
-                                    sx={{
-                                        // borderRadius: "20px",
-                                        textTransform: "capitalize",
-                                        boxShadow: selectedStatus === status ? "inherit" : "none",
-                                        background: selectedStatus === status ? "#EEE5FF" : "inherit",
-                                        color: selectedStatus === status ? "#6834D1" : "inherit",
-                                        "&:hover": {
-                                            boxShadow: "none",
-                                        },
-
-                                        ...filterButtonStyle,
-                                    }}
-                                />
-                            ))}
+                            <SearchField
+                                name={"search"}
+                                placeholder={"Search..."}
+                                control={searchControl}
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        height: 40,
+                                    },
+                                    width: "100%",
+                                }}
+                            />
                         </Box>
-                    )}
-                </Box>
+                    </Box>
+                </Grid>
+                {onExportCsv && onExportXlsx && (
+                    <Grid size={{xs: 12, md: 3}}>
+                        <Box sx={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
+                            <CustomButton
+                                title={"Export"}
+                                startIcon={<FileDownloadOutlined/>}
+                                sx={{height: 40, width: 100}}
+                                variant={"contained"}
+                            >
+                                <MenuItem onClick={handleCsvClick}>Export as CSV</MenuItem>
+                                <MenuItem onClick={handleXlsxClick}>Export as XLSX</MenuItem>
+                            </CustomButton>
+                        </Box>
+                    </Grid>
+                )}
             </Grid>
-        </Grid>
+        </CustomCard>
     );
 };
 
