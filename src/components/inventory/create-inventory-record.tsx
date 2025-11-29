@@ -131,13 +131,14 @@ const CreateInventoryRecord: FC<Props> = ({open, onClose}) => {
                         />
                     </Grid>
                 </Grid>
-                <Box sx={{display: "flex", justifyContent: "flex-end", gap: 2, mt: 4}}>
-                    <CustomButton onClick={onClose} variant="outlined">
-                        Cancel
-                    </CustomButton>
-                    <CustomButton type="submit" variant="contained" disabled={isLoading}>
-                        {isLoading ? <CircularProgress size={24}/> : "Create Record"}
-                    </CustomButton>
+                <Box sx={{display: "flex", justifyContent: "flex-end", gap: 2, mt: 2}}>
+                    <CustomButton title={"Close"} onClick={onClose}/>
+                    <CustomButton
+                        title={isLoading ? <CircularProgress size={24}/> : "Create Record"}
+                        type="submit"
+                        variant={"contained"}
+                        disabled={isLoading}
+                    />
                 </Box>
             </Box>
         </CustomModal>

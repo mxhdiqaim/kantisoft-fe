@@ -1,4 +1,4 @@
-import {useGetAllInventoryQuery, useMarkAsDiscontinuedMutation} from "@/store/slice";
+import {useDeleteInventoryRecordMutation, useGetAllInventoryQuery, useMarkAsDiscontinuedMutation} from "@/store/slice";
 import type {InventoryType} from "@/types/inventory-types.ts";
 import {Box, Button, Chip, Grid, MenuItem, Skeleton, Tooltip, Typography, useTheme} from "@mui/material";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
@@ -17,15 +17,23 @@ import AdjustStock from "@/components/inventory/adjust-stock.tsx";
 import {getStatusChipColor} from "@/styles";
 import {useNavigate} from "react-router-dom";
 import {useSearch} from "@/use-search.ts";
+import {useSelector} from "react-redux";
+import {selectCurrentUser} from "@/store/slice/auth-slice";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
+import {UserRoleEnum, UserStatusEnum} from "@/types/user-types.ts";
 
 const InventoryManagement = () => {
     const {t} = useTranslation();
     const theme = useTheme();
+    const user = useSelector(selectCurrentUser);
     const notify = useNotifier();
     const navigate = useNavigate();
     const {data: inventoryData, isLoading, isError, error} = useGetAllInventoryQuery();
     const [markAsDiscontinued, {isLoading: isDiscontinuing}] = useMarkAsDiscontinuedMutation();
+    const [deleteInventoryRecord, {isLoading: isDeleting}] = useDeleteInventoryRecordMutation();
+
+    const canInteract = user?.status === UserStatusEnum.ACTIVE &&
+        (user?.role === UserRoleEnum.ADMIN || user?.role === UserRoleEnum.MANAGER);
 
     const memoizedInventories = useMemo(() => inventoryData || [], [inventoryData]);
 
@@ -72,6 +80,19 @@ const InventoryManagement = () => {
             notify("Item has been discontinued.", "success");
         } catch (err) {
             const defaultMessage = "Failed to discontinue item.";
+            const apiError = getApiError(err, defaultMessage);
+            notify(apiError.message, "error");
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!selectedRow) return;
+
+        try {
+            await deleteInventoryRecord(selectedRow.menuItemId).unwrap();
+            notify("Item has been deleted.", "success");
+        } catch (err) {
+            const defaultMessage = "Failed to delete item.";
             const apiError = getApiError(err, defaultMessage);
             notify(apiError.message, "error");
         }
@@ -176,28 +197,49 @@ const InventoryManagement = () => {
             headerAlign: "center",
             sortable: false,
             renderCell: (params) => (
-                <CustomButton
-                    variant={"text"}
-                    sx={{
-                        borderRadius: "10px",
-                        color: theme.palette.text.primary,
-                    }}
-                    onClick={(e) => handleMenuClick(e, params.row)}
-                    startIcon={
-                        <Tooltip title="More Actions" placement={"top"}>
-                            <MoreVertIcon/>
-                        </Tooltip>
-                    }
-                >
-                    <MenuItem onClick={handleMenuClose}>View Details</MenuItem>
-                    <MenuItem onClick={handleOpenAdjustStockModal}>Adjust Stock</MenuItem>
-                    <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
-                    <MenuItem onClick={handleDiscontinue}
-                              disabled={isDiscontinuing || params.row.status === "discontinued"}
-                              sx={{color: theme.palette.error.main}}>
-                        Discontinue
-                    </MenuItem>
-                </CustomButton>
+                canInteract && (
+                    <CustomButton
+                        variant={"text"}
+                        sx={{
+                            borderRadius: "10px",
+                            color: theme.palette.text.primary,
+                        }}
+                        onClick={(e) => handleMenuClick(e, params.row)}
+                        startIcon={
+                            <Tooltip title="More Actions" placement={"top"}>
+                                <MoreVertIcon/>
+                            </Tooltip>
+                        }
+                    >
+                        <MenuItem onClick={handleOpenAdjustStockModal}
+                                  sx={{borderRadius: theme.borderRadius.small, mx: 1}}>
+                            Adjust Stock
+                        </MenuItem>
+                        <MenuItem onClick={handleMenuClose} sx={{borderRadius: theme.borderRadius.small, mx: 1}}>
+                            Edit
+                        </MenuItem>
+                        <MenuItem onClick={handleDiscontinue}
+                                  disabled={isDiscontinuing || params.row.status === "discontinued"}
+                                  sx={{
+                                      color: theme.palette.warning.main,
+                                      borderRadius: theme.borderRadius.small,
+                                      mx: 1
+                                  }}>
+                            Discontinue
+                        </MenuItem>
+                        <MenuItem onClick={handleDelete} disabled={isDeleting}
+                                  sx={{
+                                      mt: 1,
+                                      border: `1px solid ${theme.palette.error.main}`,
+                                      color: theme.palette.error.main,
+                                      borderRadius: theme.borderRadius.small,
+                                      mx: 1,
+                                  }}>
+                            Delete
+                        </MenuItem>
+
+                    </CustomButton>
+                )
             ),
         },
     ], [selectedRow, isDiscontinuing])

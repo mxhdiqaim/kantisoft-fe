@@ -41,8 +41,8 @@ const CustomButton = ({
     }
 
     const buttonStyle: SxProps<Theme> = {
-        borderRadius: theme.borderRadius.small,
-        height: 35,
+        // borderRadius: theme.borderRadius.small,
+        height: 40,
         width: {xs: 100, md: "auto"},
         ...sx,
     };

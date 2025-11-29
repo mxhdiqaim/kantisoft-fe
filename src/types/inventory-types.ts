@@ -80,9 +80,9 @@ export const inventoryTransactionSchema = extendBaseSchema({
 });
 
 export const inventoryTransactionsSchema = yup.object({
-    // id: yup.string().uuid().required(),
-    // storeId: yup.string().uuid().required(),
-    // performedBy: yup.string().required(),
+    id: yup.string().uuid().required(),
+    storeId: yup.string().uuid().required(),
+    performedBy: yup.string().uuid().required(),
     type: yup.string().oneOf(TRANSACTION_TYPE).default("sale").required(),
     totalChange: yup.number().required(),
     label: yup.string().required(),
