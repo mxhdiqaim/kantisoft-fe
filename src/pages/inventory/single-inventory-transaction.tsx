@@ -69,8 +69,12 @@ const SingleInventoryTransaction = () => {
             headerAlign: "left",
             renderCell: (params) => (
                 <TableStyledBox>
-                    <Typography variant="body2"
-                                color={params.value > 0 ? 'success.main' : 'error.main'}>{params.value}</Typography>
+                    <Typography
+                        variant="body2"
+                        color={params.value > 0 ? 'success.main' : 'error.main'}
+                    >
+                        {params.value}
+                    </Typography>
                 </TableStyledBox>
             ),
         },
@@ -82,9 +86,11 @@ const SingleInventoryTransaction = () => {
             minWidth: 120,
             align: "left",
             headerAlign: "left",
-            renderCell: (params) => <TableStyledBox>
-                <Typography variant="body2">{params.value}</Typography>
-            </TableStyledBox>,
+            renderCell: (params) => (
+                <TableStyledBox>
+                    <Typography variant="body2">{params.value}</Typography>
+                </TableStyledBox>
+            ),
         },
         {
             flex: 1,
@@ -94,9 +100,11 @@ const SingleInventoryTransaction = () => {
             // valueGetter: (params) => params.row.user?.fullName || 'System',
             align: "left",
             headerAlign: "left",
-            renderCell: (params) => <TableStyledBox>
-                <Typography variant="body2">{params.value}</Typography>
-            </TableStyledBox>,
+            renderCell: (params) => (
+                <TableStyledBox>
+                    <Typography variant="body2">{params.value}</Typography>
+                </TableStyledBox>
+            ),
         },
         {
             field: "notes",
@@ -105,9 +113,11 @@ const SingleInventoryTransaction = () => {
             minWidth: 200,
             align: "left",
             headerAlign: "left",
-            renderCell: (params) => <TableStyledBox>
-                <Typography variant="body2">{params.value || 'N/A'}</Typography>
-            </TableStyledBox>,
+            renderCell: (params) => (
+                <TableStyledBox>
+                    <Typography variant="body2">{params.value || 'N/A'}</Typography>
+                </TableStyledBox>
+            )
         },
     ], []);
 

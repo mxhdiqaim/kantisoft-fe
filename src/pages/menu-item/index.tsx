@@ -1,5 +1,5 @@
 import {type MouseEvent, useMemo, useState} from "react";
-import {Box, Grid, MenuItem as MuiMenuItem, Tooltip, Typography, useTheme} from "@mui/material";
+import {Box, Grid, Tooltip, Typography, useTheme} from "@mui/material";
 import {useDeleteMenuItemMutation, useGetMenuItemsQuery} from "@/store/slice";
 import useNotifier from "@/hooks/useNotifier";
 import MenuItemFormModal from "@/components/order-tracking/menu-item-form-modal";
@@ -21,6 +21,7 @@ import {useSearch} from "@/use-search.ts";
 import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils.ts";
 import CustomButton from "@/components/ui/button.tsx";
 import {UserRoleEnum} from "@/types/user-types.ts";
+import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
 
 const MenuItems = () => {
     const theme = useTheme();
@@ -242,18 +243,18 @@ const MenuItems = () => {
                                     </Tooltip>
                                 }
                             >
-                                <MuiMenuItem onClick={handleEdit}>
+                                <TableStyledMenuItem onClick={handleEdit}>
                                     <EditOutlined sx={{mr: 1}}/>
                                     Edit
-                                </MuiMenuItem>
-                                <MuiMenuItem
+                                </TableStyledMenuItem>
+                                <TableStyledMenuItem
                                     onClick={() => handleDelete(params.row.id)}
                                     sx={{color: "error.main"}}
                                     disabled={isDeleting && selectedRowId === params.row.id}
                                 >
                                     <DeleteOutline sx={{mr: 1}}/>
                                     Delete
-                                </MuiMenuItem>
+                                </TableStyledMenuItem>
                             </CustomButton>
                         )
                     );

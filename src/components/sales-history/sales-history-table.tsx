@@ -6,7 +6,7 @@ import {UserRoleEnum} from "@/types/user-types";
 import {ngnFormatter} from "@/utils";
 import {relativeTime} from "@/utils/get-relative-time";
 import {EditOutlined, MoreVert, PrintOutlined, VisibilityOutlined,} from "@mui/icons-material";
-import {Box, Grid, IconButton, Menu, MenuItem, Tooltip, Typography, useTheme} from "@mui/material";
+import {Box, Grid, Tooltip, Typography, useTheme} from "@mui/material";
 import {type GridColDef} from "@mui/x-data-grid";
 import {type MouseEvent, useEffect, useMemo, useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
@@ -20,6 +20,8 @@ import DataGridTable from "@/components/ui/data-grid-table";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 import {useSearch} from "@/use-search.ts";
 import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils";
+import CustomButton from "@/components/ui/button.tsx";
+import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
 
 export interface Props {
     orders: OrderType[];
@@ -129,6 +131,8 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 field: "reference",
                 headerName: "Order Reference",
                 width: 200,
+                align: "left",
+                headerAlign: "left",
                 cellClassName: "capitalize-cell",
                 renderCell: (params) => (
                     <TableStyledBox>
@@ -141,6 +145,8 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 field: "seller",
                 headerName: "Seller Name",
                 width: 200,
+                align: "left",
+                headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2">
@@ -153,8 +159,8 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 flex: 1,
                 field: "orderDate",
                 headerName: "Time",
-                align: "center",
-                headerAlign: "center",
+                align: "left",
+                headerAlign: "left",
                 width: 150,
                 renderCell: (params) => (
                     <TableStyledBox>
@@ -168,8 +174,8 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 headerName: "Total Amount",
                 type: "number",
                 width: 180,
-                align: "center",
-                headerAlign: "center",
+                align: "left",
+                headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2" fontWeight="medium">
@@ -183,8 +189,8 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 field: "paymentMethod",
                 headerName: "Payment Method",
                 width: 180,
-                align: "center",
-                headerAlign: "center",
+                align: "left",
+                headerAlign: "left",
                 // cellClassName: "capitalize-cell",
                 renderCell: (params) => (
                     <TableStyledBox>
@@ -199,8 +205,8 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 field: "orderStatus",
                 headerName: "Status",
                 width: 150,
-                align: "center",
-                headerAlign: "center",
+                align: "left",
+                headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography
@@ -236,7 +242,6 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => {
-                    const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
 
                     const handleView = () => {
                         navigate(`/sales-history/${params.row.id}/view`);
@@ -262,29 +267,34 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                     const canEdit = !isGuest && isPending;
 
                     return (
-                        <>
-                            <Tooltip title="More Actions">
-                                <IconButton onClick={(e) => handleMenuClick(e, params.row.id)}>
+                        <CustomButton
+                            variant={"text"}
+                            sx={{
+                                borderRadius: "10px",
+                                color: theme.palette.text.primary,
+                            }}
+                            onClick={(e) => handleMenuClick(e, params.row.id)}
+                            startIcon={
+                                <Tooltip title="More Actions" placement={"top"}>
                                     <MoreVert/>
-                                </IconButton>
-                            </Tooltip>
-                            <Menu anchorEl={anchorEl} open={isOpen} onClose={handleMenuClose}>
-                                <MenuItem onClick={handleView}>
-                                    <VisibilityOutlined sx={{mr: 1}}/>
-                                    View
-                                </MenuItem>
-                                {canEdit && (
-                                    <MenuItem onClick={handleEdit}>
-                                        <EditOutlined sx={{mr: 1}}/>
-                                        Edit
-                                    </MenuItem>
-                                )}
-                                <MenuItem onClick={handlePrintReceipt}>
-                                    <PrintOutlined sx={{mr: 1}}/>
-                                    Print
-                                </MenuItem>
-                            </Menu>
-                        </>
+                                </Tooltip>
+                            }
+                        >
+                            <TableStyledMenuItem onClick={handleView}>
+                                <VisibilityOutlined sx={{mr: 1}}/>
+                                View
+                            </TableStyledMenuItem>
+                            {canEdit && (
+                                <TableStyledMenuItem onClick={handleEdit}>
+                                    <EditOutlined sx={{mr: 1}}/>
+                                    Edit
+                                </TableStyledMenuItem>
+                            )}
+                            <TableStyledMenuItem onClick={handlePrintReceipt}>
+                                <PrintOutlined sx={{mr: 1}}/>
+                                Print
+                            </TableStyledMenuItem>
+                        </CustomButton>
                     );
                 },
             },

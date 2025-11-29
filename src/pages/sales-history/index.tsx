@@ -11,8 +11,12 @@ import {Box, Grid, Typography} from "@mui/material";
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import OverviewHeader from "@/components/ui/custom-header.tsx";
+import {UserRoleEnum, UserStatusEnum} from "@/types/user-types.ts";
+import {useSelector} from "react-redux";
+import {selectCurrentUser} from "@/store/slice/auth-slice.ts";
 
 const SalesHistory = () => {
+    const currentUser = useSelector(selectCurrentUser);
     const {control, watch} = useForm<{ timePeriod: TimePeriod }>({
         mode: "onChange",
         resolver: yupResolver(filterSchema),
@@ -26,6 +30,10 @@ const SalesHistory = () => {
     const {data: ordersData, isLoading, isError, fulfilledTimeStamp} = useGetOrdersByPeriodQuery(period);
 
     const [lastFetched, setLastFetched] = useState<Date | null>(null);
+
+    const adminOrManager = currentUser?.status === UserStatusEnum.ACTIVE &&
+        (currentUser?.role === UserRoleEnum.ADMIN || currentUser?.role === UserRoleEnum.MANAGER);
+
 
     useEffect(() => {
         if (fulfilledTimeStamp) {
@@ -62,45 +70,48 @@ const SalesHistory = () => {
                 </Typography>
             </Box>
 
-            <Grid container spacing={3} mb={3}>
-                <Grid size={{xs: 12, sm: 6, md: 3}}>
-                    <SalesHistoryOverviewCard
-                        title="Total Sales Balance"
-                        color="success"
-                        icon={<MonetizationOn/>}
-                        value={ngnFormatter.format(Number(ordersData?.totalRevenue ?? 0))}
-                        isLoading={isLoading}
-                    />
+            {adminOrManager && (
+                <Grid container spacing={3} mb={3}>
+                    <Grid size={{xs: 12, sm: 6, md: 3}}>
+                        <SalesHistoryOverviewCard
+                            title="Total Sales Balance"
+                            color="success"
+                            icon={<MonetizationOn/>}
+                            value={ngnFormatter.format(Number(ordersData?.totalRevenue ?? 0))}
+                            isLoading={isLoading}
+                        />
+                    </Grid>
+                    <Grid size={{xs: 12, sm: 6, md: 3}}>
+                        <SalesHistoryOverviewCard
+                            title="Most Ordered Item"
+                            color="warning"
+                            icon={<DinnerDiningOutlined/>}
+                            value={ordersData?.mostOrderedItem?.name || "N/A"}
+                            subValue={ordersData?.mostOrderedItem ? `(${ordersData.mostOrderedItem.quantity} sold)` : ""}
+                            isLoading={isLoading}
+                        />
+                    </Grid>
+                    <Grid size={{xs: 12, sm: 6, md: 3}}>
+                        <SalesHistoryOverviewCard
+                            title="Top Seller"
+                            color="secondary"
+                            icon={<Person2Outlined/>}
+                            value={ordersData?.topSeller?.name || "N/A"}
+                            isLoading={isLoading}
+                        />
+                    </Grid>
+                    <Grid size={{xs: 12, sm: 6, md: 3}}>
+                        <SalesHistoryOverviewCard
+                            title="Total Orders"
+                            color="info"
+                            icon={<DomainVerificationOutlined/>}
+                            value={ordersData?.totalOrders ?? 0}
+                            isLoading={isLoading}
+                        />
+                    </Grid>
                 </Grid>
-                <Grid size={{xs: 12, sm: 6, md: 3}}>
-                    <SalesHistoryOverviewCard
-                        title="Most Ordered Item"
-                        color="warning"
-                        icon={<DinnerDiningOutlined/>}
-                        value={ordersData?.mostOrderedItem?.name || "N/A"}
-                        subValue={ordersData?.mostOrderedItem ? `(${ordersData.mostOrderedItem.quantity} sold)` : ""}
-                        isLoading={isLoading}
-                    />
-                </Grid>
-                <Grid size={{xs: 12, sm: 6, md: 3}}>
-                    <SalesHistoryOverviewCard
-                        title="Top Seller"
-                        color="secondary"
-                        icon={<Person2Outlined/>}
-                        value={ordersData?.topSeller?.name || "N/A"}
-                        isLoading={isLoading}
-                    />
-                </Grid>
-                <Grid size={{xs: 12, sm: 6, md: 3}}>
-                    <SalesHistoryOverviewCard
-                        title="Total Orders"
-                        color="info"
-                        icon={<DomainVerificationOutlined/>}
-                        value={ordersData?.totalOrders ?? 0}
-                        isLoading={isLoading}
-                    />
-                </Grid>
-            </Grid>
+            )}
+
             <SalesHistoryTable orders={ordersData?.orders ?? []} loading={isLoading} period={period}/>
         </Box>
     );

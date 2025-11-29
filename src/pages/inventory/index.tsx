@@ -1,6 +1,6 @@
 import {useDeleteInventoryRecordMutation, useGetAllInventoryQuery, useMarkAsDiscontinuedMutation} from "@/store/slice";
 import type {InventoryType} from "@/types/inventory-types.ts";
-import {Box, Chip, Grid, MenuItem, Skeleton, Tooltip, Typography, useTheme} from "@mui/material";
+import {Box, Chip, Grid, Skeleton, Tooltip, Typography, useTheme} from "@mui/material";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
 import {type MouseEvent, useMemo, useState} from "react";
 import AddIcon from "@mui/icons-material/Add";
@@ -21,19 +21,20 @@ import TableSearchActions from "@/components/ui/data-grid-table/table-search-act
 import {UserRoleEnum, UserStatusEnum} from "@/types/user-types.ts";
 import {relativeTime} from "@/utils/get-relative-time.ts";
 import {getInventoryStatusChipColor} from "@/components/ui";
+import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
 
 const InventoryManagement = () => {
     const {t} = useTranslation();
     const theme = useTheme();
-    const user = useSelector(selectCurrentUser);
+    const currentUser = useSelector(selectCurrentUser);
     const notify = useNotifier();
     const navigate = useNavigate();
     const {data: inventoryData, isLoading, isError, error} = useGetAllInventoryQuery();
     const [markAsDiscontinued, {isLoading: isDiscontinuing}] = useMarkAsDiscontinuedMutation();
     const [deleteInventoryRecord, {isLoading: isDeleting}] = useDeleteInventoryRecordMutation();
 
-    const canInteract = user?.status === UserStatusEnum.ACTIVE &&
-        (user?.role === UserRoleEnum.ADMIN || user?.role === UserRoleEnum.MANAGER);
+    const canInteract = currentUser?.status === UserStatusEnum.ACTIVE &&
+        (currentUser?.role === UserRoleEnum.ADMIN || currentUser?.role === UserRoleEnum.MANAGER);
 
     const memoizedInventories = useMemo(() => inventoryData || [], [inventoryData]);
 
@@ -211,41 +212,43 @@ const InventoryManagement = () => {
                             </Tooltip>
                         }
                     >
-                        <MenuItem onClick={handleOpenAdjustStockModal}
-                                  sx={{borderRadius: theme.borderRadius.small, mx: 1}}>
+                        <TableStyledMenuItem
+                            onClick={handleOpenAdjustStockModal}
+                            sx={{borderRadius: theme.borderRadius.small, mx: 1}}
+                        >
                             Adjust Stock
-                        </MenuItem>
-                        <MenuItem onClick={handleMenuClose} disabled={true}
-                                  sx={{borderRadius: theme.borderRadius.small, mx: 1}}>
+                        </TableStyledMenuItem>
+                        <TableStyledMenuItem
+                            onClick={handleMenuClose}
+                            disabled={true}
+                            sx={{borderRadius: theme.borderRadius.small, mx: 1}}
+                        >
                             Edit
-                        </MenuItem>
-                        <MenuItem onClick={handleDiscontinue}
-                                  disabled={isDiscontinuing || params.row.status === "discontinued"}
-                                  sx={{
-                                      color: theme.palette.warning.main,
-                                      borderRadius: theme.borderRadius.small,
-                                      mx: 1
-                                  }}>
+                        </TableStyledMenuItem>
+                        <TableStyledMenuItem
+                            onClick={handleDiscontinue}
+                            disabled={isDiscontinuing || params.row.status === "discontinued"}
+                            sx={{
+                                color: theme.palette.warning.main,
+                                borderRadius: theme.borderRadius.small,
+                                mx: 1
+                            }}
+                        >
                             Discontinue
-                        </MenuItem>
-                        <MenuItem onClick={handleDelete} disabled={isDeleting}
-                                  sx={{
-                                      mt: 1,
-                                      mx: 1,
-                                      border: `1px solid ${theme.palette.error.main}`,
-                                      // background: theme.palette.error.main,
-                                      borderRadius: theme.borderRadius.small,
-                                      color: theme.palette.error.main,
-
-                                      // // Hover Styles
-                                      // ":hover": {
-                                      //     background: theme.palette.error.main,
-                                      //     // color: 'white',
-                                      // }
-                                  }}>
+                        </TableStyledMenuItem>
+                        <TableStyledMenuItem
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                            sx={{
+                                mt: 1,
+                                mx: 1,
+                                border: `1px solid ${theme.palette.error.main}`,
+                                borderRadius: theme.borderRadius.small,
+                                color: theme.palette.error.main,
+                            }}
+                        >
                             Delete
-                        </MenuItem>
-
+                        </TableStyledMenuItem>
                     </CustomButton>
                 )
             ),
@@ -278,12 +281,14 @@ const InventoryManagement = () => {
                 <Typography variant="h4" component="h1">
                     Inventory Management
                 </Typography>
-                <CustomButton
-                    title={"Add Record"}
-                    variant="contained"
-                    startIcon={<AddIcon/>}
-                    onClick={handleOpenFormModal}
-                />
+                {canInteract && (
+                    <CustomButton
+                        title={"Add Record"}
+                        variant="contained"
+                        startIcon={<AddIcon/>}
+                        onClick={handleOpenFormModal}
+                    />
+                )}
             </Box>
             <TableSearchActions
                 searchControl={searchControl}
