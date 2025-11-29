@@ -18,8 +18,8 @@ interface Props {
     onStatusChange?: (newStatus: string) => void;
     showFilterButton?: boolean;
     showColumnsButton?: boolean;
-    onExportCsv: () => void;
-    onExportXlsx: () => void;
+    onExportCsv?: () => void;
+    onExportXlsx?: () => void;
     sx?: SxProps<Theme>;
 }
 

@@ -12,6 +12,8 @@ import StoreDeleteConfirmation from "@/components/stores/store-delete-confirmati
 import useNotifier from "@/hooks/useNotifier.ts";
 import {getApiError} from "@/helpers/get-api-error.ts";
 import DataGridTable from "@/components/ui/data-grid-table";
+import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
+import {useSearch} from "@/use-search.ts";
 
 const StoresPage = () => {
     const theme = useTheme();
@@ -21,6 +23,13 @@ const StoresPage = () => {
 
     const {data: storesData, isLoading, isError} = useGetAllStoresQuery();
     const [deleteStore, {isLoading: isDeleting}] = useDeleteStoreMutation();
+
+    const memoizedStores = useMemo(() => storesData || [], [storesData]);
+
+    const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
+        initialData: memoizedStores,
+        searchKeys: ["name", "storeType", "location"],
+    });
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -223,9 +232,16 @@ const StoresPage = () => {
                     New {t("store")}
                 </Button>
             </Box>
+            <TableSearchActions
+                searchControl={searchControl}
+                searchSubmit={searchSubmit}
+                handleSearch={handleSearch}
+                // onExportCsv={handleExportCsv}
+                // onExportXlsx={handleExportXlsx}
+            />
             <Grid container spacing={2}>
                 <Grid size={12}>
-                    <DataGridTable data={storesData} loading={isLoading} columns={columns}/>
+                    <DataGridTable data={filteredData} loading={isLoading} columns={columns}/>
                 </Grid>
             </Grid>
 
