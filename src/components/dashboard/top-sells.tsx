@@ -47,7 +47,7 @@ const TopSells = ({timePeriod}: Props) => {
                             <ListItem key={item.itemId} disableGutters divider={index < topSells?.length - 1}>
                                 <ListItemText
                                     primary={
-                                        <Typography variant="subtitle1" component="p" noWrap>
+                                        <Typography variant="subtitle1" noWrap>
                                             {item.itemName}
                                         </Typography>
                                     }

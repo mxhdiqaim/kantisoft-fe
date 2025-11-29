@@ -1,5 +1,5 @@
 import {useGetActivitiesQuery} from "@/store/slice";
-import {Box, Chip, Typography} from "@mui/material";
+import {Box, Chip, Grid, Typography} from "@mui/material";
 import {useAppSelector} from "@/store";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {UserRoleEnum} from "@/types/user-types";
@@ -173,13 +173,16 @@ const ActivityLogPage = () => {
             <Typography variant="h4" gutterBottom>
                 Activity Log
             </Typography>
-            <Box sx={{width: "100%", overflowX: "auto"}}>
-                <DataGridTable
-                    data={rows}
-                    columns={columns}
-                    loading={isLoading}
-                />
-            </Box>
+            <Grid container spacing={2}>
+                <Grid size={12}>
+                    <DataGridTable
+                        data={rows}
+                        columns={columns}
+                        loading={isLoading}
+                    />
+
+                </Grid>
+            </Grid>
         </Box>
     );
 };

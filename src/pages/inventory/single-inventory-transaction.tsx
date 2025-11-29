@@ -1,15 +1,18 @@
 import {useMemo} from "react";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {Box, Chip, Grid, Skeleton, Typography} from "@mui/material";
 import {useGetAllInventoryQuery, useGetTransactionsByMenuItemQuery} from "@/store/slice";
 import DataGridTable from "@/components/ui/data-grid-table";
 import type {GridColDef} from "@mui/x-data-grid";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
-import {getTransactionChipColor} from "@/styles";
 import {relativeTime} from "@/utils/get-relative-time.ts";
+import CustomButton from "@/components/ui/button.tsx";
+import {ArrowBackIosNewOutlined} from "@mui/icons-material";
+import {getTransactionChipColor} from "@/components/ui";
 
-const InventoryTransaction = () => {
+const SingleInventoryTransaction = () => {
     const {id: menuItemId} = useParams<{ id: string }>();
+    const navigate = useNavigate();
 
     const {
         data: transactions,
@@ -127,13 +130,24 @@ const InventoryTransaction = () => {
     }
 
     return (
-        <Box>
-            <Typography variant="h4" component="h1">
-                Transaction History
-            </Typography>
-            <Typography variant="subtitle1" color="text.secondary" sx={{mb: 3}}>
-                {inventoryItem?.menuItem.name} (SKU: {inventoryItem?.menuItem.itemCode})
-            </Typography>
+        <>
+            <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                <CustomButton
+                    title={"Go Back"}
+                    variant="outlined"
+                    size="small"
+                    onClick={() => navigate(-1)}
+                    startIcon={<ArrowBackIosNewOutlined fontSize="small" sx={{height: 16, mr: 0.5}}/>}
+                />
+                <Box sx={{textAlign: "right"}}>
+                    <Typography variant="h4" component="h1">
+                        Transaction History
+                    </Typography>
+                    <Typography variant="subtitle1" color="text.secondary" sx={{mb: 3}}>
+                        {inventoryItem?.menuItem.name} (SKU: {inventoryItem?.menuItem.itemCode})
+                    </Typography>
+                </Box>
+            </Box>
 
             <Grid container spacing={2}>
                 <Grid size={12}>
@@ -144,8 +158,8 @@ const InventoryTransaction = () => {
                     />
                 </Grid>
             </Grid>
-        </Box>
+        </>
     );
 };
 
-export default InventoryTransaction;
+export default SingleInventoryTransaction;

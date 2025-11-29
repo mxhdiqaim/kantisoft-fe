@@ -4,13 +4,13 @@ import type {GridColDef} from "@mui/x-data-grid";
 import {useEffect, useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import DataGridTable from "@/components/ui/data-grid-table";
-import {getTransactionChipColor} from "@/styles";
 import OverviewHeader from "@/components/ui/custom-header.tsx";
 import {getTitle} from "@/utils";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {filterSchema, type TimePeriod} from "@/types";
 import {relativeTime} from "@/utils/get-relative-time.ts";
+import {getTransactionChipColor, getTransactionTypeChipColor} from "@/components/ui";
 
 const InventoryTransactions = () => {
 
@@ -39,7 +39,12 @@ const InventoryTransactions = () => {
             headerAlign: "left",
             renderCell: (params) => (
                 <TableStyledBox>
-                    <Typography variant="body2">{params.value}</Typography>
+                    <Chip
+                        label={params.value}
+                        color={getTransactionTypeChipColor(params.value)}
+                        size="small"
+                        sx={{textTransform: "capitalize"}}
+                    />
                 </TableStyledBox>
             ),
         },
@@ -52,7 +57,6 @@ const InventoryTransactions = () => {
             headerAlign: "left",
             renderCell: (params) => (
                 <TableStyledBox>
-                    {/*<Typography variant="body2">{params.value}</Typography>*/}
                     <Chip
                         label={params.value}
                         color={getTransactionChipColor(params.value)}
@@ -77,7 +81,7 @@ const InventoryTransactions = () => {
             ),
         }
     ], []);
-    
+
     useEffect(() => {
         if (fulfilledTimeStamp) {
             setLastFetched(new Date(fulfilledTimeStamp));

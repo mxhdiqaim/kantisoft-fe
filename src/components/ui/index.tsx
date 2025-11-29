@@ -1,5 +1,5 @@
 import {OrderStatus} from "@/types/order-types.ts";
-import {InventoryStatusEnum} from "@/types/inventory-types.ts";
+import {InventoryStatusEnum, TransactionTypeEnum} from "@/types/inventory-types.ts";
 import type {UserRoleType, UserStatus} from "@/types/user-types.ts";
 
 export const getPaymentStatusChipColor = (status: string) => {
@@ -49,4 +49,28 @@ export const getUserRoleChipColor = (role: UserRoleType) => {
         guest: "default",
     };
     return colors[role] || "default";
+};
+
+export const getTransactionTypeChipColor = (type: typeof TransactionTypeEnum[keyof typeof TransactionTypeEnum]) => {
+    const colors: Record<typeof TransactionTypeEnum[keyof typeof TransactionTypeEnum], "success" | "warning" | "error" | "info" | "default"> = {
+        sale: "success",
+        return: "warning",
+        waste: "error",
+        adjustmentIn: "info",
+        adjustmentOut: "info",
+        purchaseReceive: "default",
+    };
+    return colors[type] || "default";
+};
+
+export const getTransactionChipColor = (status: string) => {
+    switch (status) {
+        case TransactionTypeEnum.ADJUSTMENT_IN:
+            return "success";
+        case TransactionTypeEnum.ADJUSTMENT_OUT:
+            return "error";
+        case TransactionTypeEnum.PURCHASE_RECEIVE:
+        default:
+            return "default";
+    }
 };

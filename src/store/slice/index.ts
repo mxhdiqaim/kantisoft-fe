@@ -129,7 +129,7 @@ export const apiSlice = createApi({
         "ActivityLog",
         "Inventory",
         "InventoryReport",
-        "InventoryTransaction",
+        "SingleInventoryTransaction",
         "InventoryTransactions",
     ],
     endpoints: (builder) => ({
@@ -433,11 +433,11 @@ export const apiSlice = createApi({
             providesTags: (result) =>
                 result
                     ? [...result.map(({id}) => ({
-                        type: "InventoryTransaction" as const,
+                        type: "SingleInventoryTransaction" as const,
                         id
-                    })), {type: "InventoryTransaction", id: "LIST"}]
-                    : [{type: "InventoryTransaction", id: "LIST"}],
-            // providesTags: (_result, _error, {menuItemId}) => [{type: "InventoryTransaction", id: menuItemId}],
+                    })), {type: "SingleInventoryTransaction", id: "LIST"}]
+                    : [{type: "SingleInventoryTransaction", id: "LIST"}],
+            // providesTags: (_result, _error, {menuItemId}) => [{type: "SingleInventoryTransaction", id: menuItemId}],
         }),
 
         getInventoryTransactions: builder.query<InventoryTransactionResponseType, {

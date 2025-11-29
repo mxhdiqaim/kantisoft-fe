@@ -8,7 +8,6 @@ import {
     ForgetPasswordScreen,
     HomeScreen,
     InventoryManagementScreen,
-    InventoryTransactionScreen,
     InventoryTransactionsScreen,
     LoginScreen,
     MenuItemScreen,
@@ -17,6 +16,7 @@ import {
     ProfileScreen,
     RegisterScreen,
     SalesHistoryScreen,
+    SingleInventoryTransactionScreen,
     StoreFormScreen,
     StoreScreen,
     UsersScreen,
@@ -150,13 +150,13 @@ export const appRoutes: AppRouteType[] = [
             {
                 to: ":id/transactions",
                 title: "menuItemTransactions",
-                element: InventoryTransactionScreen,
+                element: SingleInventoryTransactionScreen,
                 hidden: true,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
             },
             {
                 to: "transactions",
-                title: "Transactions",
+                title: "Inventory Transactions",
                 element: InventoryTransactionsScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
             }
