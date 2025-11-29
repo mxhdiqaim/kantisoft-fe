@@ -1,7 +1,7 @@
 import StoresPageLoading from "@/components/stores/loading";
 import {useDeleteStoreMutation, useGetAllStoresQuery} from "@/store/slice";
 import {AddOutlined, DeleteOutline, EditOutlined, MoreVert, VisibilityOutlined} from "@mui/icons-material";
-import {Box, Chip, Grid, IconButton, Menu, MenuItem, Tooltip, Typography, useTheme} from "@mui/material";
+import {Box, Chip, Grid, Tooltip, Typography, useTheme} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
@@ -15,6 +15,7 @@ import DataGridTable from "@/components/ui/data-grid-table";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 import {useSearch} from "@/use-search.ts";
 import CustomButton from "@/components/ui/button.tsx";
+import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
 
 const StoresPage = () => {
     const theme = useTheme();
@@ -167,8 +168,6 @@ const StoresPage = () => {
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => {
-                    const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
-
                     const isMainStore = params.row.branchType === "main";
                     const hasBranches = storesData?.length > 1;
                     const isDeleteDisabled = isMainStore && hasBranches;
@@ -187,27 +186,32 @@ const StoresPage = () => {
                         handleMenuClose();
                     };
                     return (
-                        <>
-                            <Tooltip title="More Actions">
-                                <IconButton onClick={(e) => handleMenuClick(e, params.row.id)}>
+                        <CustomButton
+                            variant={"text"}
+                            sx={{
+                                borderRadius: "10px",
+                                color: theme.palette.text.primary,
+                            }}
+                            onClick={(e) => handleMenuClick(e, params.row.id)}
+                            startIcon={
+                                <Tooltip title="More Actions" placement={"top"}>
                                     <MoreVert/>
-                                </IconButton>
-                            </Tooltip>
-                            <Menu anchorEl={anchorEl} open={isOpen} onClose={handleMenuClose}>
-                                <MenuItem onClick={handleView}>
-                                    <VisibilityOutlined sx={{mr: 1}}/>
-                                    View
-                                </MenuItem>
-                                <MenuItem onClick={handleEdit}>
-                                    <EditOutlined sx={{mr: 1}}/>
-                                    Edit
-                                </MenuItem>
-                                <MenuItem onClick={handleDelete} disabled={isDeleteDisabled}>
-                                    <DeleteOutline sx={{mr: 1}}/>
-                                    Delete
-                                </MenuItem>
-                            </Menu>
-                        </>
+                                </Tooltip>
+                            }
+                        >
+                            <TableStyledMenuItem onClick={handleView}>
+                                <VisibilityOutlined sx={{mr: 1}}/>
+                                View
+                            </TableStyledMenuItem>
+                            <TableStyledMenuItem onClick={handleEdit}>
+                                <EditOutlined sx={{mr: 1}}/>
+                                Edit
+                            </TableStyledMenuItem>
+                            <TableStyledMenuItem onClick={handleDelete} disabled={isDeleteDisabled}>
+                                <DeleteOutline sx={{mr: 1}}/>
+                                Delete
+                            </TableStyledMenuItem>
+                        </CustomButton>
                     );
                 },
             },

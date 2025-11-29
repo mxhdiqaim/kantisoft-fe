@@ -9,7 +9,7 @@ import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {roleHierarchy, UserRoleEnum, UserStatusEnum, type UserType} from "@/types/user-types.ts";
 
 import {AddOutlined, EditOutlined, MoreVert, StorefrontOutlined, VisibilityOutlined} from "@mui/icons-material";
-import {Avatar, Box, Chip, Grid, IconButton, Menu, MenuItem, Tooltip, Typography,} from "@mui/material";
+import {Avatar, Box, Chip, Grid, Tooltip, Typography, useTheme,} from "@mui/material";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
 import {type MouseEvent, useMemo, useState} from "react";
 import {useNavigate} from "react-router-dom";
@@ -21,10 +21,12 @@ import TableSearchActions from "@/components/ui/data-grid-table/table-search-act
 import {useSearch} from "@/use-search.ts";
 import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils";
 import CustomButton from "@/components/ui/button.tsx";
+import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
 
 const UsersPage = () => {
     const notify = useNotifier();
     const navigate = useNavigate();
+    const theme = useTheme();
     const currentUser = useAppSelector(selectCurrentUser);
     const {data: usersData, isLoading, isError, error} = useGetAllUsersQuery();
     const {data: storesData} = useGetAllStoresQuery();
@@ -139,7 +141,7 @@ const UsersPage = () => {
                         <TableStyledBox>
                             <Avatar
                                 sx={{
-                                    bgcolor: "primary.light",
+                                    backgroundColor: "primary.light",
                                     color: "primary.dark",
                                     width: 36,
                                     height: 36,
@@ -228,8 +230,6 @@ const UsersPage = () => {
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => {
-                    const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
-
                     const handleView = () => {
                         navigate(`/users/${params.row.id}/view`);
                         handleMenuClose();
@@ -268,30 +268,37 @@ const UsersPage = () => {
 
 
                     return (
-                        <>
-                            <Tooltip title="More Actions">
-                                <IconButton onClick={(e) => handleMenuClick(e, params.row.id)}>
+                        <CustomButton
+                            variant={"text"}
+                            sx={{
+                                borderRadius: "10px",
+                                color: theme.palette.text.primary,
+                            }}
+                            onClick={(e) => handleMenuClick(e, params.row.id)}
+                            startIcon={
+                                <Tooltip title="More Actions" placement={"top"}>
                                     <MoreVert/>
-                                </IconButton>
-                            </Tooltip>
-                            <Menu anchorEl={anchorEl} open={isOpen} onClose={handleMenuClose}>
-                                <MenuItem onClick={handleView} disabled={isEditDisabled}>
-                                    <VisibilityOutlined sx={{mr: 1}}/>
-                                    View
-                                </MenuItem>
-                                <MenuItem onClick={handleEdit} disabled={isEditDisabled}>
-                                    <EditOutlined sx={{mr: 1}}/>
-                                    Edit
-                                </MenuItem>
-                                {currentUser?.role === UserRoleEnum.MANAGER && (
-                                    <MenuItem onClick={() => handleOpenChangeStoreDialog(params.row)}
-                                              disabled={!canChangeStore}>
-                                        <StorefrontOutlined sx={{mr: 1}}/>
-                                        Change Store
-                                    </MenuItem>
-                                )}
-                            </Menu>
-                        </>
+                                </Tooltip>
+                            }
+                        >
+                            <TableStyledMenuItem onClick={handleView} disabled={isEditDisabled}>
+                                <VisibilityOutlined sx={{mr: 1}}/>
+                                View
+                            </TableStyledMenuItem>
+                            <TableStyledMenuItem onClick={handleEdit} disabled={isEditDisabled}>
+                                <EditOutlined sx={{mr: 1}}/>
+                                Edit
+                            </TableStyledMenuItem>
+                            {currentUser?.role === UserRoleEnum.MANAGER && (
+                                <TableStyledMenuItem
+                                    onClick={() => handleOpenChangeStoreDialog(params.row)}
+                                    disabled={!canChangeStore}
+                                >
+                                    <StorefrontOutlined sx={{mr: 1}}/>
+                                    Change Store
+                                </TableStyledMenuItem>
+                            )}
+                        </CustomButton>
                     );
                 },
             },

@@ -1,5 +1,5 @@
 import {type MouseEvent, useMemo, useState} from "react";
-import {Box, Grid, IconButton, Menu, MenuItem as MuiMenuItem, Tooltip, Typography, useTheme} from "@mui/material";
+import {Box, Grid, MenuItem as MuiMenuItem, Tooltip, Typography, useTheme} from "@mui/material";
 import {useDeleteMenuItemMutation, useGetMenuItemsQuery} from "@/store/slice";
 import useNotifier from "@/hooks/useNotifier";
 import MenuItemFormModal from "@/components/order-tracking/menu-item-form-modal";
@@ -20,6 +20,7 @@ import TableSearchActions from "@/components/ui/data-grid-table/table-search-act
 import {useSearch} from "@/use-search.ts";
 import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils.ts";
 import CustomButton from "@/components/ui/button.tsx";
+import {UserRoleEnum} from "@/types/user-types.ts";
 
 const MenuItems = () => {
     const theme = useTheme();
@@ -42,8 +43,6 @@ const MenuItems = () => {
     const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItemType | null>(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
-    // const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
-    // const isExportMenuOpen = Boolean(exportAnchorEl);
 
     const totalMenuItems = useMemo(() => menuItems?.length || 0, [menuItems]);
 
@@ -212,46 +211,51 @@ const MenuItems = () => {
                 align: "center",
                 headerAlign: "center",
                 renderCell: (params) => {
-                    const isOpen = Boolean(anchorEl) && selectedRowId === params.row.id;
 
                     const handleEdit = () => {
                         handleOpenFormModal(params.row);
                         handleMenuClose();
                     };
 
-                    if (!currentUser || currentUser.role === "guest") {
+                    if (!currentUser || currentUser.role === UserRoleEnum.GUEST) {
                         return null; // No actions for guests or logged-out users
                     }
 
-                    const canEdit = ["manager", "admin", "user"].includes(currentUser.role);
-                    const canDelete = ["manager", "admin"].includes(currentUser.role);
+                    const canInteract = [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN].includes(currentUser.role);
 
                     return (
-                        <>
-                            <Tooltip title="More Actions">
-                                <IconButton onClick={(e) => handleMenuClick(e, params.row.id)}>
-                                    <MoreVert/>
-                                </IconButton>
-                            </Tooltip>
-                            <Menu anchorEl={anchorEl} open={isOpen} onClose={handleMenuClose}>
-                                {canEdit && (
-                                    <MuiMenuItem onClick={handleEdit}>
-                                        <EditOutlined sx={{mr: 1}}/>
-                                        Edit
-                                    </MuiMenuItem>
-                                )}
-                                {canDelete && (
-                                    <MuiMenuItem
-                                        onClick={() => handleDelete(params.row.id)}
-                                        sx={{color: "error.main"}}
-                                        disabled={isDeleting && selectedRowId === params.row.id}
-                                    >
-                                        <DeleteOutline sx={{mr: 1}}/>
-                                        Delete
-                                    </MuiMenuItem>
-                                )}
-                            </Menu>
-                        </>
+                        canInteract && (
+                            <CustomButton
+                                variant={"text"}
+                                // anchorEl={anchorEl}
+                                // open={isOpen}
+                                // onClose={handleMenuClose}
+                                sx={{
+                                    borderRadius: "10px",
+                                    color: theme.palette.text.primary,
+                                }}
+
+                                onClick={(e) => handleMenuClick(e, params.row)}
+                                startIcon={
+                                    <Tooltip title="More Actions" placement={"top"}>
+                                        <MoreVert/>
+                                    </Tooltip>
+                                }
+                            >
+                                <MuiMenuItem onClick={handleEdit}>
+                                    <EditOutlined sx={{mr: 1}}/>
+                                    Edit
+                                </MuiMenuItem>
+                                <MuiMenuItem
+                                    onClick={() => handleDelete(params.row.id)}
+                                    sx={{color: "error.main"}}
+                                    disabled={isDeleting && selectedRowId === params.row.id}
+                                >
+                                    <DeleteOutline sx={{mr: 1}}/>
+                                    Delete
+                                </MuiMenuItem>
+                            </CustomButton>
+                        )
                     );
                 },
             },

@@ -55,7 +55,7 @@ export const appRoutes: AppRouteType[] = [
         title: "home",
         element: HomeScreen,
         hidden: true,
-        roles: [UserRoleEnum.GUEST],
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
     },
 
     // ---------------------------------
@@ -107,7 +107,7 @@ export const appRoutes: AppRouteType[] = [
                 title: "viewSalesHistory",
                 element: ViewSalesHistoryScreen,
                 hidden: true,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
             },
         ]
     },
@@ -139,26 +139,26 @@ export const appRoutes: AppRouteType[] = [
                 <InventoryOutlinedIcon/>
             </IconButton>
         ),
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
         children: [
             {
                 to: "management",
                 title: "Inventory Management",
                 element: InventoryManagementScreen,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
             {
                 to: ":id/transactions",
                 title: "menuItemTransactions",
                 element: SingleInventoryTransactionScreen,
                 hidden: true,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
             {
                 to: "transactions",
                 title: "Inventory Transactions",
                 element: InventoryTransactionsScreen,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             }
         ]
     },
@@ -203,7 +203,7 @@ export const appRoutes: AppRouteType[] = [
                 hidden: true,
                 authGuard: true,
                 useLayout: true,
-                roles: [UserRoleEnum.GUEST],
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
             },
             {
                 to: "change-password",
@@ -212,7 +212,7 @@ export const appRoutes: AppRouteType[] = [
                 hidden: true,
                 authGuard: true,
                 useLayout: true,
-                roles: [UserRoleEnum.GUEST],
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
         ]
     },

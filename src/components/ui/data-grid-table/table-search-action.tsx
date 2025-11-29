@@ -5,6 +5,9 @@ import type {Control} from "react-hook-form";
 import CustomCard from "@/components/customs/custom-card.tsx";
 import CustomButton from "@/components/ui/button.tsx";
 import {FileDownloadOutlined} from "@mui/icons-material";
+import {UserRoleEnum} from "@/types/user-types.ts";
+import {useAppSelector} from "@/store";
+import {selectCurrentUser} from "@/store/slice/auth-slice.ts";
 
 interface Props {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,6 +35,8 @@ const TableSearchActions = ({
                                 sx,
                             }: Props) => {
 
+    const currentUser = useAppSelector(selectCurrentUser);
+
     const handleCsvClick = () => {
         onExportCsv();
     };
@@ -39,6 +44,9 @@ const TableSearchActions = ({
     const handleXlsxClick = () => {
         onExportXlsx();
     };
+
+    const showExport = onExportCsv && onExportXlsx;
+    const canExport = [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN].includes(currentUser.role);
 
     return (
         <CustomCard
@@ -53,7 +61,7 @@ const TableSearchActions = ({
             }}
         >
             <Grid container spacing={2} alignItems={"center"}>
-                <Grid size={{xs: 12, md: 9}}>
+                <Grid size={{xs: 12, md: canExport ? 9 : 12}}>
                     <Box sx={{display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap"}}>
                         <Box
                             component="form"
@@ -75,7 +83,7 @@ const TableSearchActions = ({
                         </Box>
                     </Box>
                 </Grid>
-                {onExportCsv && onExportXlsx && (
+                {(showExport && canExport) && (
                     <Grid size={{xs: 12, md: 3}}>
                         <Box sx={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
                             <CustomButton

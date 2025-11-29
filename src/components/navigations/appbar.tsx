@@ -16,15 +16,15 @@ import {
     CircularProgress,
     Divider,
     IconButton,
-    Menu,
     MenuItem,
     Toolbar,
     Tooltip,
     useTheme,
 } from "@mui/material";
-import {type FC, type MouseEvent, useState} from "react";
+import {type FC} from "react";
 import {useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
+import CustomButton from "@/components/ui/button.tsx";
 
 export interface Props {
     toggleDrawer?: (open: boolean) => void;
@@ -39,18 +39,6 @@ const AppbarComponent: FC<Props> = ({toggleDrawer, drawerState}) => {
 
     const currentUser = useSelector(selectCurrentUser);
     const [logout, {isLoading: isLoggingOut}] = useLogoutMutation();
-
-    const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState<null | HTMLElement>(null);
-    const isProfileMenuOpen = Boolean(profileMenuAnchorEl);
-
-    // 4. Handlers for the profile menu
-    const handleProfileMenuClick = (event: MouseEvent<HTMLElement>) => {
-        setProfileMenuAnchorEl(event.currentTarget);
-    };
-
-    const handleProfileMenuClose = () => {
-        setProfileMenuAnchorEl(null);
-    };
 
     const handleLogout = async () => {
         try {
@@ -111,39 +99,26 @@ const AppbarComponent: FC<Props> = ({toggleDrawer, drawerState}) => {
                     >
                         <NotificationsNoneOutlinedIcon/>
                     </IconButton>
-                    <Tooltip title="Account settings">
-                        <IconButton onClick={handleProfileMenuClick} size="small">
-                            <Avatar sx={{width: 36, height: 36, bgcolor: "primary.main"}}>
-                                {currentUser?.firstName?.charAt(0).toUpperCase()}
-                            </Avatar>
-                        </IconButton>
-                    </Tooltip>
-                    <Menu
-                        anchorEl={profileMenuAnchorEl}
-                        open={isProfileMenuOpen}
-                        onClose={handleProfileMenuClose}
-                        PaperProps={{
-                            elevation: 0,
-                            sx: {
-                                overflow: "visible",
-                                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.15))",
-                                mt: 1.5,
-                                "& .MuiAvatar-root": {
-                                    width: 32,
-                                    height: 32,
-                                    ml: -0.5,
-                                    mr: 1,
-                                },
-                            },
+                    <CustomButton
+                        variant={"text"}
+                        sx={{
+                            color: theme.palette.text.primary,
                         }}
-                        transformOrigin={{horizontal: "right", vertical: "top"}}
-                        anchorOrigin={{horizontal: "right", vertical: "bottom"}}
+                        startIcon={
+                            <Tooltip title="Account settings" placement={"top"}>
+                                <Avatar
+                                    sx={{width: 36, height: 36, backgroundColor: "primary.main"}}>
+                                    {currentUser?.firstName?.charAt(0).toUpperCase()}
+                                </Avatar>
+                            </Tooltip>
+                        }
                     >
-                        <MenuItem onClick={() => navigate("/users/profile")}>
+                        <MenuItem onClick={() => navigate("/users/profile")} sx={{mx: 1, borderRadius: 3}}>
                             <PersonOutline sx={{mr: 1}}/> Profile
                         </MenuItem>
                         <Divider/>
-                        <MenuItem onClick={handleLogout} sx={{color: "error.main"}} disabled={isLoggingOut}>
+                        <MenuItem onClick={handleLogout} sx={{color: "error.main", mx: 1, borderRadius: 3}}
+                                  disabled={isLoggingOut}>
                             {isLoggingOut ? (
                                 <CircularProgress size={20} sx={{mr: 1}} color="inherit"/>
                             ) : (
@@ -151,7 +126,7 @@ const AppbarComponent: FC<Props> = ({toggleDrawer, drawerState}) => {
                             )}
                             {isLoggingOut ? "Logging out..." : "Logout"}
                         </MenuItem>
-                    </Menu>
+                    </CustomButton>
                 </Box>
             </Toolbar>
         </AppBar>
