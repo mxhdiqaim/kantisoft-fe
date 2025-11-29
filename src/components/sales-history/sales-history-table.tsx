@@ -122,50 +122,6 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
         exportToXlsx(dataToExport, filename, "Sales History", columns); // Uses generic utility
     };
 
-    // // Export to CSV function
-    // const handleExportCsv = () => {
-    //     // Use the generic utility function with specific formatters
-    //     const dataToExport = getExportFormattedData(filteredData, columns, salesHistoryFieldFormatters);
-    //
-    //     if (dataToExport.length === 0) {
-    //         notify("No data to export.", "error");
-    //         return;
-    //     }
-    //
-    //     const header = Object.keys(dataToExport[0]);
-    //     const csvContent = [
-    //         header.join(","),
-    //         ...dataToExport.map((row) =>
-    //             header.map((key) => `"${String(row[key] || "").replace(/"/g, '""')}"`).join(","),
-    //         ),
-    //     ].join("\n");
-    //
-    //     const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
-    //     saveAs(blob, `sales_history_${period.toLowerCase().replace(" ", "_")}.csv`);
-    // };
-    //
-    // // Export to XLSX function
-    // const handleExportXlsx = () => {
-    //     // Use the generic utility function with specific formatters
-    //     const dataToExport = getExportFormattedData(filteredData, columns, salesHistoryFieldFormatters);
-    //
-    //     if (dataToExport.length === 0) {
-    //         notify("No data to export.", "error");
-    //         // alert('No data to export.');
-    //         return;
-    //     }
-    //
-    //     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    //     const workbook = XLSX.utils.book_new();
-    //     XLSX.utils.book_append_sheet(workbook, worksheet, "Sales History");
-    //
-    //     worksheet["!cols"] = columns
-    //         .filter((col) => col.field !== "actions" && col.headerName)
-    //         .map((col) => ({wch: (col.headerName?.toString().length || 15) + 5}));
-    //
-    //     XLSX.writeFile(workbook, `sales_history_${period.toLowerCase().replace(" ", "_")}.xlsx`);
-    // };
-
     const columns: GridColDef[] = useMemo(
         () => [
             {

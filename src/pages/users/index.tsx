@@ -8,19 +8,18 @@ import {useChangeUserStoreMutation, useGetAllStoresQuery, useGetAllUsersQuery} f
 import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {roleHierarchy, UserRoleEnum, UserStatusEnum, type UserType} from "@/types/user-types.ts";
 
-import {getExportFormattedData} from "@/utils/table-export-utils";
 import {AddOutlined, EditOutlined, MoreVert, StorefrontOutlined, VisibilityOutlined} from "@mui/icons-material";
 import {Avatar, Box, Button, Chip, Grid, IconButton, Menu, MenuItem, Tooltip, Typography,} from "@mui/material";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
-import {saveAs} from "file-saver";
 import {type MouseEvent, useMemo, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import * as XLSX from "xlsx";
+
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import DataGridTable from "@/components/ui/data-grid-table";
-// import CustomCard from "@/components/customs/custom-card.tsx";
 import ChangeStoreDialog from "@/components/users/change-store-modal.tsx";
-import ExportCard from "@/components/customs/export-card.tsx";
+import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
+import {useSearch} from "@/use-search.ts";
+import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils";
 
 const UsersPage = () => {
     const notify = useNotifier();
@@ -30,11 +29,15 @@ const UsersPage = () => {
     const {data: storesData} = useGetAllStoresQuery();
     const [changeUserStore, {isLoading: isChangingStore}] = useChangeUserStoreMutation();
 
+    const memoizedUsers = useMemo(() => usersData ?? [], [usersData]);
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
-    // const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
-    // const isExportMenuOpen = Boolean(exportAnchorEl);
+
+    const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
+        initialData: memoizedUsers,
+        searchKeys: ["firstName", "lastName", "email"],
+    });
 
     const [isChangeStoreDialogOpen, setChangeStoreDialogOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
@@ -75,68 +78,37 @@ const UsersPage = () => {
         [],
     );
 
-    // Export to CSV function
-    const handleExportCsv = () => {
-        // Create a simplified columns array just for export, to match `getExportFormattedData`'s needs
-        // and avoid passing complex renderCell logic from UsersTable.
-        const exportColumns: GridColDef[] = [
-            {field: "name", headerName: "Name"},
-            {field: "email", headerName: "Email"},
-            {field: "role", headerName: "Role"},
-            {field: "status", headerName: "Status"},
-            {field: "createdAt", headerName: "Date Created"},
-        ];
+    const prepareExportData = () => {
+        return getExportFormattedData(
+            filteredData, // Your data source
+            columns,      // Your column definitions
+            usersFieldFormatters // Your specific formatters
+        );
+    };
 
-        const dataToExport = getExportFormattedData(usersData ?? [], exportColumns, usersFieldFormatters); // Pass users (can be null) and new exportColumns
+    const handleExportCsv = () => {
+        const dataToExport = prepareExportData();
 
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
-            // // setExportAnchorEl(null);
             return;
         }
 
-        const header = Object.keys(dataToExport[0]);
-        const csvContent = [
-            header.join(","),
-            ...dataToExport.map((row) =>
-                header.map((key) => `"${String(row[key] || "").replace(/"/g, '""')}"`).join(","),
-            ),
-        ].join("\n");
-
-        const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
-        saveAs(blob, `users_data.csv`);
-        // setExportAnchorEl(null);
+        const filename = `user_data.csv`;
+        exportToCsv(dataToExport, filename); // Uses generic utility
     };
 
     // Export to XLSX function
     const handleExportXlsx = () => {
-        const exportColumns: GridColDef[] = [
-            {field: "name", headerName: "Name"},
-            {field: "email", headerName: "Email"},
-            {field: "role", headerName: "Role"},
-            {field: "status", headerName: "Status"},
-            {field: "createdAt", headerName: "Date Created"},
-        ];
-
-        const dataToExport = getExportFormattedData(usersData ?? [], exportColumns, usersFieldFormatters);
+        const dataToExport = prepareExportData();
 
         if (dataToExport.length === 0) {
             notify("No data to export.", "error");
-            // setExportAnchorEl(null);
             return;
         }
 
-        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Users Data");
-
-        // Use exportColumns for calculating widths
-        worksheet["!cols"] = exportColumns
-            .filter((col) => col.headerName) // Ensure headerName exists for width calculation
-            .map((col) => ({wch: (col.headerName?.toString().length || 15) + 5}));
-
-        XLSX.writeFile(workbook, `users_data.xlsx`);
-        // setExportAnchorEl(null);
+        const filename = `user_data.xlsx`;
+        exportToXlsx(dataToExport, filename, "Sales History", columns); // Uses generic utility
     };
 
     const handleMenuClick = (event: MouseEvent<HTMLElement>, rowId: string) => {
@@ -346,13 +318,16 @@ const UsersPage = () => {
                     </Button>
                 )}
             </Box>
-            <ExportCard
+            <TableSearchActions
+                searchControl={searchControl}
+                searchSubmit={searchSubmit}
+                handleSearch={handleSearch}
                 onExportCsv={handleExportCsv}
                 onExportXlsx={handleExportXlsx}
             />
             <Grid container spacing={2}>
                 <Grid size={12}>
-                    <DataGridTable data={usersData ?? []} columns={columns} loading={isLoading}/>
+                    <DataGridTable data={filteredData ?? []} columns={columns} loading={isLoading}/>
                 </Grid>
             </Grid>
             <ChangeStoreDialog
