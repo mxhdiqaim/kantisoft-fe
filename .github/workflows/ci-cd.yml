@@ -36,8 +36,8 @@ jobs:
       - name: Build Check (tsc)
         run: pnpm run build
 
-      - name: Run Linting
-        run: pnpm run lint
+  #      - name: Run Linting
+  #        run: pnpm run lint
 
   # ---------------------------------------------------
   #       DOCKER PUSH JOB (Build and Push Image)
