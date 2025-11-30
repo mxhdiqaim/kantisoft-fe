@@ -104,18 +104,18 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Set the directory where your docker-compose.prod.yml file lives on the Droplet
-            DEPLOY_PATH="/root/kantisoft/kantisoft-api" 
+            # The dir where the docker-compose.prod.yml file lives on the server
+            DEPLOY_PATH="/root/kantisoft/kantisoft-fe" 
             
             echo "Navigating to deployment directory..."
             cd $DEPLOY_PATH
             
             # Pull the latest image
-            echo "Pulling latest image for 'api' service..."
-            docker compose -f docker-compose.prod.yml pull api 
+            echo "Pulling latest image for 'fe' service..."
+            docker compose -f docker-compose.prod.yml pull fe 
             
             # Restart only the API service using the new image (rolling update)
             echo "Starting new container version..."
-            docker compose -f docker-compose.prod.yml up -d api
+            docker compose -f docker-compose.prod.yml up -d fe
             
             echo "Deployment finished for api service!"
