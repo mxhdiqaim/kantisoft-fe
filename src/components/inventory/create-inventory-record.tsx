@@ -134,7 +134,7 @@ const CreateInventoryRecord: FC<Props> = ({open, onClose}) => {
                 <Box sx={{display: "flex", justifyContent: "flex-end", gap: 2, mt: 2}}>
                     <CustomButton title={"Close"} onClick={onClose}/>
                     <CustomButton
-                        title={isLoading ? <CircularProgress size={24}/> : "Create Record"}
+                        title={isLoading ? "Creating..." : "Create Record"}
                         type="submit"
                         variant={"contained"}
                         disabled={isLoading}
