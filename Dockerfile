@@ -31,7 +31,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=Build /app/dist /usr/share/nginx/html
 
 # Expose port 80 to the host machine
-EXPOSE 80
+EXPOSE 3000
 
 # Command to start Nginx in the foreground
 CMD ["nginx", "-g", "daemon off;"]
