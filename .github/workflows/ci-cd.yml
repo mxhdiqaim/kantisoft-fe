@@ -128,7 +128,7 @@ jobs:
   build-static-files:
     name: Build Static Files
     runs-on: ubuntu-latest
-    #    needs: build-and-test
+    needs: deploy
 
     steps:
       - name: Checkout Repository
