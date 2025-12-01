@@ -16,6 +16,7 @@ import ApiErrorDisplay from "@/components/feedback/api-error-display";
 import {getApiError} from "@/helpers/get-api-error";
 import {selectActiveStore} from "@/store/slice/store-slice";
 import {useSelector} from "react-redux";
+import CustomButton from "@/components/ui/button.tsx";
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -44,10 +45,11 @@ const ProfilePage = () => {
 
     return (
         <Box>
-            <Button variant="text" onClick={() => navigate(-1)} sx={{mb: 2}}>
-                <ArrowBackIosNewOutlined fontSize="small" sx={{mr: 0.5}}/>
-                Go back
-            </Button>
+            <CustomButton
+                startIcon={<ArrowBackIosNewOutlined fontSize="small"/>}
+                title={"Go Back"}
+                onClick={() => navigate(-1)} sx={{mb: 2}}
+            />
             <Typography variant="h4" gutterBottom>
                 My Profile
             </Typography>

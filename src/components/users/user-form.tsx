@@ -86,7 +86,7 @@ const UserForm = ({userToEdit}: Props) => {
         console.log("first");
         try {
             if (isEditMode && userToEdit) {
-                // If password is not being changed, don't send it in the payload
+                // If the password is not being changed, don't send it in the payload
                 const payload = {...data};
                 if (!payload.password) {
                     delete payload.password;
@@ -106,7 +106,7 @@ const UserForm = ({userToEdit}: Props) => {
     };
 
     let availableRoles: UserRoleEnum[] = [];
-    let canEditRole = true;
+    let canEditRole;
 
     if (currentUser?.role === UserRoleEnum.MANAGER) {
         availableRoles = [UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST];
@@ -218,17 +218,19 @@ const UserForm = ({userToEdit}: Props) => {
                                             type={showPassword ? "text" : "password"}
                                             error={!!errors.password}
                                             helperText={errors.password?.message}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            onClick={() => setShowPassword(!showPassword)}
-                                                            edge="end"
-                                                        >
-                                                            {showPassword ? <VisibilityOff/> : <Visibility/>}
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                ),
+                                            slotProps={{
+                                                input: {
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <IconButton
+                                                                onClick={() => setShowPassword(!showPassword)}
+                                                                edge="end"
+                                                            >
+                                                                {showPassword ? <VisibilityOff/> : <Visibility/>}
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    )
+                                                }
                                             }}
                                         />
                                     )}
@@ -281,7 +283,11 @@ const UserForm = ({userToEdit}: Props) => {
                                     label="Role"
                                     value={userToEdit?.role || currentUser?.role}
                                     fullWidth
-                                    InputProps={{readOnly: true}}
+                                    slotProps={{
+                                        input: {
+                                            readOnly: true
+                                        }
+                                    }}
                                     disabled
                                 />
                             )}

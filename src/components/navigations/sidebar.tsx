@@ -246,13 +246,13 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                 ) : (
                     <CustomButton
                         startIcon={<StorefrontOutlined sx={{mr: 1}}/>}
-                        endIcon={<ExpandMoreOutlinedIcon/>}
+                        endIcon={isManager && <ExpandMoreOutlinedIcon/>}
                         title={activeStore?.name || "Select Store"}
                         sx={{
                             borderRadius: 1,
                             color: "text.primary",
                             textTransform: "none",
-                            cursor: isManager ? "pointer" : "default",
+                            cursor: "pointer",
                         }}
                         component={isManager ? "button" : Link}
                         to={!isManager ? "/" : undefined}

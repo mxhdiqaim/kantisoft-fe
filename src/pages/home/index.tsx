@@ -4,6 +4,7 @@ import {useAppSelector} from "@/store";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {useEffect} from "react";
 import {useNavigate} from "react-router-dom";
+import {UserRoleEnum} from "@/types/user-types.ts";
 
 const HomeScreen = () => {
     const navigate = useNavigate();
@@ -11,6 +12,12 @@ const HomeScreen = () => {
 
     useEffect(() => {
         if (currentUser) {
+            // Specifically handle the 'guest' role to prevent redirection to a data-heavy dashboard.
+            if (currentUser.role === UserRoleEnum.GUEST) {
+                navigate("/point-of-sale", {replace: true});
+                return;
+            }
+
             // Find the first accessible, non-hidden, primary route for the user's role.
             // The appRoutes supposed to be ordered by precedence (most important routes first), but for now they are not
             const destinationRoute = appRoutes.find(
@@ -26,7 +33,7 @@ const HomeScreen = () => {
             } else {
                 // As a fallback, if no specific page is found for the user's role,
                 // send them to the login page.
-                navigate("/login", {replace: true});
+                navigate("/profile", {replace: true});
             }
         } else {
             // If there's no authenticated user, they must log in.

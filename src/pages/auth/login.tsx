@@ -103,7 +103,7 @@ const Login = () => {
                                         onChange={onChange}
                                         error={Boolean(errors.email)}
                                         placeholder="example@gmail.com"
-                                        sx={{borderRadius: theme.borderRadius.small, textTransform: "lowercase"}}
+                                        sx={{borderRadius: theme.borderRadius.small}}
                                     />
                                 )}
                             />

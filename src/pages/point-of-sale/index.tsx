@@ -23,8 +23,6 @@ const PointOfSale = () => {
     const {t} = useTranslation();
     const {data: menuItems, isLoading: isLoadingMenuItems, isError} = useGetMenuItemsQuery({});
 
-    console.log("menuItems", menuItems);
-
     const [createOrder, {isLoading: isCreatingOrder}] = useCreateOrderMutation();
 
     const [cartItems, setCartItems] = useState<CartItem[]>([]);

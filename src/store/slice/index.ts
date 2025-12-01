@@ -33,8 +33,9 @@ import type {
     InventoryTransactionType,
     InventoryType
 } from "@/types/inventory-types.ts";
+import {getEnvVariable} from "@/utils";
 
-const baseUrl = import.meta.env.VITE_APP_API_URL;
+const baseUrl = getEnvVariable("VITE_APP_API_URL");
 
 // Create a new base query that wraps fetchBaseQuery
 const baseQuery = fetchBaseQuery({
@@ -178,7 +179,7 @@ export const apiSlice = createApi({
                     window.location.href = "/login";
 
                     // reload
-                    window.location.reload();
+                    // window.location.reload();
                 } catch (error) {
                     console.error("Logout failed:", error);
                     // Even if the server call fails, force a local logout
@@ -189,7 +190,7 @@ export const apiSlice = createApi({
                     window.location.href = "/login";
 
                     // reload
-                    window.location.reload();
+                    // window.location.reload();
                 }
             },
         }),

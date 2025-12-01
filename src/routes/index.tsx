@@ -50,6 +50,9 @@ export interface AppRouteType {
 
 // Application routes with layout
 export const appRoutes: AppRouteType[] = [
+    // ---------------------------------
+    // Home
+    // ---------------------------------
     {
         to: "/",
         title: "home",
@@ -139,7 +142,7 @@ export const appRoutes: AppRouteType[] = [
                 <InventoryOutlinedIcon/>
             </IconButton>
         ),
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
         children: [
             {
                 to: "management",
@@ -163,7 +166,9 @@ export const appRoutes: AppRouteType[] = [
         ]
     },
 
+    // ---------------------------------
     // Users management
+    // ---------------------------------
     {
         to: "/users",
         title: "usersManagement",
@@ -194,7 +199,7 @@ export const appRoutes: AppRouteType[] = [
                 title: "editUser",
                 element: EditUserScreen,
                 hidden: true,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
             },
             {
                 to: "profile",
@@ -212,7 +217,7 @@ export const appRoutes: AppRouteType[] = [
                 hidden: true,
                 authGuard: true,
                 useLayout: true,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
             },
         ]
     },
@@ -229,7 +234,7 @@ export const appRoutes: AppRouteType[] = [
                 <StorefrontOutlinedIcon/>
             </IconButton>
         ),
-        roles: [UserRoleEnum.MANAGER],
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
         children: [
             {
                 to: "new",
@@ -267,7 +272,7 @@ export const appRoutes: AppRouteType[] = [
                 <PlaylistAddCheckCircleOutlinedIcon/>
             </IconButton>
         ),
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+        roles: [UserRoleEnum.MANAGER],
     },
 
     // ---------------------------------
@@ -305,6 +310,6 @@ export const appRoutes: AppRouteType[] = [
         element: NotFoundScreen,
         hidden: true,
         useLayout: false,
-        roles: [UserRoleEnum.GUEST],
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
     },
 ];

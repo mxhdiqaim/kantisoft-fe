@@ -88,3 +88,13 @@ export const getTokenExpFromStorage = (): number | null => {
     }
     return null;
 };
+
+export const getEnvVariable = (key: string): string => {
+    const value = import.meta.env[key];
+
+    if (!value) {
+        throw new Error(`Environment variable is missing: ${key}`);
+    }
+
+    return value;
+};
