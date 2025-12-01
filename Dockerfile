@@ -28,7 +28,7 @@ FROM nginx:alpine AS serve
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy the built application from the build stage to the Nginx public directory
-COPY --from=Build /app/dist /usr/share/nginx/html
+COPY --from=Build /app/dist /var/www/html/app.kantisoft.com
 
 # Expose port 80 to the host machine
 EXPOSE 80
