@@ -90,7 +90,7 @@ const Login = () => {
                             Welcome Back! Login to your account
                         </Typography>
                     </Box>
-                    <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+                    <Box component={"form"} noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                         <FormControl fullWidth>
                             <Controller
                                 name="email"
@@ -164,15 +164,15 @@ const Login = () => {
                                 {loading ? "Logging in..." : "Login"}
                             </Button>
                         </Box>
-                        <Box sx={{textAlign: "center", mt: 2}}>
-                            <Typography variant="body1">
-                                Don&apos;t have an account?{" "}
-                                <Button variant="text" onClick={() => navigate("/register")}>
-                                    Register
-                                </Button>
-                            </Typography>
-                        </Box>
-                    </form>
+                        {/*<Box sx={{textAlign: "center", mt: 2}}>*/}
+                        {/*    <Typography variant="body1">*/}
+                        {/*        Don&apos;t have an account?{" "}*/}
+                        {/*        <Button variant="text" onClick={() => navigate("/register")}>*/}
+                        {/*            Register*/}
+                        {/*        </Button>*/}
+                        {/*    </Typography>*/}
+                        {/*</Box>*/}
+                    </Box>
                 </Box>
             </Grid>
         </Grid>

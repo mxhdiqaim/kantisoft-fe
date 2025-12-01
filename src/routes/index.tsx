@@ -282,7 +282,7 @@ export const appRoutes: AppRouteType[] = [
     },
 
     {
-        to: "/register",
+        to: "/auth/register/5473",
         element: RegisterScreen,
         useLayout: false,
         authGuard: false,
