@@ -62,7 +62,7 @@ export const baseUserSchema = yup.object().shape({
         // Otherwise, the field is optional and not required.
         otherwise: (schema) => schema.notRequired(),
     }),
-    role: yup.string().oneOf(USER_ROLES).default("user"),
+    role: yup.string().oneOf(USER_ROLES).default("guest"),
     status: yup.string().oneOf(USER_STATUSES).default("active"),
     storeId: yup.string().uuid().required("Store must be selected"),
     // store: storeSchema.optional().nullable(), // Optional store object for user
@@ -116,7 +116,11 @@ export const updateUserSchema = createUserSchemaWithoutStatus.concat(
 
 // Creates the login schema that maintains the validation rules
 export const loginUserType = yup.object().shape({
-    email: baseUserSchema.fields.email,
+    email: yup
+        .string()
+        .email("Please enter a valid email address")
+        .required("Email address is required")
+        .matches(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, "Invalid email format"),
     password: yup.string().required("Password is required"),
 });
 

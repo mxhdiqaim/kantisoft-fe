@@ -24,11 +24,9 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    Menu,
     MenuItem,
     type SxProps,
     type Theme,
-    Typography,
     useTheme,
 } from "@mui/material";
 import {type FC, Fragment, useEffect, useState} from "react";
@@ -36,7 +34,9 @@ import {useTranslation} from "react-i18next";
 import {useDispatch, useSelector} from "react-redux";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import type {Props as AppBarProps} from "./appbar";
+import {UserRoleEnum} from "@/types/user-types.ts";
 import type {StoreType} from "@/types/store-types.ts";
+import CustomButton from "@/components/ui/button.tsx";
 
 interface Props extends AppBarProps {
     sx?: SxProps<Theme>;
@@ -56,24 +56,11 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
     const {data: stores, isLoading: isLoadingStores} = useGetAllStoresQuery();
     const activeStore = useSelector(selectActiveStore);
 
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-
-    const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-        if (currentUser?.role === "manager") {
-            setAnchorEl(event.currentTarget);
-        }
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
     const handleStoreSelect = (store: StoreType) => {
         dispatch(setActiveStore(store));
         // Reset the entire API state to force refetching of all data for the new store
         dispatch(apiSlice.util.resetApiState());
-        handleMenuClose();
+        // handleMenuClose();
     };
 
     const handleLogout = async () => {
@@ -210,7 +197,7 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
         if (stores && stores.length > 0 && currentUser) {
             const userDefaultStore = stores.find((store) => store.id === currentUser.storeId);
 
-            if (currentUser.role !== "manager") {
+            if (currentUser.role !== UserRoleEnum.MANAGER) {
                 // For non-managers, always set their default store as active
                 if (userDefaultStore && activeStore?.id !== userDefaultStore.id) {
                     dispatch(setActiveStore(userDefaultStore));
@@ -224,7 +211,7 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
         }
     }, [activeStore, stores, currentUser, dispatch]);
 
-    const isManager = currentUser?.role === "manager";
+    const isManager = currentUser?.role === UserRoleEnum.MANAGER;
 
     return (
         <Drawer
@@ -257,50 +244,28 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                 {isLoadingStores ? (
                     <CircularProgress size={24}/>
                 ) : (
-                    <>
-                        <IconButton
-                            aria-label={"Select Store"}
-                            aria-controls={open ? "store-menu" : undefined}
-                            aria-haspopup="true"
-                            aria-expanded={open ? "true" : undefined}
-                            onClick={handleMenuClick}
-                            sx={{
-                                borderRadius: 1,
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                color: "text.primary",
-                                textTransform: "none",
-                                cursor: isManager ? "pointer" : "default",
-                            }}
-                            component={!isManager ? Link : "button"}
-                            to={"/"}
-                        >
-                            <StorefrontOutlined sx={{mr: 1}}/>
-                            <Typography variant="subtitle2" fontWeight="bold">
-                                {activeStore?.name || "Select Store"}
-                            </Typography>
-                            {isManager && (open ? <ExpandLessOutlinedIcon/> : <ExpandMoreOutlinedIcon/>)}
-                        </IconButton>
+                    <CustomButton
+                        startIcon={<StorefrontOutlined sx={{mr: 1}}/>}
+                        endIcon={<ExpandMoreOutlinedIcon/>}
+                        title={activeStore?.name || "Select Store"}
+                        sx={{
+                            borderRadius: 1,
+                            color: "text.primary",
+                            textTransform: "none",
+                            cursor: isManager ? "pointer" : "default",
+                        }}
+                        component={isManager ? "button" : Link}
+                        to={!isManager ? "/" : undefined}
+                    >
                         {isManager && (
-                            <Menu
-                                id="store-menu"
-                                anchorEl={anchorEl}
-                                open={open}
-                                onClose={handleMenuClose}
-                                MenuListProps={{
-                                    "aria-labelledby": "basic-button",
-                                }}
-                            >
-                                {stores?.map((store) => (
-                                    <MenuItem key={store.id} onClick={() => handleStoreSelect(store)}
-                                              selected={store.id === activeStore?.id}>
-                                        {store.name}
-                                    </MenuItem>
-                                ))}
-                            </Menu>
+                            (stores ?? []).map((store) => (
+                                <MenuItem key={store.id} onClick={() => handleStoreSelect(store)}
+                                          selected={store.id === activeStore?.id}>
+                                    {store.name}
+                                </MenuItem>
+                            ))
                         )}
-                    </>
+                    </CustomButton>
                 )}
                 {screenSize === "mobile" || screenSize === "tablet" ? (
                     <IconButton aria-label="menu" sx={{borderRadius: 1}}

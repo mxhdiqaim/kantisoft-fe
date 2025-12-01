@@ -1,5 +1,6 @@
 import {type MouseEvent, type ReactNode, useState} from "react";
 import {Box, Button, type ButtonProps, Menu, type SxProps, type Theme, useTheme} from "@mui/material";
+import {Link} from "react-router-dom";
 
 export interface Props extends ButtonProps {
     startIcon?: ReactNode;
@@ -7,6 +8,7 @@ export interface Props extends ButtonProps {
     title?: string;
     sx?: SxProps<Theme>;
     titleStyle?: SxProps<Theme>;
+    to?: string;
 }
 
 const CustomButton = ({
@@ -18,6 +20,7 @@ const CustomButton = ({
                           variant = "outlined",
                           children,
                           onClick,
+                          to,
                           ...rest
                       }: Props) => {
 
@@ -48,6 +51,8 @@ const CustomButton = ({
     };
 
     const renderButton = (props: ButtonProps) => {
+        const linkProps = to ? {component: Link, to} : {};
+
         // Icon-only buttons
         if ((startIcon && !title && !endIcon) || (endIcon && !title && !startIcon)) {
             return (
@@ -60,6 +65,7 @@ const CustomButton = ({
                         padding: "8px",
                     }}
                     {...props}
+                    {...linkProps}
                 >
                     {startIcon || endIcon}
                 </Button>
@@ -74,6 +80,7 @@ const CustomButton = ({
                 endIcon={endIcon}
                 sx={{...buttonStyle}}
                 {...props}
+                {...linkProps}
             >
                 <Box component={"span"} sx={{...titleStyle}}>
                     {title}

@@ -1,11 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-import { getApiError } from "@/helpers/get-api-error";
+import {getApiError} from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
-import { useCreateUserMutation, useGetAllStoresQuery, useUpdateUserMutation } from "@/store/slice";
-import { selectCurrentUser } from "@/store/slice/auth-slice";
-import type { StoreType } from "@/types/store-types";
+import {useCreateUserMutation, useGetAllStoresQuery, useUpdateUserMutation} from "@/store/slice";
+import {selectCurrentUser} from "@/store/slice/auth-slice";
+import type {StoreType} from "@/types/store-types";
 import {
     createUserSchema,
     type CreateUserType,
@@ -15,8 +15,8 @@ import {
     UserRoleEnum,
     type UserType,
 } from "@/types/user-types";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { ArrowBackIosNewOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {ArrowBackIosNewOutlined, Visibility, VisibilityOff} from "@mui/icons-material";
 import {
     Box,
     Button,
@@ -33,16 +33,17 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import { useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import {useMemo, useState} from "react";
+import {Controller, useForm} from "react-hook-form";
+import {useSelector} from "react-redux";
+import {useNavigate} from "react-router-dom";
+import CustomButton from "@/components/ui/button.tsx";
 
 interface Props {
     userToEdit?: UserType;
 }
 
-const UserForm = ({ userToEdit }: Props) => {
+const UserForm = ({userToEdit}: Props) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const notify = useNotifier();
@@ -51,10 +52,10 @@ const UserForm = ({ userToEdit }: Props) => {
 
     const isEditMode = Boolean(userToEdit);
 
-    const { data: stores, isLoading: isLoadingStores } = useGetAllStoresQuery();
+    const {data: stores, isLoading: isLoadingStores} = useGetAllStoresQuery();
 
-    const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
-    const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+    const [createUser, {isLoading: isCreating}] = useCreateUserMutation();
+    const [updateUser, {isLoading: isUpdating}] = useUpdateUserMutation();
     const isLoading = isCreating || isUpdating;
 
     const defaultValues = useMemo(
@@ -74,7 +75,7 @@ const UserForm = ({ userToEdit }: Props) => {
     const {
         control,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm({
         defaultValues,
         mode: "onChange",
@@ -86,11 +87,11 @@ const UserForm = ({ userToEdit }: Props) => {
         try {
             if (isEditMode && userToEdit) {
                 // If password is not being changed, don't send it in the payload
-                const payload = { ...data };
+                const payload = {...data};
                 if (!payload.password) {
                     delete payload.password;
                 }
-                await updateUser({ id: userToEdit.id, ...payload }).unwrap();
+                await updateUser({id: userToEdit.id, ...payload}).unwrap();
                 notify("User updated successfully!", "success");
             } else {
                 await createUser(data as CreateUserType).unwrap();
@@ -108,25 +109,26 @@ const UserForm = ({ userToEdit }: Props) => {
     let canEditRole = true;
 
     if (currentUser?.role === UserRoleEnum.MANAGER) {
-        availableRoles = USER_ROLES;
+        availableRoles = [UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST];
         canEditRole = true;
     } else if (currentUser?.role === UserRoleEnum.ADMIN) {
         availableRoles = USER_ROLES.filter((role) => role === UserRoleEnum.USER || role === UserRoleEnum.GUEST);
         // Admin cannot edit their own role
         canEditRole = !isEditMode || (userToEdit && userToEdit.id !== currentUser.id);
     } else {
-        // User and Guest cannot edit or select role
+        // User and Guest cannot edit or select a role
         availableRoles = [];
         canEditRole = false;
     }
 
     return (
         <Box>
-            <Button variant="text" onClick={() => navigate(-1)} sx={{ mb: 2 }}>
-                <ArrowBackIosNewOutlined fontSize="small" sx={{ mr: 0.5 }} />
-                Go back
-            </Button>
-            <Typography variant="h4" sx={{ mb: 3 }}>
+            <CustomButton
+                startIcon={<ArrowBackIosNewOutlined fontSize="small"/>}
+                title={"Go Back"}
+                onClick={() => navigate(-1)} sx={{mb: 2}}
+            />
+            <Typography variant="h4" sx={{mb: 3}}>
                 {isEditMode ? "Edit User" : "Create New User"}
             </Typography>
 
@@ -135,17 +137,17 @@ const UserForm = ({ userToEdit }: Props) => {
                 onSubmit={handleSubmit(onSubmit)}
                 elevation={0}
                 sx={{
-                    p: { xs: 2, md: 4 },
+                    p: {xs: 2, md: 4},
                     border: `1px solid ${theme.palette.divider}`,
                     borderRadius: theme.borderRadius.small,
                 }}
             >
                 <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, sm: 6 }}>
+                    <Grid size={{xs: 12, sm: 6}}>
                         <Controller
                             name="firstName"
                             control={control}
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <TextField
                                     {...field}
                                     fullWidth
@@ -156,11 +158,11 @@ const UserForm = ({ userToEdit }: Props) => {
                             )}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
+                    <Grid size={{xs: 12, sm: 6}}>
                         <Controller
                             name="lastName"
                             control={control}
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <TextField
                                     {...field}
                                     fullWidth
@@ -171,11 +173,11 @@ const UserForm = ({ userToEdit }: Props) => {
                             )}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
+                    <Grid size={{xs: 12, sm: 6}}>
                         <Controller
                             name="email"
                             control={control}
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <TextField
                                     {...field}
                                     fullWidth
@@ -187,11 +189,11 @@ const UserForm = ({ userToEdit }: Props) => {
                             )}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
+                    <Grid size={{xs: 12, sm: 6}}>
                         <Controller
                             name="phone"
                             control={control}
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <TextField
                                     {...field}
                                     fullWidth
@@ -204,11 +206,11 @@ const UserForm = ({ userToEdit }: Props) => {
                     </Grid>
                     {!isEditMode && (
                         <>
-                            <Grid size={{ xs: 12, sm: 6 }}>
+                            <Grid size={{xs: 12, sm: 6}}>
                                 <Controller
                                     name="password"
                                     control={control}
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <TextField
                                             {...field}
                                             fullWidth
@@ -223,7 +225,7 @@ const UserForm = ({ userToEdit }: Props) => {
                                                             onClick={() => setShowPassword(!showPassword)}
                                                             edge="end"
                                                         >
-                                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                            {showPassword ? <VisibilityOff/> : <Visibility/>}
                                                         </IconButton>
                                                     </InputAdornment>
                                                 ),
@@ -232,11 +234,11 @@ const UserForm = ({ userToEdit }: Props) => {
                                     )}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}>
+                            <Grid size={{xs: 12, sm: 6}}>
                                 <Controller
                                     name="confirmPassword"
                                     control={control}
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <TextField
                                             {...field}
                                             fullWidth
@@ -251,20 +253,20 @@ const UserForm = ({ userToEdit }: Props) => {
                         </>
                     )}
                     {canEditRole && (
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                        <Grid size={{xs: 12, sm: 6}}>
                             {canEditRole ? (
                                 <FormControl fullWidth error={!!errors.role}>
                                     <InputLabel id="role-select-label">Role</InputLabel>
                                     <Controller
                                         name="role"
                                         control={control}
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <Select {...field} labelId="role-select-label" label="Role">
                                                 {availableRoles.map((role) => (
                                                     <MenuItem
                                                         key={role}
                                                         value={role}
-                                                        sx={{ textTransform: "capitalize" }}
+                                                        sx={{textTransform: "capitalize"}}
                                                     >
                                                         {role}
                                                     </MenuItem>
@@ -279,20 +281,20 @@ const UserForm = ({ userToEdit }: Props) => {
                                     label="Role"
                                     value={userToEdit?.role || currentUser?.role}
                                     fullWidth
-                                    InputProps={{ readOnly: true }}
+                                    InputProps={{readOnly: true}}
                                     disabled
                                 />
                             )}
                         </Grid>
                     )}
                     {currentUser?.role === UserRoleEnum.MANAGER && (
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                        <Grid size={{xs: 12, sm: 6}}>
                             <FormControl fullWidth error={!!errors.storeId}>
                                 <InputLabel id="store-select-label">Assigned Store</InputLabel>
                                 <Controller
                                     name="storeId"
                                     control={control}
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <Select
                                             {...field}
                                             labelId="store-select-label"

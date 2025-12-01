@@ -19,8 +19,8 @@ import {Controller, useForm} from "react-hook-form";
 import {Link, useNavigate} from "react-router-dom";
 
 const defaultValues = {
-    password: "",
     email: "",
+    password: "",
 };
 
 const Login = () => {
@@ -41,13 +41,11 @@ const Login = () => {
     } = useForm({
         defaultValues,
         mode: "onBlur",
-        resolver: yupResolver(loginUserType),
+        resolver: yupResolver(loginUserType)
     });
 
     const onSubmit = async (data: LoginUserType) => {
         try {
-            // The login mutation returns a promise.
-            // .unwrap() will throw an error on failure, which is caught by the catch block.
             await login(data).unwrap();
 
             // On successful login, navigate to the intended page or a default.
@@ -105,7 +103,7 @@ const Login = () => {
                                         onChange={onChange}
                                         error={Boolean(errors.email)}
                                         placeholder="example@gmail.com"
-                                        sx={{borderRadius: theme.borderRadius.small}}
+                                        sx={{borderRadius: theme.borderRadius.small, textTransform: "lowercase"}}
                                     />
                                 )}
                             />
