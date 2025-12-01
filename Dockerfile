@@ -28,10 +28,10 @@ FROM nginx:alpine AS serve
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy the built application from the build stage to the Nginx public directory
-COPY --from=Build /app/dist /var/www/html/app.kantisoft.com
+COPY --from=Build /app/dist /usr/share/nginx/html
 
 # Expose port 80 to the host machine
-EXPOSE 80
+EXPOSE 80, 3000
 
 # Command to start Nginx in the foreground
 CMD ["nginx", "-g", "daemon off;"]
