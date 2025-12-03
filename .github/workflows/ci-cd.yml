@@ -151,6 +151,7 @@ jobs:
         env:
           NODE_ENV: production
           VITE_APP_API_URL: ${{ secrets.VITE_APP_API_URL }}
+          VITE_APP_SENTRY_DSN: ${{ secrets.VITE_APP_SENTRY_DSN }}
 
       - name: Deploy to Server via SCP
         uses: appleboy/scp-action@v0.1.7
