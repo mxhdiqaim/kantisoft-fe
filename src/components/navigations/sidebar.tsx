@@ -14,7 +14,6 @@ import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import {
     Box,
-    Button,
     CircularProgress,
     Collapse,
     Drawer,
@@ -285,13 +284,14 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                 </Box>
             </List>
             <Box position={"absolute"} bottom={0} width={"100%"} p={2}>
-                <Button
-                    fullWidth
+                <CustomButton
+                    title={isLoading ? "Logging out..." : t("Logout")}
                     onClick={handleLogout}
                     disabled={isLoading}
                     variant="contained"
                     startIcon={<LogoutOutlined/>}
                     sx={{
+                        width: "100%",
                         backgroundColor: theme.palette.error.main,
                         color: theme.palette.error.contrastText,
                         justifyContent: "flex-start",
@@ -306,9 +306,8 @@ const SideBar: FC<Props> = ({sx, drawerState, toggleDrawer, showDrawer}) => {
                             transform: "scale(1.02)",
                         },
                     }}
-                >
-                    {isLoading ? "Logging out..." : t("Logout")}
-                </Button>
+                />
+
             </Box>
         </Drawer>
     );

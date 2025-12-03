@@ -1,6 +1,6 @@
 import type {FC} from "react";
 import {useEffect} from "react";
-import {Box, CircularProgress, FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@mui/material";
+import {Box, FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@mui/material";
 import CustomModal from "@/components/customs/custom-modal.tsx";
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
@@ -133,12 +133,13 @@ const AdjustStock: FC<Props> = ({open, onClose, inventoryItem}) => {
                     </Grid>
                 </Grid>
                 <Box sx={{display: "flex", justifyContent: "flex-end", gap: 2, mt: 4}}>
-                    <CustomButton onClick={onClose} variant="outlined">
-                        Cancel
-                    </CustomButton>
-                    <CustomButton type="submit" variant="contained" disabled={isLoading}>
-                        {isLoading ? <CircularProgress size={24}/> : "Adjust Stock"}
-                    </CustomButton>
+                    <CustomButton title={"Cancel"} onClick={onClose} variant="outlined"/>
+                    <CustomButton
+                        type="submit"
+                        variant="contained"
+                        disabled={isLoading}
+                        title={isLoading ? "Adjusting..." : "Adjust Stock"}
+                    />
                 </Box>
             </Box>
         </CustomModal>
