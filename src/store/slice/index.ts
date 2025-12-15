@@ -122,6 +122,7 @@ export const apiSlice = createApi({
         "Order",
         "MenuItem",
         "User",
+        "users",
         "Summary",
         "TopSells",
         "InventorySummary",

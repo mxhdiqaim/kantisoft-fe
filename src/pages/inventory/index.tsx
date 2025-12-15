@@ -22,6 +22,8 @@ import {UserRoleEnum, UserStatusEnum} from "@/types/user-types.ts";
 import {relativeTime} from "@/utils/get-relative-time.ts";
 import {getInventoryStatusChipColor} from "@/components/ui";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
+import {camelCaseToTitleCase} from "@/utils"
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 
 const InventoryManagement = () => {
     const {t} = useTranslation();
@@ -36,7 +38,7 @@ const InventoryManagement = () => {
     const canInteract = currentUser?.status === UserStatusEnum.ACTIVE &&
         (currentUser?.role === UserRoleEnum.ADMIN || currentUser?.role === UserRoleEnum.MANAGER);
 
-    const memoizedInventories = useMemo(() => inventoryData || [], [inventoryData]);
+    const memoizedInventories = useMemoizedArray(inventoryData);
 
     const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
         initialData: memoizedInventories,
@@ -169,7 +171,7 @@ const InventoryManagement = () => {
             renderCell: (params: GridRenderCellParams<InventoryType, string>) => (
                 <TableStyledBox>
                     <Chip
-                        label={params.value}
+                        label={camelCaseToTitleCase(params.value)}
                         color={getInventoryStatusChipColor(params.value ?? "")}
                         size="small"
                         sx={{textTransform: "capitalize"}}

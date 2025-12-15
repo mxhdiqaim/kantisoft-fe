@@ -5,7 +5,7 @@ import {useEffect, useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import DataGridTable from "@/components/ui/data-grid-table";
 import OverviewHeader from "@/components/ui/custom-header.tsx";
-import {getTitle} from "@/utils";
+import {camelCaseToTitleCase, getTitle} from "@/utils";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {filterSchema, type TimePeriod} from "@/types";
@@ -40,7 +40,7 @@ const InventoryTransactions = () => {
             renderCell: (params) => (
                 <TableStyledBox>
                     <Chip
-                        label={params.value}
+                        label={camelCaseToTitleCase(params.value)}
                         color={getTransactionTypeChipColor(params.value)}
                         size="small"
                         sx={{textTransform: "capitalize"}}

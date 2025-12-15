@@ -64,7 +64,11 @@ export const baseUserSchema = yup.object().shape({
     }),
     role: yup.string().oneOf(USER_ROLES).default("guest"),
     status: yup.string().oneOf(USER_STATUSES).default("active"),
-    storeId: yup.string().uuid().required("Store must be selected"),
+    storeId: yup.object({
+        id: yup.string().uuid().required("Store ID is required"),
+        name: yup.string().required("Store name is required"),
+        location: yup.string().required("Store location is required"),
+    }),
     // store: storeSchema.optional().nullable(), // Optional store object for user
 });
 

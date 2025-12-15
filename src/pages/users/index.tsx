@@ -23,6 +23,7 @@ import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-
 import CustomButton from "@/components/ui/button.tsx";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
 import {getUserStatusChipColor} from "@/components/ui";
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 
 const UsersPage = () => {
     const notify = useNotifier();
@@ -33,7 +34,9 @@ const UsersPage = () => {
     const {data: storesData} = useGetAllStoresQuery();
     const [changeUserStore, {isLoading: isChangingStore}] = useChangeUserStoreMutation();
 
-    const memoizedUsers = useMemo(() => usersData ?? [], [usersData]);
+    const memoizedUsers = useMemoizedArray(usersData)
+
+    console.log("Users Data:", memoizedUsers);
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -200,6 +203,18 @@ const UsersPage = () => {
                             size="medium"
                             sx={{textTransform: "capitalize", fontWeight: "bold"}}
                         />
+                    </TableStyledBox>
+                ),
+            },
+            {
+                field: "store",
+                headerName: "Store",
+                width: 120,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        Hello
                     </TableStyledBox>
                 ),
             },
