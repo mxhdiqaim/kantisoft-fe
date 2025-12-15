@@ -22,6 +22,7 @@ import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-
 import CustomButton from "@/components/ui/button.tsx";
 import {UserRoleEnum} from "@/types/user-types.ts";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 
 const MenuItems = () => {
     const theme = useTheme();
@@ -33,7 +34,9 @@ const MenuItems = () => {
     const {data: menuItems, isLoading, isError, error} = useGetMenuItemsQuery({});
     const [deleteMenuItem, {isLoading: isDeleting}] = useDeleteMenuItemMutation();
 
-    const memoizedMenuItems = useMemo(() => menuItems ?? [], [menuItems]);
+    const memoizedMenuItems = useMemoizedArray(menuItems);
+
+    console.log("MenuItems rendered with items:", memoizedMenuItems);
 
     const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
         initialData: memoizedMenuItems,
@@ -126,12 +129,12 @@ const MenuItems = () => {
     const columns: GridColDef[] = useMemo(
         () => [
             {
-                flex: 0.4,
+                flex: 1,
                 field: "itemCode",
                 headerName: "Item Code",
                 minWidth: 150,
                 renderCell: (params) => (
-                    <TableStyledBox sx={{justifyContent: "center"}}>
+                    <TableStyledBox>
                         <Typography variant="body2" className="capitalize">
                             {params?.value}
                         </Typography>
@@ -162,15 +165,15 @@ const MenuItems = () => {
                 ),
             },
             {
-                flex: 0.5,
+                flex: 1,
                 field: "price",
                 headerName: "Price",
                 type: "number",
                 minWidth: 100,
-                align: "center",
-                headerAlign: "center",
+                align: "left",
+                headerAlign: "left",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{justifyContent: "center"}}>
+                    <TableStyledBox sx={{justifyContent: "left"}}>
                         <Typography variant="body2" fontWeight="medium">
                             {ngnFormatter.format(params.value)}
                         </Typography>
@@ -178,14 +181,14 @@ const MenuItems = () => {
                 ),
             },
             {
-                flex: 0.5,
+                flex: 1,
                 field: "isAvailable",
                 headerName: "Is Available",
                 minWidth: 100,
-                align: "center",
-                headerAlign: "center",
+                align: "left",
+                headerAlign: "left",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{justifyContent: "center"}}>
+                    <TableStyledBox sx={{justifyContent: "left"}}>
                         <Typography
                             variant="body2"
                             className="capitalize"
@@ -204,6 +207,54 @@ const MenuItems = () => {
                     </TableStyledBox>
                 ),
             },
+            {
+                flex: 1,
+                field: "store",
+                headerName: "Store",
+                minWidth: 150,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography>
+                            {params.value?.name || "N/A"}
+                        </Typography>
+                    </TableStyledBox>
+                ),
+            },
+            {
+                flex: 1,
+                field: "quantity",
+                headerName: "Quantity",
+                minWidth: 120,
+                align: "left",
+                headerAlign: "left",
+                valueGetter: (params: { row: MenuItemType }) => params?.row.inventory?.quantity,
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography variant="body2">
+                            {params.value ?? "N/A"}
+                        </Typography>
+                    </TableStyledBox>
+                ),
+            },
+            {
+                flex: 1,
+                field: "stockStatus",
+                headerName: "Stock Status",
+                minWidth: 120,
+                align: "left",
+                headerAlign: "left",
+                valueGetter: (params: { row: MenuItemType }) => params?.row.inventory?.status,
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography variant="body2" className="capitalize">
+                            {params.value ?? "N/A"}
+                        </Typography>
+                    </TableStyledBox>
+                ),
+            },
+
             {
                 field: "actions",
                 headerName: "Actions",
