@@ -13,6 +13,16 @@ const coreMenuItemSchema = yup.object({
     isAvailable: yup.boolean().required().default(true),
 });
 
+export const MenuItemInventoryStatusEnum = {
+    IN_STOCK: "inStock",
+    OUT_OF_STOCK: "outOfStock",
+    LOW_STOCK: "lowStock",
+} as const;
+
+export const INVENTORY_STATUS_VALUES = Object.values(MenuItemInventoryStatusEnum);
+
+export type MenuItemInventoryType = (typeof INVENTORY_STATUS_VALUES)[number];
+
 // Schema for a full menu item object, including base fields like id and timestamps
 export const menuItemSchema = extendBaseSchema({
     name: yup.string().required("Name is required").min(2, "Name must be at least 2 characters"),
@@ -30,7 +40,7 @@ export const menuItemSchema = extendBaseSchema({
     }),
     inventory: yup.object({
         quantity: yup.number().integer().min(0).required(),
-        status: yup.string().required(),
+        status: yup.string().oneOf(INVENTORY_STATUS_VALUES).default(MenuItemInventoryStatusEnum.IN_STOCK).required(),
         minStockLevel: yup.number().integer().min(0).optional(),
         lastCountDate: yup.string().required(),
     }).optional().nullable(),

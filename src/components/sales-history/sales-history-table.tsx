@@ -164,7 +164,7 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 width: 150,
                 renderCell: (params) => (
                     <TableStyledBox>
-                        <Typography variant="body2">{relativeTime(new Date(), new Date(params.value))}</Typography>
+                        <Typography variant="body2">{relativeTime(new Date(params.value))}</Typography>
                     </TableStyledBox>
                 ),
             },

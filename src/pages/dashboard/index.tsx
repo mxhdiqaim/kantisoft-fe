@@ -123,7 +123,7 @@ const Index = () => {
                         textAlign: "right",
                     }}
                 >
-                    {lastFetched ? `Last updated ${relativeTime(new Date(), lastFetched)}` : "Fetching data..."}
+                    {lastFetched ? `Last updated ${relativeTime(lastFetched)}` : "Fetching data..."}
                 </Typography>
             </Box>
             <Grid container spacing={3} mb={3}>

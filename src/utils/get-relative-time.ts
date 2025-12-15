@@ -1,4 +1,4 @@
-export const relativeTime = (current: Date, previous: Date): string => {
+export const relativeTime = (previous: Date, current: Date = new Date()): string => {
     const msPerMinute = 60 * 1000;
     const msPerHour = msPerMinute * 60;
     const msPerDay = msPerHour * 24;
@@ -34,7 +34,7 @@ export const relativeTime = (current: Date, previous: Date): string => {
     }
 
     if (elapsed < msPerYear) {
-        const shortMonth = previous.toLocaleString("en-US", { month: "short" });
+        const shortMonth = previous.toLocaleString("en-US", {month: "short"});
         const day = previous.getDate();
 
         return `${shortMonth} ${day}, ${previous.toLocaleTimeString("en-US", {

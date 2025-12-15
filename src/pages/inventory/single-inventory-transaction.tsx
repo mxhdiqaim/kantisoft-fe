@@ -37,7 +37,7 @@ const SingleInventoryTransaction = () => {
             headerAlign: "left",
             renderCell: (params) => (
                 <TableStyledBox>
-                    <Typography variant="body2">{relativeTime(new Date(), new Date(params.value))}</Typography>
+                    <Typography variant="body2">{relativeTime(new Date(params.value))}</Typography>
                 </TableStyledBox>
             ),
         },

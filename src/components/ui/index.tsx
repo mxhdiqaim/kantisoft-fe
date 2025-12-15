@@ -1,6 +1,7 @@
 import {OrderStatus} from "@/types/order-types.ts";
 import {InventoryStatusEnum, TransactionTypeEnum} from "@/types/inventory-types.ts";
 import type {UserRoleType, UserStatus} from "@/types/user-types.ts";
+import type {MenuItemInventoryType} from "@/types/menu-item-type.ts";
 
 export const getPaymentStatusChipColor = (status: string) => {
     switch (status) {
@@ -74,3 +75,12 @@ export const getTransactionChipColor = (status: string) => {
             return "default";
     }
 };
+
+export const getMenuItemsInventoryStatusChip = (status: MenuItemInventoryType) => {
+    const colors: Record<MenuItemInventoryType, "success" | "warning" | "error" | "default"> = {
+        inStock: "success",
+        lowStock: "warning",
+        outOfStock: "error",
+    };
+    return colors[status] || "default";
+}

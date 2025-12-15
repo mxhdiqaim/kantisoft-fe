@@ -124,7 +124,7 @@ const InventoryTransactions = () => {
                         textAlign: "right",
                     }}
                 >
-                    {lastFetched ? `Last updated ${relativeTime(new Date(), lastFetched)}` : "Fetching data..."}
+                    {lastFetched ? `Last updated ${relativeTime(lastFetched)}` : "Fetching data..."}
                 </Typography>
             </Box>
 
