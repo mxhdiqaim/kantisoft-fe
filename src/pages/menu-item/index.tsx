@@ -1,5 +1,5 @@
 import {type MouseEvent, useMemo, useState} from "react";
-import {Box, Grid, Tooltip, Typography, useTheme} from "@mui/material";
+import {Box, Chip, Grid, Tooltip, Typography, useTheme} from "@mui/material";
 import {useDeleteMenuItemMutation, useGetMenuItemsQuery} from "@/store/slice";
 import useNotifier from "@/hooks/useNotifier";
 import MenuItemFormModal from "@/components/order-tracking/menu-item-form-modal";
@@ -15,13 +15,16 @@ import {DeleteOutline, EditOutlined, MoreVert} from "@mui/icons-material";
 import DataGridTable from "@/components/ui/data-grid-table";
 import type {GridColDef} from "@mui/x-data-grid";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
-import {ngnFormatter} from "@/utils";
+import {camelCaseToTitleCase, formatCurrency} from "@/utils";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 import {useSearch} from "@/use-search.ts";
 import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils.ts";
 import CustomButton from "@/components/ui/button.tsx";
 import {UserRoleEnum} from "@/types/user-types.ts";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
+import {getMenuItemsInventoryStatusChip} from "@/components/ui";
+import {relativeTime} from "@/utils/get-relative-time.ts";
 
 const MenuItems = () => {
     const theme = useTheme();
@@ -33,7 +36,18 @@ const MenuItems = () => {
     const {data: menuItems, isLoading, isError, error} = useGetMenuItemsQuery({});
     const [deleteMenuItem, {isLoading: isDeleting}] = useDeleteMenuItemMutation();
 
-    const memoizedMenuItems = useMemo(() => menuItems ?? [], [menuItems]);
+    const flattenedMenuItems = useMemo(() => {
+        if (!menuItems) return [];
+        return menuItems.map(item => ({
+            ...item,
+            inventoryQuantity: item.inventory?.quantity,
+            inventoryStockStatus: item.inventory?.status,
+            inventoryMinStockLevel: item.inventory?.minStockLevel,
+            inventoryLastCountDate: item.inventory?.lastCountDate,
+        }));
+    }, [menuItems]);
+
+    const memoizedMenuItems = useMemoizedArray(flattenedMenuItems);
 
     const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
         initialData: memoizedMenuItems,
@@ -62,8 +76,10 @@ const MenuItems = () => {
         () => ({
             itemCode: (row: MenuItemType) => row.itemCode,
             name: (row: MenuItemType) => row.name,
-            price: (row: MenuItemType) => row.price, // Raw number
-            isAvailable: (row: MenuItemType) => (row.isAvailable ? "Yes" : "No"),
+            price: (row: MenuItemType) => row.price,
+            store: (row: MenuItemType) => row.store?.name,
+            inventoryQuantity: (row: MenuItemType) => row.inventory?.quantity ?? "",
+            inventoryStockStatus: (row: MenuItemType) => row.inventory?.status ?? "",
         }),
         [],
     );
@@ -126,12 +142,12 @@ const MenuItems = () => {
     const columns: GridColDef[] = useMemo(
         () => [
             {
-                flex: 0.4,
+                flex: 1,
                 field: "itemCode",
                 headerName: "Item Code",
                 minWidth: 150,
                 renderCell: (params) => (
-                    <TableStyledBox sx={{justifyContent: "center"}}>
+                    <TableStyledBox>
                         <Typography variant="body2" className="capitalize">
                             {params?.value}
                         </Typography>
@@ -162,44 +178,95 @@ const MenuItems = () => {
                 ),
             },
             {
-                flex: 0.5,
+                flex: 1,
                 field: "price",
                 headerName: "Price",
                 type: "number",
-                minWidth: 100,
-                align: "center",
-                headerAlign: "center",
+                minWidth: 120,
+                align: "left",
+                headerAlign: "left",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{justifyContent: "center"}}>
+                    <TableStyledBox sx={{justifyContent: "left"}}>
                         <Typography variant="body2" fontWeight="medium">
-                            {ngnFormatter.format(params.value)}
+                            {formatCurrency(params.value)}
                         </Typography>
                     </TableStyledBox>
                 ),
             },
             {
-                flex: 0.5,
-                field: "isAvailable",
-                headerName: "Is Available",
-                minWidth: 100,
-                align: "center",
-                headerAlign: "center",
+                flex: 1,
+                field: "inventoryStockStatus",
+                headerName: "Stock Status",
+                minWidth: 120,
+                align: "left",
+                headerAlign: "left",
                 renderCell: (params) => (
-                    <TableStyledBox sx={{justifyContent: "center"}}>
-                        <Typography
-                            variant="body2"
-                            className="capitalize"
-                            sx={{
-                                backgroundColor: params.value ? theme.palette.success.main : theme.palette.error.main,
-                                p: "4px 8px",
-                                borderRadius: "4px",
-                                color: theme.palette.primary.contrastText,
-                                fontWeight: "500",
-                                textTransform: "capitalize",
-                                width: "50px",
-                            }}
-                        >
-                            {params.value ? "Yes" : "No"}
+                    <TableStyledBox>
+                        {params.value ? <Chip
+                            label={camelCaseToTitleCase(params.value)}
+                            color={getMenuItemsInventoryStatusChip(params.value)}
+                            size="small"
+                            sx={{textTransform: "capitalize"}}
+                        /> : ""}
+                    </TableStyledBox>
+                ),
+            },
+            {
+                flex: 1,
+                field: "inventoryQuantity",
+                headerName: "Quantity",
+                minWidth: 120,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography variant="body2">
+                            {params.value ?? ""}
+                        </Typography>
+                    </TableStyledBox>
+                ),
+            },
+            {
+                flex: 1,
+                field: "inventoryMinStockLevel",
+                headerName: "Minimum Stock",
+                minWidth: 150,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography variant="body2">
+                            {params.value ?? ""}
+                        </Typography>
+                    </TableStyledBox>
+                ),
+            },
+            {
+                flex: 1,
+                field: "inventoryLastCountDate",
+                headerName: "Last Count Date",
+                minWidth: 150,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography variant="body2">
+                            {params?.value ? relativeTime(new Date(params?.value)) : ""}
+                        </Typography>
+                    </TableStyledBox>
+                ),
+            },
+            {
+                flex: 1,
+                field: "store",
+                headerName: `${t("store")}`,
+                minWidth: 150,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography>
+                            {params.value?.name}
                         </Typography>
                     </TableStyledBox>
                 ),

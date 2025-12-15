@@ -23,24 +23,39 @@ import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-
 import CustomButton from "@/components/ui/button.tsx";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
 import {getUserStatusChipColor} from "@/components/ui";
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
+import {useTranslation} from "react-i18next";
 
 const UsersPage = () => {
     const notify = useNotifier();
     const navigate = useNavigate();
     const theme = useTheme();
+    const {t} = useTranslation();
     const currentUser = useAppSelector(selectCurrentUser);
     const {data: usersData, isLoading, isError, error} = useGetAllUsersQuery();
     const {data: storesData} = useGetAllStoresQuery();
     const [changeUserStore, {isLoading: isChangingStore}] = useChangeUserStoreMutation();
 
-    const memoizedUsers = useMemo(() => usersData ?? [], [usersData]);
+    const flattenedUsers = useMemo(() => {
+        if (!usersData) return [];
+
+        return usersData.map(user => ({
+            ...user,
+            storeName: user.store?.name,
+            storeLocation: user.store?.location,
+        }));
+    }, [usersData]);
+
+    const memoizedUsers: UserType[] = useMemoizedArray(flattenedUsers)
+
+    console.log("Users Data:", memoizedUsers);
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
     const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
         initialData: memoizedUsers,
-        searchKeys: ["firstName", "lastName", "email"],
+        searchKeys: ["firstName", "lastName", "email", "storeName"],
     });
 
     const [isChangeStoreDialogOpen, setChangeStoreDialogOpen] = useState(false);
@@ -78,6 +93,7 @@ const UsersPage = () => {
             role: (row: UserType) => row.role,
             status: (row: UserType) => row.status,
             createdAt: (row: UserType) => new Date(row.createdAt).toLocaleString(),
+
         }),
         [],
     );
@@ -131,7 +147,7 @@ const UsersPage = () => {
                 flex: 1,
                 field: "name",
                 headerName: "Name",
-                width: 150,
+                minWidth: 220,
                 align: "left",
                 headerAlign: "left",
                 renderCell: (params) => {
@@ -164,7 +180,7 @@ const UsersPage = () => {
                 flex: 1,
                 field: "email",
                 headerName: "Email",
-                width: 150,
+                minWidth: 220,
                 align: "left",
                 headerAlign: "left",
                 renderCell: (params) => (
@@ -174,22 +190,24 @@ const UsersPage = () => {
                 ),
             },
             {
+                flex: 1,
                 field: "role",
                 headerName: "Role",
-                width: 120,
+                minWidth: 100,
                 cellClassName: "capitalize-cell",
                 align: "left",
                 headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
-                        <Typography variant="body2">{params.value}</Typography>
+                        <Typography variant="body2" sx={{textTransform: "capitalize"}}>{params.value}</Typography>
                     </TableStyledBox>
                 ),
             },
             {
+                flex: 1,
                 field: "status",
                 headerName: "Status",
-                width: 120,
+                minWidth: 120,
                 align: "left",
                 headerAlign: "left",
                 renderCell: (params: GridRenderCellParams<UserType>) => (
@@ -204,9 +222,25 @@ const UsersPage = () => {
                 ),
             },
             {
+                flex: 1,
+                field: "storeName",
+                headerName: `${t("store")}`,
+                minWidth: 150,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography variant="body2" fontWeight="500">
+                            {params.value}
+                        </Typography>
+                    </TableStyledBox>
+                ),
+            },
+            {
+                flex: 1,
                 field: "createdAt",
                 headerName: "Date Created",
-                width: 180,
+                minWidth: 150,
                 align: "left",
                 headerAlign: "left",
                 renderCell: (params: GridRenderCellParams<UserType, string>) => {

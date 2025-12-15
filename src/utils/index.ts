@@ -20,6 +20,38 @@ export const ngnFormatter = new Intl.NumberFormat("en-US", {
     currency: "NGN",
 });
 
+
+/**
+ * Formats a number as a currency string.
+ * @param amount The numeric value to format.
+ * @param currencyCode The ISO 4217 currency code (e.g. 'USD', 'EUR', 'NGN').
+ * @param locale The locale for formatting (e.g. 'en-US', 'de-DE', 'ha-NG').
+ * @returns The formatted currency string.
+ */
+export const formatCurrency = (amount: number, currencyCode: string = "NGN", locale: string = "ha-NG"): string => {
+    // Check for invalid input
+    if (isNaN(amount)) {
+        return "Invalid Amount";
+    }
+    if (currencyCode.trim() === "") {
+        return "Invalid Currency";
+    }
+
+    try {
+        const formatter = new Intl.NumberFormat(locale, {
+            style: "currency",
+            currency: currencyCode,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+
+        return formatter.format(amount);
+    } catch (error) {
+        console.error(`Error formatting currency:`, error);
+        return `${currencyCode} ${amount.toFixed(2)}`; // Fallback
+    }
+};
+
 export const getTitle = (period: Period) => {
     switch (period) {
         case "today":
@@ -97,4 +129,25 @@ export const getEnvVariable = (key: string): string => {
     }
 
     return value;
+};
+
+// convert snake case to Title Case
+export const snakeCaseToTitleCase = (str: string) => {
+    if (!str) return "";
+    return str
+        .toLowerCase()
+        .split("_")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+};
+
+// convert camel case to Title Case
+export const camelCaseToTitleCase = (str: string) => {
+    if (!str) return "";
+
+    // Insert a space before all capital letters and trim the leading space
+    const result = str.replace(/([A-Z])/g, " $1").trim();
+
+    // Capitalise the first letter of the resulting string
+    return result.charAt(0).toUpperCase() + result.slice(1);
 };
