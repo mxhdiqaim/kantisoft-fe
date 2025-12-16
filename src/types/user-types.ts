@@ -1,7 +1,6 @@
 import {extendBaseSchema} from "@/types";
 import * as yup from "yup";
 import {STORE_TYPES} from "./store-types";
-// import { storeSchema } from "./store-types";
 
 // Password-specific validation rules
 const PASSWORD_RULES = {
@@ -70,19 +69,19 @@ export const baseUserSchema = yup.object().shape({
         name: yup.string().required("Store name is required"),
         location: yup.string().required("Store location is required"),
     }),
-    // store: storeSchema.optional().nullable(), // Optional store object for user
 });
 
 export const createUserSchema = baseUserSchema;
 
-export const createUserSchemaWithoutStatusStoreIDRole = createUserSchema.omit(["status", "storeId", "role"]);
+export const createUserSchemaWithoutStatusStoreIDRole = createUserSchema.omit(["status", "storeId", "role", "store"]);
 
 export const registerUserSchema = createUserSchemaWithoutStatusStoreIDRole.concat(
     yup.object().shape({
         storeName: yup.string().required("Store name is required"),
         storeType: yup
             .string()
-            .oneOf(STORE_TYPES as string[], "Select a valid store type")
+            .oneOf(STORE_TYPES)
+            .default("restaurant")
             .required("Store type is required"),
     }),
 );

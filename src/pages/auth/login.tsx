@@ -3,20 +3,11 @@ import useNotifier from "@/hooks/useNotifier";
 import {useLoginMutation} from "@/store/slice";
 import {loginUserType, type LoginUserType} from "@/types/user-types";
 import {yupResolver} from "@hookform/resolvers/yup";
-import {
-    Box,
-    Button,
-    FormControl,
-    FormHelperText,
-    Grid,
-    Link as MuiLink,
-    TextField,
-    Typography,
-    useTheme
-} from "@mui/material";
+import {Box, FormControl, FormHelperText, Grid, Link as MuiLink, TextField, Typography, useTheme} from "@mui/material";
 
 import {Controller, useForm} from "react-hook-form";
 import {Link, useNavigate} from "react-router-dom";
+import CustomButton from "@/components/ui/button.tsx";
 
 const defaultValues = {
     email: "",
@@ -147,20 +138,18 @@ const Login = () => {
                             </MuiLink>
                         </Box>
                         <Box sx={{display: "flex", justifyContent: "center", mt: 3}}>
-                            <Button
+                            <CustomButton
+                                title={loading ? "Logging in..." : "Login"}
                                 type="submit"
                                 variant="contained"
                                 sx={{
                                     width: "100%", // Make the button full width
                                     color: "#fff",
-                                    borderRadius: theme.borderRadius.small,
                                     p: 2,
                                     mb: 2,
                                 }}
                                 disabled={loading}
-                            >
-                                {loading ? "Logging in..." : "Login"}
-                            </Button>
+                            />
                         </Box>
                         {/*<Box sx={{textAlign: "center", mt: 2}}>*/}
                         {/*    <Typography variant="body1">*/}
