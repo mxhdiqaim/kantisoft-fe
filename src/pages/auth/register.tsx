@@ -2,12 +2,11 @@ import {getApiError} from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
 import {useRegisterManagerAndStoreMutation} from "@/store/slice";
 import {STORE_TYPES} from "@/types/store-types";
-import {createUserSchemaWithoutStatusStoreIDRole, type RegisterUserType} from "@/types/user-types";
+import {registerUserSchema, type RegisterUserType} from "@/types/user-types";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 import {
     Box,
-    Button,
     FormControl,
     FormHelperText,
     Grid,
@@ -16,29 +15,26 @@ import {
     MenuItem,
     TextField,
     Typography,
-    useTheme,
 } from "@mui/material";
 import {useState} from "react";
 import {Controller, useForm} from "react-hook-form";
 import {useNavigate} from "react-router-dom";
+import CustomButton from "@/components/ui/button.tsx";
 
-const defaultValues: RegisterUserType = {
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phone: "",
-    storeName: "",
-    storeType: STORE_TYPES[0],
-};
+// const defaultValues: RegisterUserType = {
+//     firstName: "",
+//     lastName: "",
+//     email: "",
+//     password: "",
+//     confirmPassword: "",
+//     phone: "",
+//     storeName: "",
+//     storeType: STORE_TYPES[0],
+// };
 
 const Register = () => {
     const navigate = useNavigate();
     const notify = useNotifier();
-    const theme = useTheme();
-
-    // const currentUser = useAppSelector(selectCurrentUser);
 
     const [registerManagerAndStore, {isLoading}] = useRegisterManagerAndStoreMutation();
 
@@ -48,15 +44,16 @@ const Register = () => {
         control,
         handleSubmit,
         formState: {errors},
-    } = useForm<RegisterUserType>({
-        defaultValues,
+    } = useForm({
+        defaultValues: {},
         mode: "onBlur",
         // eslint-disable-next-line
         // @ts-ignore
-        resolver: yupResolver(createUserSchemaWithoutStatusStoreIDRole),
+        resolver: yupResolver(registerUserSchema),
     });
 
     const onSubmit = async (data: RegisterUserType) => {
+        console.log("data", data);
         try {
             // eslint-disable-next-line
             const {confirmPassword, ...rest} = data;
@@ -94,7 +91,7 @@ const Register = () => {
                         </Typography>
                     </Box>
                     {/* eslint-disable-next-line */}
-                    <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit as any)}>
+                    <Box component={"form"} noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit as any)}>
                         <FormControl fullWidth sx={{mb: 2}}>
                             <Controller
                                 name="firstName"
@@ -247,31 +244,27 @@ const Register = () => {
                             )}
                         </FormControl>
                         <Box sx={{display: "flex", justifyContent: "center"}}>
-                            <Button
+                            <CustomButton
+                                title={isLoading ? "Registering..." : "Register"}
                                 type="submit"
                                 variant="contained"
                                 disabled={isLoading}
                                 sx={{
                                     width: "100%",
                                     color: "#fff",
-                                    borderRadius: theme.borderRadius.small,
                                     p: 2,
                                     mb: 2,
                                     fontWeight: 600,
                                 }}
-                            >
-                                {isLoading ? "Registering..." : "Register"}
-                            </Button>
+                            />
                         </Box>
                         <Box sx={{textAlign: "center"}}>
                             <Typography variant="body1">
                                 Already have an account?{" "}
-                                <Button variant="text" onClick={() => navigate("/login")}>
-                                    Login
-                                </Button>
+                                <CustomButton title={"Login"} variant="text" onClick={() => navigate("/login")}/>
                             </Typography>
                         </Box>
-                    </form>
+                    </Box>
                 </Box>
             </Grid>
         </Grid>
