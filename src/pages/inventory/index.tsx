@@ -76,7 +76,10 @@ const InventoryManagement = () => {
     };
 
     const handleDiscontinue = async () => {
+        console.log("Discontinue: ", selectedRow);
+        
         if (!selectedRow) return;
+
 
         try {
             await markAsDiscontinued(selectedRow.menuItemId).unwrap();

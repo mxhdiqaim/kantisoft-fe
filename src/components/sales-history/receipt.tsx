@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {type OrderType} from "@/types/order-types"; // Assuming you have an OrderType
 import type {StoreType} from "@/types/store-types";
-import {ngnFormatter} from "@/utils";
+import {formatCurrency} from "@/utils";
 import {
     Box,
     Chip,
@@ -232,7 +232,7 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({order, storeData}, ref) => {
                                 Amount Paid
                             </Typography>
                             <Typography variant="body1" fontWeight="500">
-                                {ngnFormatter.format(order.paymentDetails.amountPaid)}
+                                {formatCurrency(order.paymentDetails.amountPaid)}
                             </Typography>
                         </Grid>
                         {order.paymentDetails.changeGiven > 0 && (
@@ -241,7 +241,7 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({order, storeData}, ref) => {
                                     Change Given
                                 </Typography>
                                 <Typography variant="body1" fontWeight="500">
-                                    {ngnFormatter.format(order.paymentDetails.changeGiven)}
+                                    {formatCurrency(order.paymentDetails.changeGiven)}
                                 </Typography>
                             </Grid>
                         )}
@@ -283,8 +283,8 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({order, storeData}, ref) => {
                             <TableRow key={item.id} sx={{"&:nth-of-type(odd)": {backgroundColor: "transparent"}}}>
                                 <TableCell>{item.menuItem?.name}</TableCell>
                                 <TableCell align="center">{item.quantity}</TableCell>
-                                <TableCell align="right">{ngnFormatter.format(item.priceAtOrder)}</TableCell>
-                                <TableCell align="right">{ngnFormatter.format(item.subTotal)}</TableCell>
+                                <TableCell align="right">{formatCurrency(item.priceAtOrder)}</TableCell>
+                                <TableCell align="right">{formatCurrency(item.subTotal)}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -300,7 +300,7 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({order, storeData}, ref) => {
                         TOTAL
                     </Typography>
                     <Typography variant="h5" fontWeight="bold" color="primary.main">
-                        {ngnFormatter.format(order.totalAmount)}
+                        {formatCurrency(order.totalAmount)}
                     </Typography>
                 </Box>
             </Box>
@@ -312,7 +312,7 @@ const Receipt = forwardRef<HTMLDivElement, Props>(({order, storeData}, ref) => {
                             Amount Due
                         </Typography>
                         <Typography variant="body1" fontWeight="bold" color="error.main">
-                            {ngnFormatter.format(order.paymentDetails.amountDue)}
+                            {formatCurrency(order.paymentDetails.amountDue)}
                         </Typography>
                     </Box>
                 </Box>
