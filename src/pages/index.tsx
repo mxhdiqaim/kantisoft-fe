@@ -36,3 +36,8 @@ export {default as ForgetPasswordScreen} from "./auth/forget-password";
 
 // Feedback screens
 export {default as NotFoundScreen} from "./feedbacks/not-found";
+
+// Raw Material Inventory Management Sub-screens
+export {default as RawMaterialsScreen} from "./inventory/raw-materials"; // Master list of ingredients
+export {default as RawMaterialInventoryScreen} from "./inventory/raw-materials/raw-material-inventory.tsx"; // Actual stock levels/min stock
+export {default as BillOfMaterialsScreen} from "./menu-item/bom"; // Recipe definition

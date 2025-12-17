@@ -2,6 +2,7 @@ import {type ComponentType, type ReactNode} from "react";
 import {
     ActivityLogScreen,
     AddUserScreen,
+    BillOfMaterialsScreen,
     ChangePasswordScreen,
     DashboardScreen,
     EditUserScreen,
@@ -14,6 +15,8 @@ import {
     NotFoundScreen,
     PointOfSaleScreen,
     ProfileScreen,
+    RawMaterialInventoryScreen,
+    RawMaterialsScreen,
     RegisterScreen,
     SalesHistoryScreen,
     SingleInventoryTransactionScreen,
@@ -128,6 +131,15 @@ export const appRoutes: AppRouteType[] = [
             </IconButton>
         ),
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+        children: [
+            {
+                to: ":id/recipe", // Define BOM here
+                title: "Manage Recipe",
+                element: BillOfMaterialsScreen,
+                hidden: true,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+            }
+        ]
     },
 
     // ---------------------------------
@@ -151,6 +163,12 @@ export const appRoutes: AppRouteType[] = [
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
             {
+                to: "transactions",
+                title: "Inventory Transactions",
+                element: InventoryTransactionsScreen,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+            },
+            {
                 to: ":id/transactions",
                 title: "menuItemTransactions",
                 element: SingleInventoryTransactionScreen,
@@ -158,11 +176,17 @@ export const appRoutes: AppRouteType[] = [
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
             {
-                to: "transactions",
-                title: "Inventory Transactions",
-                element: InventoryTransactionsScreen,
+                to: "raw-materials", // STEP 1: Define ingredients (Flour, Milk, etc.)
+                title: "Raw Materials",
+                element: RawMaterialsScreen,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+            },
+            {
+                to: "raw-material-inventory", // STEP 2: Current stock levels per store
+                title: "Raw Material Inventory",
+                element: RawMaterialInventoryScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
-            }
+            },
         ]
     },
 
