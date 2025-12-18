@@ -59,11 +59,11 @@ export const UnitOfMeasurementFamilyEnum = {
 export const UNIT_OF_MEASUREMENT_FAMILY_VALUES = Object.values(UnitOfMeasurementFamilyEnum);
 
 export const unitOfMeasurementSchema = yup.object({
-    id: yup.string().uuid("Unit of Measurement ID must be a valid UUID.").required("Unit of Measurement ID is required."),
+    id: yup.string().uuid("Unit of Measurement must be is not valid.").required("Unit of Measurement is required."),
     name: yup.string().oneOf(UNIT_NAME_VALUES, "Invalid unit name.").required("Unit of Measurement name is required."),
     symbol: yup.string().oneOf(UNIT_SYMBOL_VALUES, "Invalid unit symbol.").required("Unit of Measurement symbol is required."),
     unitOfMeasurementFamily: yup.string().oneOf(UNIT_OF_MEASUREMENT_FAMILY_VALUES, "Invalid unit of measurement family.").required("Unit of Measurement family is required."),
-    isBaseUnit: yup.boolean().required("isBaseUnit is required.").default("false"),
+    isBaseUnit: yup.boolean().required("Base Unit is required."),
     conversionFactorToBase: yup.number().required("Conversion factor to base is required.").min(0, "Conversion factor must be at least 0."),
     calculationLogic: yup.string().optional(),
 });
