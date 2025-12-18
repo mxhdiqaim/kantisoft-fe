@@ -2,6 +2,7 @@ import {OrderStatus} from "@/types/order-types.ts";
 import {InventoryStatusEnum, TransactionTypeEnum} from "@/types/inventory-types.ts";
 import type {UserRoleType, UserStatus} from "@/types/user-types.ts";
 import type {MenuItemInventoryType} from "@/types/menu-item-type.ts";
+import {styled, TextField} from "@mui/material";
 
 export const getPaymentStatusChipColor = (status: string) => {
     switch (status) {
@@ -84,3 +85,27 @@ export const getMenuItemsInventoryStatusChip = (status: MenuItemInventoryType) =
     };
     return colors[status] || "default";
 }
+
+export const StyledTextField = styled(TextField, {
+    shouldForwardProp: (prop) => prop !== "disabled",
+})<{ disabled?: boolean }>(({disabled}) => ({
+    "& .MuiOutlinedInput-root": {
+        // height: 40,
+        // "& fieldset": {height: 45},
+        background: disabled && "#CFD1D3",
+    },
+}));
+
+export const getRawMaterialStatusChipColor = (status: string) => {
+    switch (status) {
+        case "active":
+            return "success";
+        case "inactive":
+            return "warning";
+        case "archived":
+            return "default";
+        default:
+            return "default";
+    }
+};
+

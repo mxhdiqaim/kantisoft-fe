@@ -3,6 +3,7 @@ import {useGetStoreByIdQuery} from "@/store/slice";
 import {ArrowBackIosNewOutlined, EditOutlined} from "@mui/icons-material";
 import {Box, Button, Chip, Divider, Grid, Paper, Typography, useTheme} from "@mui/material";
 import {useNavigate, useParams} from "react-router-dom";
+import CustomButton from "@/components/ui/button.tsx";
 
 const ViewStore = () => {
     const {id} = useParams<{ id: string }>();
@@ -58,16 +59,21 @@ const ViewStore = () => {
     return (
         <Box>
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-                <Button variant="text" onClick={() => navigate(-1)} sx={{mb: 2}}>
-                    <ArrowBackIosNewOutlined fontSize="small" sx={{mr: 0.5}}/>
-                    Go back
-                </Button>
+                <CustomButton
+                    title={"Go back"}
+                    variant="text"
+                    startIcon={<ArrowBackIosNewOutlined fontSize="small" sx={{mr: 0.5}}/>}
+                    onClick={() => navigate(-1)} sx={{mb: 2}}
+                />
 
                 <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
-                    <Button variant="contained" startIcon={<EditOutlined/>}
-                            onClick={() => navigate(`/stores/${id}/edit`)}>
-                        Edit
-                    </Button>
+                    <CustomButton
+                        title={"Edit"}
+                        variant="contained"
+                        startIcon={<EditOutlined/>}
+                        onClick={() => navigate(`/stores/${id}/edit`)}
+                    />
+
                 </Box>
             </Box>
 

@@ -34,6 +34,14 @@ import type {
     InventoryType
 } from "@/types/inventory-types.ts";
 import {getEnvVariable} from "@/utils";
+import type {UnitOfMeasurementType} from "@/types/unit-of-measurement-types.ts";
+import type {
+    CreateRawMaterialType,
+    RawMaterialType,
+    SingleRawMaterialType,
+    UpdateRawMaterialResponseType,
+    UpdateRawMaterialType
+} from "@/types/raw-material-types.ts";
 
 const baseUrl = getEnvVariable("VITE_APP_API_URL");
 
@@ -133,6 +141,9 @@ export const apiSlice = createApi({
         "InventoryReport",
         "SingleInventoryTransaction",
         "InventoryTransactions",
+        "RawMaterials",
+        "RawMaterial",
+        "UnitOfMeasurements"
     ],
     endpoints: (builder) => ({
         // -------------------------
@@ -498,6 +509,71 @@ export const apiSlice = createApi({
             }),
             invalidatesTags: [{type: "Inventory", id: "LIST"}],
         }),
+
+        // -------------------------
+        // Unit of Measurement Endpoints
+        // -------------------------
+        getAllUnitOfMeasurements: builder.query<UnitOfMeasurementType[], void>({
+            query: () => "/unit-of-measurement",
+            providesTags: (result) =>
+                result
+                    ? [...result.map(({id}) => ({type: "UnitOfMeasurements" as const, id})), {
+                        type: "UnitOfMeasurements",
+                        id: "LIST"
+                    }]
+                    : [{type: "UnitOfMeasurements", id: "LIST"}],
+        }),
+
+        // -------------------------
+        // Raw Material Inventory Endpoints
+        // -------------------------
+        getAllRawMaterials: builder.query<RawMaterialType[], void>({
+            query: () => "/raw-materials",
+            providesTags: (result) =>
+                result
+                    ? [...result.map(({id}) => ({type: "RawMaterials" as const, id})), {
+                        type: "RawMaterials",
+                        id: "LIST"
+                    }]
+                    : [{type: "RawMaterials", id: "LIST"}],
+        }),
+
+        createRawMaterial: builder.mutation<SingleRawMaterialType, CreateRawMaterialType>({
+            query: (body) => ({
+                url: "/raw-materials/create",
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: [{type: "RawMaterials", id: "LIST"}],
+        }),
+
+        getSingleRawMaterial: builder.query<RawMaterialType, string>({
+            query: (id) => `/raw-materials/${id}`,
+            providesTags: (_result, _error, id) => [{type: "RawMaterial", id}],
+        }),
+
+        updateRawMaterial: builder.mutation<UpdateRawMaterialResponseType, Partial<UpdateRawMaterialType> & Pick<RawMaterialType, "id">>({
+            query: ({id, ...patch}) => ({
+                url: `/raw-materials/${id}`,
+                method: "PATCH",
+                body: patch,
+            }),
+            invalidatesTags: (_result, _error, {id}) => [
+                {type: "RawMaterial", id},
+                {type: "RawMaterials", id: "LIST"},
+            ],
+        }),
+
+        deleteRawMaterial: builder.mutation<{ message: string }, string>({
+            query: (id) => ({
+                url: `/raw-materials/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: (_result, _error, id) => [
+                {type: "RawMaterial", id},
+                {type: "RawMaterials", id: "LIST"},
+            ],
+        }),
     }),
 });
 
@@ -554,4 +630,14 @@ export const {
     useAdjustStockMutation,
     useMarkAsDiscontinuedMutation,
     useDeleteInventoryRecordMutation,
+
+    // Unit of Measurement Hooks
+    useGetAllUnitOfMeasurementsQuery,
+
+    // Raw Material Hooks
+    useGetAllRawMaterialsQuery,
+    useCreateRawMaterialMutation,
+    useGetSingleRawMaterialQuery,
+    useUpdateRawMaterialMutation,
+    useDeleteRawMaterialMutation,
 } = apiSlice;
