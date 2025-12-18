@@ -136,6 +136,7 @@ export const apiSlice = createApi({
         "SingleInventoryTransaction",
         "InventoryTransactions",
         "RawMaterials",
+        "RawMaterial",
         "UnitOfMeasurements"
     ],
     endpoints: (builder) => ({
@@ -539,6 +540,11 @@ export const apiSlice = createApi({
             }),
             invalidatesTags: [{type: "RawMaterials", id: "LIST"}],
         }),
+
+        getSingleRawMaterial: builder.query<RawMaterialType, string>({
+            query: (id) => `/raw-materials/${id}`,
+            providesTags: (_result, _error, id) => [{type: "RawMaterial", id}],
+        }),
     }),
 });
 
@@ -602,4 +608,5 @@ export const {
     // Raw Material Hooks
     useGetAllRawMaterialsQuery,
     useCreateRawMaterialMutation,
+    useGetSingleRawMaterialQuery,
 } = apiSlice;

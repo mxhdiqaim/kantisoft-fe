@@ -95,3 +95,17 @@ export const StyledTextField = styled(TextField, {
         background: disabled && "#CFD1D3",
     },
 }));
+
+export const getRawMaterialStatusChipColor = (status: string) => {
+    switch (status) {
+        case "active":
+            return "success";
+        case "inactive":
+            return "warning";
+        case "archived":
+            return "default";
+        default:
+            return "default";
+    }
+};
+

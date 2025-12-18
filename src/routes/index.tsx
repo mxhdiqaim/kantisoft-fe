@@ -24,6 +24,7 @@ import {
     StoreScreen,
     UnitOfMeasurementsScreen,
     UsersScreen,
+    ViewRawMaterialScreen,
     ViewSalesHistoryScreen,
     ViewStoreScreen,
     ViewUserScreen,
@@ -181,6 +182,15 @@ export const appRoutes: AppRouteType[] = [
                 title: "Raw Materials",
                 element: RawMaterialsScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                children: [
+                    {
+                        to: ":id/view",
+                        title: "View Raw Material",
+                        element: ViewRawMaterialScreen,
+                        hidden: true,
+                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                    }
+                ]
             },
             {
                 to: "raw-material-inventory", // STEP 2: Current stock levels per store

@@ -12,8 +12,10 @@ import {relativeTime} from "@/utils/get-relative-time.ts";
 import CreateRawMaterial from "@/components/inventory/create-raw-material.tsx";
 import CustomButton from "@/components/ui/button.tsx";
 import AddIcon from "@mui/icons-material/Add";
+import {useNavigate} from "react-router-dom";
 
 const RawMaterials = () => {
+    const navigate = useNavigate();
     const [formModalOpen, setFormModalOpen] = useState(false);
     const {data, isLoading} = useGetAllRawMaterialsQuery();
 
@@ -43,7 +45,12 @@ const RawMaterials = () => {
                 headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
-                        <Typography variant="body2" fontWeight="500" textTransform={"capitalize"}>
+                        <Typography
+                            variant="body2"
+                            fontWeight="500"
+                            sx={{textTransform: "capitalize", textDecoration: "underline", cursor: "pointer"}}
+                            onClick={() => navigate(`/inventory/raw-materials/${params.row.id}/view`)}
+                        >
                             {params.value}
                         </Typography>
                     </TableStyledBox>

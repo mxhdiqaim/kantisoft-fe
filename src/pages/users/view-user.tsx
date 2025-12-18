@@ -12,6 +12,7 @@ import {format} from "date-fns";
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {getUserRoleChipColor, getUserStatusChipColor} from "@/components/ui";
+import CustomButton from "@/components/ui/button.tsx";
 
 const getInitials = (firstName: string, lastName: string) => `${firstName[0] || ""}${lastName[0] || ""}`.toUpperCase();
 
@@ -89,10 +90,13 @@ const ViewUser = () => {
 
     return (
         <Box>
-            <Button variant="text" onClick={() => navigate(-1)} sx={{mb: 2}}>
-                <ArrowBackIosNewOutlined fontSize="small" sx={{mr: 0.5}}/>
-                Go back
-            </Button>
+            <CustomButton
+                title={"Go Back"}
+                variant="text"
+                startIcon={<ArrowBackIosNewOutlined fontSize="small" sx={{mr: 0.5}}/>}
+                onClick={() => navigate(-1)}
+                sx={{mb: 2}}
+            />
             <Typography variant="h4" gutterBottom>
                 User Details
             </Typography>
