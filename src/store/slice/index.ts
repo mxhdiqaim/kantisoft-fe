@@ -35,6 +35,7 @@ import type {
 } from "@/types/inventory-types.ts";
 import {getEnvVariable} from "@/utils";
 import type {UnitOfMeasurementType} from "@/types/unit-of-measurement-types.ts";
+import type {RawMaterialType} from "@/types/raw-material-types.ts";
 
 const baseUrl = getEnvVariable("VITE_APP_API_URL");
 
@@ -519,7 +520,7 @@ export const apiSlice = createApi({
         // -------------------------
         // Raw Material Inventory Endpoints
         // -------------------------
-        getAllRawMaterials: builder.query<InventoryType[], void>({
+        getAllRawMaterials: builder.query<RawMaterialType[], void>({
             query: () => "/raw-materials",
             providesTags: (result) =>
                 result
