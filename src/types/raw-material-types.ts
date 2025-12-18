@@ -51,3 +51,24 @@ export const baseSingleRawMaterialSchema = yup.object({
 export const singleRawMaterialSchema = extendBaseSchema(baseSingleRawMaterialSchema);
 
 export type SingleRawMaterialType = yup.InferType<typeof singleRawMaterialSchema>;
+
+export const updateRawMaterialSchema = yup.object({
+    name: yup.string().required("Raw Material name is required."),
+    description: yup.string().optional(),
+    unitOfMeasurementId: yup.string().uuid().required("Unit of Measurement is required."),
+    latestUnitPricePresentation: yup.number().required("Latest unit price in presentation is required.").min(0, "Latest unit price must be at least 0."),
+});
+
+export type UpdateRawMaterialType = yup.InferType<typeof updateRawMaterialSchema>;
+
+export const updateRawMaterialResponseSchema = extendBaseSchema(yup.object({
+    name: yup.string().required("Raw Material name is required."),
+    unitOfMeasurementId: yup.string().uuid().required("Unit of Measurement is required."),
+    description: yup.string().optional(),
+    latestUnitPrice: yup.number().required("Latest unit price is required.").min(0, "Latest unit price must be at least 0."),
+    status: yup.string().oneOf(RAW_MATERIAL_STATUS).required("Status is required."),
+    latestUnitPricePresentation: yup.number().required("Latest unit price in presentation is required.").min(0, "Latest unit price must be at least 0."),
+    unitOfMeasurement: yup.array(unitOfMeasurementSchema).min(1, "At least one unit of measurement is required.").required("Unit of Measurement is required."),
+}))
+
+export type UpdateRawMaterialResponseType = yup.InferType<typeof updateRawMaterialResponseSchema>;

@@ -11,11 +11,15 @@ import CustomButton from "@/components/ui/button.tsx";
 import CustomCard from "@/components/customs/custom-card.tsx";
 import {formatCurrency} from "@/utils";
 import {relativeTime} from "@/utils/get-relative-time.ts";
+import RawMaterialForm from "@/components/inventory/raw-material-form.tsx";
+import {useState} from "react";
 
 const ViewRawMaterial = () => {
     const navigate = useNavigate();
     const notify = useNotifier();
     const {id} = useParams<{ id: string }>();
+
+    const [formModalOpen, setFormModalOpen] = useState(false);
 
     const {
         data: rawMaterial,
@@ -24,6 +28,14 @@ const ViewRawMaterial = () => {
     } = useGetSingleRawMaterialQuery(id as string, {
         skip: !id,
     });
+
+    const handleCloseFormModal = () => {
+        setFormModalOpen(false);
+    };
+
+    const handleOpenFormModal = () => {
+        setFormModalOpen(true);
+    };
 
     if (isLoading) return <ViewRawMaterialSkeleton/>;
 
@@ -64,7 +76,7 @@ const ViewRawMaterial = () => {
                                 title={" Edit Raw Material"}
                                 variant="contained"
                                 startIcon={<EditOutlined/>}
-                                // onClick={() => navigate(`/inventory/raw-materials/${rawMaterial.id}/edit`)}
+                                onClick={handleOpenFormModal}
                             />
                             {/*// TODO: Add Deactivate and Delete functionality */}
                         </Box>
@@ -125,6 +137,8 @@ const ViewRawMaterial = () => {
                     </CustomCard>
                 </Grid>
             </Grid>
+
+            <RawMaterialForm open={formModalOpen} onClose={handleCloseFormModal} rawMaterial={rawMaterial}/>
         </Box>
     );
 };

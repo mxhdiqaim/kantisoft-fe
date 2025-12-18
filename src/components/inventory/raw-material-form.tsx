@@ -4,11 +4,15 @@ import {Box, FormControl, Grid, InputAdornment, MenuItem,} from "@mui/material";
 import CustomModal from "@/components/customs/custom-modal.tsx";
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
-import {useCreateRawMaterialMutation, useGetAllUnitOfMeasurementsQuery} from "@/store/slice";
+import {
+    useCreateRawMaterialMutation,
+    useGetAllUnitOfMeasurementsQuery,
+    useUpdateRawMaterialMutation
+} from "@/store/slice";
 import useNotifier from "@/hooks/useNotifier.ts";
 import {getApiError} from "@/helpers/get-api-error.ts";
 import CustomButton from "@/components/ui/button.tsx";
-import {createRawMaterialSchema, type CreateRawMaterialType} from "@/types/raw-material-types.ts";
+import {createRawMaterialSchema, type CreateRawMaterialType, type RawMaterialType} from "@/types/raw-material-types.ts";
 import {StyledTextField} from "@/components/ui";
 import Icon from "@/components/ui/icon.tsx";
 
@@ -17,12 +21,16 @@ import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
 interface Props {
     open: boolean;
     onClose: () => void;
+    rawMaterial?: RawMaterialType | null;
 }
 
-const CreateRawMaterial: FC<Props> = ({open, onClose}) => {
+const RawMaterialForm: FC<Props> = ({open, onClose, rawMaterial}) => {
     const notify = useNotifier();
+    const isEditMode = !!rawMaterial;
+
     const {data: measurementUnit, isLoading: isMeasurementLoading} = useGetAllUnitOfMeasurementsQuery();
-    const [createRawMaterial, {isLoading: isCreating, isSuccess}] = useCreateRawMaterialMutation();
+    const [createRawMaterial, {isLoading: isCreating, isSuccess: isCreateSuccess}] = useCreateRawMaterialMutation();
+    const [updateRawMaterial, {isLoading: isUpdating, isSuccess: isUpdateSuccess}] = useUpdateRawMaterialMutation();
 
     const {
         control,
@@ -30,34 +38,59 @@ const CreateRawMaterial: FC<Props> = ({open, onClose}) => {
         reset,
         formState: {errors},
     } = useForm({
-        defaultValues: {},
+        defaultValues: {
+            name: "",
+            description: "",
+            unitOfMeasurementId: "",
+            latestUnitPricePresentation: 0,
+        },
         resolver: yupResolver(createRawMaterialSchema),
     });
 
     useEffect(() => {
-        if (isSuccess) {
+        if (isEditMode && rawMaterial) {
+            reset({
+                name: rawMaterial.name,
+                description: rawMaterial.description,
+                unitOfMeasurementId: rawMaterial.unitOfMeasurementId,
+                latestUnitPricePresentation: rawMaterial.latestUnitPricePresentation,
+            });
+        } else {
+            reset();
+        }
+    }, [isEditMode, rawMaterial, reset]);
+
+    useEffect(() => {
+        if (isCreateSuccess || isUpdateSuccess) {
             reset();
             onClose();
         }
-    }, [isSuccess, onClose, reset]);
+    }, [isCreateSuccess, isUpdateSuccess, onClose, reset]);
 
     const onSubmit = async (data: CreateRawMaterialType) => {
-        try {
-            await createRawMaterial(data).unwrap();
-            notify("Raw Material Added Successfully!", "success");
-        } catch (error) {
-            const defaultMessage = `Failed to Raw Material. Please try again.`;
-            const apiError = getApiError(error, defaultMessage);
 
+        try {
+            if (isEditMode && rawMaterial) {
+                await updateRawMaterial({id: rawMaterial.id, ...data}).unwrap();
+                notify("Raw Material Updated Successfully!", "success");
+            } else {
+                await createRawMaterial(data).unwrap();
+                notify("Raw Material Added Successfully!", "success");
+            }
+        } catch (error) {
+            const defaultMessage = `Failed to ${isEditMode ? 'update' : 'create'} Raw Material. Please try again.`;
+            const apiError = getApiError(error, defaultMessage);
             notify(apiError.message, "error");
         }
     };
+
+    const isLoading = isCreating || isUpdating;
 
     return (
         <CustomModal
             open={open}
             onClose={onClose}
-            title="Create Raw Material"
+            title={isEditMode ? "Update Raw Material" : "Create Raw Material"}
         >
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{mt: 3}}>
                 <Grid container spacing={3}>
@@ -141,7 +174,6 @@ const CreateRawMaterial: FC<Props> = ({open, onClose}) => {
                             render={({field}) => (
                                 <FormControl fullWidth>
                                     <StyledTextField
-                                        textarea
                                         {...field}
                                         label="Description"
                                         error={Boolean(errors.description)}
@@ -155,10 +187,10 @@ const CreateRawMaterial: FC<Props> = ({open, onClose}) => {
                 <Box sx={{display: "flex", justifyContent: "flex-end", gap: 2, mt: 2}}>
                     <CustomButton title={"Close"} onClick={onClose}/>
                     <CustomButton
-                        title={isCreating ? "Creating..." : "Create Record"}
+                        title={isLoading ? (isEditMode ? "Updating..." : "Creating...") : (isEditMode ? "Update Record" : "Create Record")}
                         type="submit"
                         variant={"contained"}
-                        disabled={isCreating}
+                        disabled={isLoading}
                     />
                 </Box>
             </Box>
@@ -166,4 +198,4 @@ const CreateRawMaterial: FC<Props> = ({open, onClose}) => {
     );
 };
 
-export default CreateRawMaterial;
+export default RawMaterialForm;

@@ -3,8 +3,6 @@ import type {InventoryType} from "@/types/inventory-types.ts";
 import {Box, Chip, Grid, Skeleton, Tooltip, Typography, useTheme} from "@mui/material";
 import type {GridColDef, GridRenderCellParams} from "@mui/x-data-grid";
 import {type MouseEvent, useMemo, useState} from "react";
-import AddIcon from "@mui/icons-material/Add";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DataGridTable from "@/components/ui/data-grid-table";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import CreateInventoryRecord from "@/components/inventory/create-inventory-record.tsx";
@@ -24,6 +22,9 @@ import {getInventoryStatusChipColor} from "@/components/ui";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
 import {camelCaseToTitleCase} from "@/utils"
 import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
+
+import AddIcon from "@mui/icons-material/Add";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const InventoryManagement = () => {
     const {t} = useTranslation();
@@ -77,7 +78,7 @@ const InventoryManagement = () => {
 
     const handleDiscontinue = async () => {
         console.log("Discontinue: ", selectedRow);
-        
+
         if (!selectedRow) return;
 
 
