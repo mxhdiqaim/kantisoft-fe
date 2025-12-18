@@ -34,6 +34,7 @@ import type {
     InventoryType
 } from "@/types/inventory-types.ts";
 import {getEnvVariable} from "@/utils";
+import type {UnitOfMeasurementType} from "@/types/unit-of-measurement-types.ts";
 
 const baseUrl = getEnvVariable("VITE_APP_API_URL");
 
@@ -133,6 +134,8 @@ export const apiSlice = createApi({
         "InventoryReport",
         "SingleInventoryTransaction",
         "InventoryTransactions",
+        "RawMaterials",
+        "UnitOfMeasurements"
     ],
     endpoints: (builder) => ({
         // -------------------------
@@ -498,6 +501,34 @@ export const apiSlice = createApi({
             }),
             invalidatesTags: [{type: "Inventory", id: "LIST"}],
         }),
+
+        // -------------------------
+        // Unit of Measurement Endpoints
+        // -------------------------
+        getAllUnitOfMeasurements: builder.query<UnitOfMeasurementType[], void>({
+            query: () => "/unit-of-measurement",
+            providesTags: (result) =>
+                result
+                    ? [...result.map(({id}) => ({type: "UnitOfMeasurements" as const, id})), {
+                        type: "UnitOfMeasurements",
+                        id: "LIST"
+                    }]
+                    : [{type: "UnitOfMeasurements", id: "LIST"}],
+        }),
+
+        // -------------------------
+        // Raw Material Inventory Endpoints
+        // -------------------------
+        getAllRawMaterials: builder.query<InventoryType[], void>({
+            query: () => "/raw-materials",
+            providesTags: (result) =>
+                result
+                    ? [...result.map(({id}) => ({type: "RawMaterials" as const, id})), {
+                        type: "RawMaterials",
+                        id: "LIST"
+                    }]
+                    : [{type: "RawMaterials", id: "LIST"}],
+        }),
     }),
 });
 
@@ -554,4 +585,10 @@ export const {
     useAdjustStockMutation,
     useMarkAsDiscontinuedMutation,
     useDeleteInventoryRecordMutation,
+
+    // Unit of Measurement Hooks
+    useGetAllUnitOfMeasurementsQuery,
+
+    // Raw Material Hooks
+    useGetAllRawMaterialsQuery,
 } = apiSlice;
