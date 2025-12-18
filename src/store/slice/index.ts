@@ -35,7 +35,7 @@ import type {
 } from "@/types/inventory-types.ts";
 import {getEnvVariable} from "@/utils";
 import type {UnitOfMeasurementType} from "@/types/unit-of-measurement-types.ts";
-import type {RawMaterialType} from "@/types/raw-material-types.ts";
+import type {CreateRawMaterialType, RawMaterialType, SingleRawMaterialType} from "@/types/raw-material-types.ts";
 
 const baseUrl = getEnvVariable("VITE_APP_API_URL");
 
@@ -530,6 +530,15 @@ export const apiSlice = createApi({
                     }]
                     : [{type: "RawMaterials", id: "LIST"}],
         }),
+
+        createRawMaterial: builder.mutation<SingleRawMaterialType, CreateRawMaterialType>({
+            query: (body) => ({
+                url: "/raw-materials/create",
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: [{type: "RawMaterials", id: "LIST"}],
+        }),
     }),
 });
 
@@ -592,4 +601,5 @@ export const {
 
     // Raw Material Hooks
     useGetAllRawMaterialsQuery,
+    useCreateRawMaterialMutation,
 } = apiSlice;

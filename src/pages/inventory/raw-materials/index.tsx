@@ -5,12 +5,16 @@ import {useSearch} from "@/use-search.ts";
 import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 import DataGridTable from "@/components/ui/data-grid-table";
 import type {GridColDef} from "@mui/x-data-grid";
-import {useMemo} from "react";
+import {useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {formatCurrency} from "@/utils";
 import {relativeTime} from "@/utils/get-relative-time.ts";
+import CreateRawMaterial from "@/components/inventory/create-raw-material.tsx";
+import CustomButton from "@/components/ui/button.tsx";
+import AddIcon from "@mui/icons-material/Add";
 
 const RawMaterials = () => {
+    const [formModalOpen, setFormModalOpen] = useState(false);
     const {data, isLoading} = useGetAllRawMaterialsQuery();
 
     const memoizedData = useMemoizedArray(data);
@@ -19,6 +23,14 @@ const RawMaterials = () => {
         initialData: memoizedData,
         searchKeys: ["name", "symbol", "unitOfMeasurementFamily", "isBaseUnit", "conversionFactorToBase"],
     });
+
+    const handleCloseFormModal = () => {
+        setFormModalOpen(false);
+    };
+
+    const handleOpenFormModal = () => {
+        setFormModalOpen(true);
+    };
 
     const columns: GridColDef[] = useMemo(
         () => [
@@ -131,6 +143,18 @@ const RawMaterials = () => {
     );
     return (
         <Box>
+            <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
+                <Typography variant="h4" component="h1">
+                    Raw Materials
+                </Typography>
+                <CustomButton
+                    title={"Create Raw Material"}
+                    variant="contained"
+                    startIcon={<AddIcon/>}
+                    onClick={handleOpenFormModal}
+                />
+            </Box>
+
             <TableSearchActions
                 searchControl={searchControl}
                 searchSubmit={searchSubmit}
@@ -139,9 +163,11 @@ const RawMaterials = () => {
 
             <Grid container spacing={2}>
                 <Grid size={12}>
-                    <DataGridTable data={filteredData ?? []} columns={columns} loading={isLoading}/>
+                    <DataGridTable data={filteredData} columns={columns} loading={isLoading}/>
                 </Grid>
             </Grid>
+
+            <CreateRawMaterial open={formModalOpen} onClose={handleCloseFormModal}/>
         </Box>
     );
 };
