@@ -11,7 +11,7 @@ import CustomButton from "@/components/ui/button.tsx";
 import CustomCard from "@/components/customs/custom-card.tsx";
 import {formatCurrency} from "@/utils";
 import {relativeTime} from "@/utils/get-relative-time.ts";
-import RawMaterialForm from "@/components/inventory/raw-material-form.tsx";
+import RawMaterialForm from "@/components/raw-material/raw-material-form.tsx";
 import {useState} from "react";
 
 const ViewRawMaterial = () => {

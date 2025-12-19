@@ -36,6 +36,7 @@ import type {
 import {getEnvVariable} from "@/utils";
 import type {UnitOfMeasurementType} from "@/types/unit-of-measurement-types.ts";
 import type {
+    CreateRawMaterialInventoryType,
     CreateRawMaterialType,
     RawMaterialType,
     SingleRawMaterialType,
@@ -143,7 +144,9 @@ export const apiSlice = createApi({
         "InventoryTransactions",
         "RawMaterials",
         "RawMaterial",
-        "UnitOfMeasurements"
+        "UnitOfMeasurements",
+        "RawMaterialInventory",
+        "RawMaterialInventories"
     ],
     endpoints: (builder) => ({
         // -------------------------
@@ -525,7 +528,7 @@ export const apiSlice = createApi({
         }),
 
         // -------------------------
-        // Raw Material Inventory Endpoints
+        // Raw Material Endpoints
         // -------------------------
         getAllRawMaterials: builder.query<RawMaterialType[], void>({
             query: () => "/raw-materials",
@@ -574,6 +577,33 @@ export const apiSlice = createApi({
                 {type: "RawMaterials", id: "LIST"},
             ],
         }),
+
+        // -------------------------
+        // Raw Material Inventory Endpoints
+        // -------------------------
+        getAllRawMaterialInventory: builder.query<any[], void>({
+            query: () => "/raw-materials/inventory",
+            providesTags: (result) =>
+                result
+                    ? [...result.map(({id}) => ({type: "RawMaterialInventories" as const, id})), {
+                        type: "RawMaterialInventories",
+                        id: "LIST"
+                    }]
+                    : [{type: "RawMaterialInventories", id: "LIST"}],
+        }),
+
+        createRawMaterialInventory: builder.mutation<any, CreateRawMaterialInventoryType>({
+            query: ({rawMaterialId, ...body}) => ({
+                url: `/raw-materials/inventory/${rawMaterialId}`,
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: (_result, _error, {rawMaterialId}) => [
+                {type: "RawMaterialInventory", id: rawMaterialId},
+                {type: "RawMaterialInventories", id: "LIST"},
+            ],
+        }),
+
     }),
 });
 
@@ -640,4 +670,8 @@ export const {
     useGetSingleRawMaterialQuery,
     useUpdateRawMaterialMutation,
     useDeleteRawMaterialMutation,
+
+    // Raw Material Inventory Hooks
+    useGetAllRawMaterialInventoryQuery,
+    useCreateRawMaterialInventoryMutation
 } = apiSlice;
