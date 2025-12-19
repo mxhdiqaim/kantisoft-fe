@@ -143,7 +143,9 @@ export const apiSlice = createApi({
         "InventoryTransactions",
         "RawMaterials",
         "RawMaterial",
-        "UnitOfMeasurements"
+        "UnitOfMeasurements",
+        "RawMaterialInventory",
+        "RawMaterialInventories"
     ],
     endpoints: (builder) => ({
         // -------------------------
@@ -525,7 +527,7 @@ export const apiSlice = createApi({
         }),
 
         // -------------------------
-        // Raw Material Inventory Endpoints
+        // Raw Material Endpoints
         // -------------------------
         getAllRawMaterials: builder.query<RawMaterialType[], void>({
             query: () => "/raw-materials",
@@ -573,6 +575,20 @@ export const apiSlice = createApi({
                 {type: "RawMaterial", id},
                 {type: "RawMaterials", id: "LIST"},
             ],
+        }),
+
+        // -------------------------
+        // Raw Material Inventory Endpoints
+        // -------------------------
+        getAllRawMaterialInventory: builder.query<any[], void>({
+            query: () => "/raw-materials/inventory",
+            providesTags: (result) =>
+                result
+                    ? [...result.map(({id}) => ({type: "RawMaterialInventories" as const, id})), {
+                        type: "RawMaterialInventories",
+                        id: "LIST"
+                    }]
+                    : [{type: "RawMaterialInventories", id: "LIST"}],
         }),
     }),
 });
@@ -640,4 +656,7 @@ export const {
     useGetSingleRawMaterialQuery,
     useUpdateRawMaterialMutation,
     useDeleteRawMaterialMutation,
+
+    // Raw Material Inventory Hooks
+    useGetAllRawMaterialInventoryQuery,
 } = apiSlice;

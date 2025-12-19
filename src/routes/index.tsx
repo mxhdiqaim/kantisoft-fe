@@ -38,6 +38,7 @@ import PlaylistAddCheckCircleOutlinedIcon from "@mui/icons-material/PlaylistAddC
 import RestaurantMenuOutlinedIcon from "@mui/icons-material/RestaurantMenuOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
+import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 
 import {IconButton} from "@mui/material";
 
@@ -160,13 +161,13 @@ export const appRoutes: AppRouteType[] = [
         children: [
             {
                 to: "management",
-                title: "Inventory Management",
+                title: "Management",
                 element: InventoryManagementScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
             {
                 to: "transactions",
-                title: "Inventory Transactions",
+                title: "Transactions",
                 element: InventoryTransactionsScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
@@ -177,24 +178,39 @@ export const appRoutes: AppRouteType[] = [
                 hidden: true,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
+        ]
+    },
+
+    // ---------------------------------
+    // Raw Material Management
+    // ---------------------------------
+    {
+        to: "/raw-materials", // STEP 1: Define ingredients (Flour, Milk, etc.)
+        title: "Raw Materials",
+        element: RawMaterialsScreen,
+        icon: (
+            <IconButton size={"medium"}>
+                <CategoryOutlinedIcon/>
+            </IconButton>
+        ),
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+        children: [
             {
-                to: "raw-materials", // STEP 1: Define ingredients (Flour, Milk, etc.)
-                title: "Raw Materials",
+                to: "management",
+                title: "Management",
                 element: RawMaterialsScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
-                children: [
-                    {
-                        to: ":id/view",
-                        title: "View Raw Material",
-                        element: ViewRawMaterialScreen,
-                        hidden: true,
-                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
-                    }
-                ]
             },
             {
-                to: "raw-material-inventory", // STEP 2: Current stock levels per store
-                title: "Raw Material Inventory",
+                to: ":id/view",
+                title: "Material",
+                element: ViewRawMaterialScreen,
+                hidden: true,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+            },
+            {
+                to: "inventory", // STEP 2: Current stock levels per store
+                title: "Inventory",
                 element: RawMaterialInventoryScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },

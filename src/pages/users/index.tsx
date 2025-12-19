@@ -33,7 +33,10 @@ const UsersPage = () => {
     const {t} = useTranslation();
     const currentUser = useAppSelector(selectCurrentUser);
     const {data: usersData, isLoading, isError, error} = useGetAllUsersQuery();
+
     const {data: storesData} = useGetAllStoresQuery();
+    const memoizedStoresData = useMemoizedArray(storesData);
+
     const [changeUserStore, {isLoading: isChangingStore}] = useChangeUserStoreMutation();
 
     const flattenedUsers = useMemo(() => {
@@ -47,8 +50,6 @@ const UsersPage = () => {
     }, [usersData]);
 
     const memoizedUsers: UserType[] = useMemoizedArray(flattenedUsers)
-
-    console.log("Users Data:", memoizedUsers);
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -382,7 +383,7 @@ const UsersPage = () => {
                 open={isChangeStoreDialogOpen}
                 onClose={handleCloseChangeStoreDialog}
                 user={selectedUser}
-                stores={storesData ?? []}
+                stores={memoizedStoresData}
                 onConfirm={handleChangeStore}
                 isLoading={isChangingStore}
             />

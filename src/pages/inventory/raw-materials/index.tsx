@@ -83,7 +83,7 @@ const RawMaterials = () => {
                             variant="body2"
                             fontWeight="500"
                             sx={{textTransform: "capitalize", textDecoration: "underline", cursor: "pointer"}}
-                            onClick={() => navigate(`/inventory/raw-materials/${params.row.id}/view`)}
+                            onClick={() => navigate(`/raw-materials/${params.row.id}/view`)}
                         >
                             {params.value}
                         </Typography>
@@ -188,7 +188,7 @@ const RawMaterials = () => {
                         }
                     >
                         <TableStyledMenuItem
-                            onClick={() => navigate(`/inventory/raw-materials/${params.row.id}/view`)}
+                            onClick={() => navigate(`/raw-materials/${params.row.id}/view`)}
                             sx={{borderRadius: theme.borderRadius.small, mx: 1}}
                         >
                             View Raw Material
