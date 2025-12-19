@@ -221,7 +221,7 @@ const RawMaterialInventory = () => {
                     Raw Material Inventory
                 </Typography>
                 <CustomButton
-                    title={"Create Raw Material"}
+                    title={"Add Inventory"}
                     variant="contained"
                     startIcon={<AddIcon/>}
                     onClick={handleOpenFormModal}

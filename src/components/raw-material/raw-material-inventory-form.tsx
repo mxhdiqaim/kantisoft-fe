@@ -6,6 +6,7 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {
     createRawMaterialInventorySchema,
     type CreateRawMaterialInventoryType,
+    type SingleRawMaterialInventoryType,
     type UpdateRawMaterialInventoryType,
 } from "@/types/raw-material-types.ts";
 import {StyledTextField} from "@/components/ui";
@@ -23,7 +24,7 @@ import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
 interface Props {
     open: boolean;
     onClose: () => void;
-    rawMaterialInventory?: UpdateRawMaterialInventoryType | null;
+    rawMaterialInventory?: SingleRawMaterialInventoryType | null;
 }
 
 const RawMaterialInventoryForm: FC<Props> = ({open, onClose, rawMaterialInventory}) => {
@@ -35,20 +36,22 @@ const RawMaterialInventoryForm: FC<Props> = ({open, onClose, rawMaterialInventor
     });
     const [createRawMaterialInventory, {
         isLoading: isCreating,
-        isSuccess: isCreateSuccess
+        isSuccess: isCreateSuccess,
+        reset: resetCreateMutation
     }] = useCreateRawMaterialInventoryMutation();
 
     const [updateRawMaterialInventory, {
         isLoading: isUpdating,
-        isSuccess: isUpdateSuccess
+        isSuccess: isUpdateSuccess,
+        reset: resetUpdateMutation
     }] = useUpdateRawMaterialInventoryMutation();
-    
+
     const {
         control,
         handleSubmit,
-        reset,
+        reset: resetForm,
         formState: {errors},
-    } = useForm<CreateRawMaterialInventoryType>({
+    } = useForm({
         defaultValues: {
             rawMaterialId: "",
             quantity: 0,
@@ -57,39 +60,45 @@ const RawMaterialInventoryForm: FC<Props> = ({open, onClose, rawMaterialInventor
         resolver: yupResolver(createRawMaterialInventorySchema),
     });
 
+    const handleClose = () => {
+        onClose();
+        resetCreateMutation();
+        resetUpdateMutation();
+    };
+
     useEffect(() => {
         if (isCreateSuccess || isUpdateSuccess) {
-            onClose();
+            handleClose();
         }
-    }, [isCreateSuccess, isUpdateSuccess, onClose]);
+    }, [isCreateSuccess, isUpdateSuccess]);
 
     useEffect(() => {
         if (rawMaterialInventory && open) {
-            reset({
+            resetForm({
                 rawMaterialId: rawMaterialInventory.rawMaterialId,
                 minStockLevel: rawMaterialInventory.minStockLevel,
                 quantity: rawMaterialInventory.quantity,
             });
         } else if (!open) {
-            reset({
+            resetForm({
                 rawMaterialId: "",
                 quantity: 0,
                 minStockLevel: 0,
             });
         }
-    }, [rawMaterialInventory, open, reset]);
+    }, [rawMaterialInventory, open, resetForm]);
 
-    const onSubmit = async (data: CreateRawMaterialInventoryType) => {
+    const onSubmit = async (data: CreateRawMaterialInventoryType | UpdateRawMaterialInventoryType) => {
         try {
             if (isEditMode && rawMaterialInventory) {
                 const payload = {
                     id: rawMaterialInventory.id,
                     minStockLevel: data.minStockLevel,
                 }
-                await updateRawMaterialInventory(payload).unwrap();
+                await updateRawMaterialInventory(payload as UpdateRawMaterialInventoryType).unwrap();
                 notify("Raw Material Inventory Updated Successfully!", "success");
             } else {
-                await createRawMaterialInventory(data).unwrap();
+                await createRawMaterialInventory(data as CreateRawMaterialInventoryType).unwrap();
                 notify("Raw Material Inventory Added Successfully!", "success");
             }
         } catch (error) {

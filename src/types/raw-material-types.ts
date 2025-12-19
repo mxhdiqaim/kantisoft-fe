@@ -105,7 +105,9 @@ export type SingleRawMaterialInventoryType = {
 }
 
 
-export type UpdateRawMaterialInventoryType = Pick<CreateRawMaterialInventoryType, "minStockLevel">;
+export type UpdateRawMaterialInventoryType = Pick<CreateRawMaterialInventoryType, "minStockLevel"> & {
+    id: string;
+};
 
 export type UpdateRawMaterialInventoryResponseType = CreateRawMaterialInventoryType & {
     id: string;
