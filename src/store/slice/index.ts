@@ -38,8 +38,12 @@ import type {UnitOfMeasurementType} from "@/types/unit-of-measurement-types.ts";
 import type {
     CreateRawMaterialInventoryType,
     CreateRawMaterialType,
+    MultipleRawMaterialInventoryResponseType,
     RawMaterialType,
+    SingleRawMaterialInventoryType,
     SingleRawMaterialType,
+    UpdateRawMaterialInventoryResponseType,
+    UpdateRawMaterialInventoryType,
     UpdateRawMaterialResponseType,
     UpdateRawMaterialType
 } from "@/types/raw-material-types.ts";
@@ -581,7 +585,7 @@ export const apiSlice = createApi({
         // -------------------------
         // Raw Material Inventory Endpoints
         // -------------------------
-        getAllRawMaterialInventory: builder.query<any[], void>({
+        getAllRawMaterialInventory: builder.query<MultipleRawMaterialInventoryResponseType[], void>({
             query: () => "/raw-materials/inventory",
             providesTags: (result) =>
                 result
@@ -592,14 +596,26 @@ export const apiSlice = createApi({
                     : [{type: "RawMaterialInventories", id: "LIST"}],
         }),
 
-        createRawMaterialInventory: builder.mutation<any, CreateRawMaterialInventoryType>({
-            query: ({rawMaterialId, ...body}) => ({
-                url: `/raw-materials/inventory/${rawMaterialId}`,
+        createRawMaterialInventory: builder.mutation<SingleRawMaterialInventoryType, CreateRawMaterialInventoryType>({
+            query: (body) => ({
+                url: `/raw-materials/inventory/create`,
                 method: "POST",
                 body,
             }),
             invalidatesTags: (_result, _error, {rawMaterialId}) => [
                 {type: "RawMaterialInventory", id: rawMaterialId},
+                {type: "RawMaterialInventories", id: "LIST"},
+            ],
+        }),
+
+        updateRawMaterialInventory: builder.mutation<UpdateRawMaterialInventoryResponseType, UpdateRawMaterialInventoryType & Pick<RawMaterialType, "id">>({
+            query: ({id, ...patch}) => ({
+                url: `/raw-materials/inventory/${id}`,
+                method: "PATCH",
+                body: patch,
+            }),
+            invalidatesTags: (_result, _error, {id}) => [
+                {type: "RawMaterialInventory", id},
                 {type: "RawMaterialInventories", id: "LIST"},
             ],
         }),
@@ -673,5 +689,6 @@ export const {
 
     // Raw Material Inventory Hooks
     useGetAllRawMaterialInventoryQuery,
-    useCreateRawMaterialInventoryMutation
+    useCreateRawMaterialInventoryMutation,
+    useUpdateRawMaterialInventoryMutation,
 } = apiSlice;

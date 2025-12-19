@@ -1,6 +1,6 @@
 import type {FC} from "react";
 import {useEffect} from "react";
-import {Autocomplete, Box, CircularProgress, Grid, TextField,} from "@mui/material";
+import {Box, FormControl, Grid, InputAdornment, MenuItem, TextField,} from "@mui/material";
 import CustomModal from "@/components/customs/custom-modal.tsx";
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
@@ -9,6 +9,9 @@ import {useCreateInventoryRecordMutation, useGetMenuItemsQuery} from "@/store/sl
 import useNotifier from "@/hooks/useNotifier.ts";
 import {getApiError} from "@/helpers/get-api-error.ts";
 import CustomButton from "@/components/ui/button.tsx";
+import {StyledTextField} from "@/components/ui";
+import Icon from "@/components/ui/icon.tsx";
+import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
 
 interface Props {
     open: boolean;
@@ -18,12 +21,12 @@ interface Props {
 const CreateInventoryRecord: FC<Props> = ({open, onClose}) => {
     const notify = useNotifier();
     const {data: menuItemsData, isLoading: isLoadingMenuItems} = useGetMenuItemsQuery({});
-    const [createInventory, {isLoading, isSuccess}] = useCreateInventoryRecordMutation();
+    const [createInventory, {isLoading, isSuccess, reset: resetMutation}] = useCreateInventoryRecordMutation();
 
     const {
         control,
         handleSubmit,
-        reset,
+        reset: resetForm,
         formState: {errors},
     } = useForm({
         resolver: yupResolver(createInventorySchema),
@@ -34,12 +37,17 @@ const CreateInventoryRecord: FC<Props> = ({open, onClose}) => {
         },
     });
 
+    const handleClose = () => {
+        onClose();
+        resetForm();
+        resetMutation();
+    }
+
     useEffect(() => {
         if (isSuccess) {
-            reset();
-            onClose();
+            handleClose();
         }
-    }, [isSuccess, onClose, reset]);
+    }, [isSuccess])
 
     const onSubmit = async (data: CreateInventoryType) => {
         try {
@@ -66,35 +74,38 @@ const CreateInventoryRecord: FC<Props> = ({open, onClose}) => {
                             name="menuItemId"
                             control={control}
                             render={({field}) => (
-                                <Autocomplete
-
-                                    value={menuItemsData?.find((option) => option.id === field.value) || null}
-                                    onChange={(_, data) => field.onChange(data?.id || "")}
-                                    options={menuItemsData || []}
-                                    getOptionLabel={(option) => option.name || ""}
-                                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                                    loading={isLoadingMenuItems}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="Select Menu Item"
-                                            error={!!errors.menuItemId}
-                                            helperText={errors.menuItemId?.message}
-                                            slotProps={{
-                                                input: {
-                                                    ...params.InputProps,
-                                                    endAdornment: (
-                                                        <>
-                                                            {isLoadingMenuItems &&
-                                                                <CircularProgress color="inherit" size={20}/>}
-                                                            {params.InputProps.endAdornment}
-                                                        </>
-                                                    )
-                                                }
-                                            }}
-                                        />
-                                    )}
-                                />
+                                <FormControl fullWidth>
+                                    <StyledTextField
+                                        {...field}
+                                        select
+                                        label="Select Menu Item"
+                                        disabled={isLoadingMenuItems}
+                                        SelectProps={{
+                                            IconComponent: () => null,
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <Icon
+                                                        src={ArrowDownIconSvg}
+                                                        alt={"Dropdown Arrow"}
+                                                        sx={{width: 15, height: 15}}
+                                                    />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                        error={Boolean(errors.menuItemId)}
+                                        helperText={errors.menuItemId?.message}
+                                    >
+                                        <MenuItem value={""} disabled>
+                                            Select Menu Item
+                                        </MenuItem>
+                                        {menuItemsData?.map((menuItem) => (
+                                            <MenuItem key={menuItem.id} value={menuItem.id}
+                                                      sx={{textTransform: "capitalize"}}>
+                                                {menuItem.name}
+                                            </MenuItem>
+                                        ))}
+                                    </StyledTextField>
+                                </FormControl>
                             )}
                         />
                     </Grid>
