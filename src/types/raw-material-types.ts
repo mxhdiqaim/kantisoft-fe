@@ -72,3 +72,21 @@ export const updateRawMaterialResponseSchema = extendBaseSchema(yup.object({
 }))
 
 export type UpdateRawMaterialResponseType = yup.InferType<typeof updateRawMaterialResponseSchema>;
+
+export const RawMaterialInventoryStatusEnum = {
+    IN_STOCK: "inStock",
+    LOW_STOCK: "lowStock",
+    OUT_OF_STOCK: "outOfStock",
+    ON_ORDER: "onOrder",
+} as const;
+
+export const RAW_MATERIAL_INVENTORY_STATUS = Object.values(RawMaterialInventoryStatusEnum);
+
+export const createRawMaterialInventorySchema = yup.object({
+    rawMaterialId: yup.string().uuid().required("Raw Material ID is required."),
+    quantity: yup.number().required("Quantity is required.").min(0, "Quantity must be at least 0."),
+    minStockLevel: yup.number().required("Minimum stock level is required.").min(0, "Minimum stock level must be at least 0."),
+    // status: yup.string().oneOf(RAW_MATERIAL_INVENTORY_STATUS).required("Inventory status is required."),
+});
+
+export type CreateRawMaterialInventoryType = yup.InferType<typeof createRawMaterialInventorySchema>;

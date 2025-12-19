@@ -36,6 +36,7 @@ import type {
 import {getEnvVariable} from "@/utils";
 import type {UnitOfMeasurementType} from "@/types/unit-of-measurement-types.ts";
 import type {
+    CreateRawMaterialInventoryType,
     CreateRawMaterialType,
     RawMaterialType,
     SingleRawMaterialType,
@@ -590,6 +591,19 @@ export const apiSlice = createApi({
                     }]
                     : [{type: "RawMaterialInventories", id: "LIST"}],
         }),
+
+        createRawMaterialInventory: builder.mutation<any, CreateRawMaterialInventoryType>({
+            query: ({rawMaterialId, ...body}) => ({
+                url: `/raw-materials/inventory/${rawMaterialId}`,
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: (_result, _error, {rawMaterialId}) => [
+                {type: "RawMaterialInventory", id: rawMaterialId},
+                {type: "RawMaterialInventories", id: "LIST"},
+            ],
+        }),
+
     }),
 });
 
@@ -659,4 +673,5 @@ export const {
 
     // Raw Material Inventory Hooks
     useGetAllRawMaterialInventoryQuery,
+    useCreateRawMaterialInventoryMutation
 } = apiSlice;

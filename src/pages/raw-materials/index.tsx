@@ -9,7 +9,7 @@ import {type MouseEvent, useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {formatCurrency} from "@/utils";
 import {relativeTime} from "@/utils/get-relative-time.ts";
-import RawMaterialForm from "@/components/inventory/raw-material-form.tsx";
+import RawMaterialForm from "@/components/raw-material/raw-material-form.tsx";
 import CustomButton from "@/components/ui/button.tsx";
 import {useNavigate} from "react-router-dom";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
