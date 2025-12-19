@@ -3,7 +3,7 @@ import {useGetAllRawMaterialInventoryQuery} from "@/store/slice";
 import CustomButton from "@/components/ui/button.tsx";
 import AddIcon from "@mui/icons-material/Add";
 import RawMaterialInventoryForm from "@/components/raw-material/raw-material-inventory-form.tsx";
-import {useMemo, useState} from "react";
+import {type MouseEvent, useMemo, useState} from "react";
 import DataGridTable from "@/components/ui/data-grid-table";
 import {useSearch} from "@/use-search.ts";
 import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
@@ -15,6 +15,7 @@ import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-men
 import {relativeTime} from "@/utils/get-relative-time.ts";
 import {camelCaseToTitleCase} from "@/utils";
 import {getInventoryStatusChipColor} from "@/components/ui";
+import type {MultipleRawMaterialInventoryResponseType,} from "@/types/raw-material-types.ts";
 
 const RawMaterialInventory = () => {
     const theme = useTheme();
@@ -23,14 +24,22 @@ const RawMaterialInventory = () => {
     const memoizedInventoryData = useMemoizedArray(data);
 
     const [formModalOpen, setFormModalOpen] = useState(false);
+    const [selectedRow, setSelectedRow] = useState<MultipleRawMaterialInventoryResponseType | null>(null);
+
+    console.log("Selected Row:", selectedRow);
 
     const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
         initialData: memoizedInventoryData,
-        searchKeys: ["name", "symbol", "unitOfMeasurementFamily", "isBaseUnit", "conversionFactorToBase"],
+        searchKeys: ["rawMaterialName", "status", "latestUnitPrice", "storeName"],
     });
+
+    const handleMenuClick = (_event: MouseEvent<HTMLElement>, row: MultipleRawMaterialInventoryResponseType) => {
+        setSelectedRow(row);
+    };
 
     const handleCloseFormModal = () => {
         setFormModalOpen(false);
+        setSelectedRow(null)
     };
 
     const handleOpenFormModal = () => {
@@ -41,7 +50,7 @@ const RawMaterialInventory = () => {
         () => [
             {
                 flex: 1,
-                field: "rawMaterial",
+                field: "rawMaterialName",
                 headerName: "Raw Material",
                 minWidth: 180,
                 align: "left",
@@ -52,7 +61,7 @@ const RawMaterialInventory = () => {
                             variant="body2"
                             fontWeight="500"
                         >
-                            {params.value.name}
+                            {params.value}
                         </Typography>
                     </TableStyledBox>
                 ),
@@ -69,6 +78,25 @@ const RawMaterialInventory = () => {
                         <Typography variant="body2">{params.value}</Typography>
                     </TableStyledBox>
                 ),
+            },
+            {
+                flex: 1,
+                field: "unitOfMeasurement",
+                headerName: "Measurement Unit",
+                minWidth: 200,
+                cellClassName: "capitalize-cell",
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => {
+                    const name = params.value.name;
+                    const symbol = params.value.symbol;
+                    return (
+                        <TableStyledBox>
+                            <Typography variant="body2" textTransform={"capitalize"}>{name}</Typography>
+                            <Typography variant="body2">({symbol})</Typography>
+                        </TableStyledBox>
+                    )
+                },
             },
             {
                 flex: 1,
@@ -104,7 +132,7 @@ const RawMaterialInventory = () => {
             },
             {
                 flex: 1,
-                field: "store",
+                field: "storeName",
                 headerName: "Store",
                 minWidth: 150,
                 align: "left",
@@ -112,7 +140,7 @@ const RawMaterialInventory = () => {
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2">
-                            {params.value.name}
+                            {params.value}
                         </Typography>
                     </TableStyledBox>
                 ),
@@ -146,7 +174,7 @@ const RawMaterialInventory = () => {
                             borderRadius: "10px",
                             color: theme.palette.text.primary,
                         }}
-                        // onClick={(e) => handleMenuClick(e, params.row)}
+                        onClick={(e) => handleMenuClick(e, params.row)}
                         startIcon={
                             <Tooltip title="More Actions" placement={"top"}>
                                 <MoreVertIcon/>
@@ -157,7 +185,7 @@ const RawMaterialInventory = () => {
                             // onClick={() => navigate(`/raw-materials/${params.row.id}/view`)}
                             sx={{borderRadius: theme.borderRadius.small, mx: 1}}
                         >
-                            View Raw Material
+                            View Inventory
                         </TableStyledMenuItem>
                         <TableStyledMenuItem
                             onClick={handleOpenFormModal}
@@ -212,7 +240,11 @@ const RawMaterialInventory = () => {
                 </Grid>
             </Grid>
 
-            <RawMaterialInventoryForm open={formModalOpen} onClose={handleCloseFormModal}/>
+            <RawMaterialInventoryForm
+                open={formModalOpen}
+                onClose={handleCloseFormModal}
+                rawMaterialInventory={selectedRow}
+            />
         </Box>
     );
 };

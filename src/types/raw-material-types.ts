@@ -82,11 +82,72 @@ export const RawMaterialInventoryStatusEnum = {
 
 export const RAW_MATERIAL_INVENTORY_STATUS = Object.values(RawMaterialInventoryStatusEnum);
 
-export const createRawMaterialInventorySchema = yup.object({
+export const rawMaterialInventorySchema = yup.object({
     rawMaterialId: yup.string().uuid().required("Raw Material ID is required."),
     quantity: yup.number().required("Quantity is required.").min(0, "Quantity must be at least 0."),
     minStockLevel: yup.number().required("Minimum stock level is required.").min(0, "Minimum stock level must be at least 0."),
     // status: yup.string().oneOf(RAW_MATERIAL_INVENTORY_STATUS).required("Inventory status is required."),
 });
 
+export const createRawMaterialInventorySchema = rawMaterialInventorySchema;
+
 export type CreateRawMaterialInventoryType = yup.InferType<typeof createRawMaterialInventorySchema>;
+
+export type SingleRawMaterialInventoryType = {
+    id: string
+    rawMaterialId: string;
+    storeId: string;
+    quantity: number;
+    minStockLevel: number;
+    status: typeof RawMaterialInventoryStatusEnum[keyof typeof RawMaterialInventoryStatusEnum];
+    createdAt: string;
+    lastModified: string;
+}
+
+
+export type UpdateRawMaterialInventoryType = Pick<CreateRawMaterialInventoryType, "minStockLevel">;
+
+export type UpdateRawMaterialInventoryResponseType = CreateRawMaterialInventoryType & {
+    id: string;
+    storeId: string;
+    status: typeof RawMaterialInventoryStatusEnum[keyof typeof RawMaterialInventoryStatusEnum];
+    createdAt: string;
+    lastModified: string;
+}
+
+export type MultipleRawMaterialInventoryResponseType = {
+    id: string;
+    quantity: number;
+    minStockLevel: number;
+    status: typeof RawMaterialInventoryStatusEnum[keyof typeof RawMaterialInventoryStatusEnum];
+    createdAt: string;
+    lastModified: string;
+    rawMaterialId: string;
+    rawMaterialName: string;
+    latestUnitPrice: number;
+    unitOfMeasurement: {
+        id: string;
+        name: string;
+        symbol: string;
+    },
+    storeId: string;
+    storeName: string;
+};
+
+export const RawMaterialTransactionSourceEnum = {
+    PURCHASE_RECEIPT: "purchaseReceipt",
+    PRODUCTION_USAGE: "productionUsage",
+    INVENTORY_ADJUSTMENT: "inventoryAdjustment",
+    WASTAGE: "wastage",
+    TRANSFER_IN: "transferIn",
+    TRANSFER_OUT: "transferOut",
+} as const;
+
+export const RAW_MATERIAL_TRANSACTION_SOURCE = Object.values(RawMaterialTransactionSourceEnum);
+
+export const RawMaterialTransactionTypeEnum = {
+    GOING_IN: "goingIn",
+    GOING_OUT: "goingOut",
+} as const;
+
+export const RAW_MATERIAL_TRANSACTION_TYPE = Object.values(RawMaterialTransactionTypeEnum);
