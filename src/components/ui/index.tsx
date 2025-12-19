@@ -3,6 +3,7 @@ import {InventoryStatusEnum, TransactionTypeEnum} from "@/types/inventory-types.
 import type {UserRoleType, UserStatus} from "@/types/user-types.ts";
 import type {MenuItemInventoryType} from "@/types/menu-item-type.ts";
 import {styled, TextField} from "@mui/material";
+import CustomCard from "@/components/customs/custom-card.tsx";
 
 export const getPaymentStatusChipColor = (status: string) => {
     switch (status) {
@@ -109,3 +110,8 @@ export const getRawMaterialStatusChipColor = (status: string) => {
     }
 };
 
+export const DashedCard = styled(CustomCard)(({theme}) => ({
+    borderStyle: "dashed",
+    boxShadow: "none",
+    borderRadius: theme.borderRadius.large,
+}));

@@ -3,7 +3,7 @@ import {useGetAllRawMaterialInventoryQuery} from "@/store/slice";
 import CustomButton from "@/components/ui/button.tsx";
 import AddIcon from "@mui/icons-material/Add";
 import RawMaterialInventoryForm from "@/components/raw-material/raw-material-inventory-form.tsx";
-import {type MouseEvent, useMemo, useState} from "react";
+import {type MouseEvent, useCallback, useMemo, useState} from "react";
 import DataGridTable from "@/components/ui/data-grid-table";
 import {useSearch} from "@/use-search.ts";
 import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
@@ -16,6 +16,7 @@ import {relativeTime} from "@/utils/get-relative-time.ts";
 import {camelCaseToTitleCase} from "@/utils";
 import {getInventoryStatusChipColor} from "@/components/ui";
 import type {MultipleRawMaterialInventoryResponseType,} from "@/types/raw-material-types.ts";
+import InventoryDetailsDrawer from "@/components/raw-material/inventory-details-drawer.tsx";
 
 const RawMaterialInventory = () => {
     const theme = useTheme();
@@ -24,9 +25,8 @@ const RawMaterialInventory = () => {
     const memoizedInventoryData = useMemoizedArray(data);
 
     const [formModalOpen, setFormModalOpen] = useState(false);
+    const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedRow, setSelectedRow] = useState<MultipleRawMaterialInventoryResponseType | null>(null);
-
-    console.log("Selected Row:", selectedRow);
 
     const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
         initialData: memoizedInventoryData,
@@ -46,6 +46,14 @@ const RawMaterialInventory = () => {
         setFormModalOpen(true);
     };
 
+    const handleDrawerOpen = useCallback(() => {
+        setDrawerOpen(true);
+    }, []);
+
+    const handleDrawerClose = useCallback(() => {
+        setDrawerOpen(false);
+    }, []);
+
     const columns: GridColDef[] = useMemo(
         () => [
             {
@@ -60,6 +68,8 @@ const RawMaterialInventory = () => {
                         <Typography
                             variant="body2"
                             fontWeight="500"
+                            sx={{textTransform: "capitalize", textDecoration: "underline", cursor: "pointer"}}
+                            onClick={handleDrawerOpen}
                         >
                             {params.value}
                         </Typography>
@@ -239,6 +249,13 @@ const RawMaterialInventory = () => {
                     <DataGridTable data={filteredData} columns={columns} loading={isLoading}/>
                 </Grid>
             </Grid>
+
+            <InventoryDetailsDrawer
+                open={drawerOpen}
+                onOpen={() => setDrawerOpen(true)}
+                onClose={handleDrawerClose}
+                inventoryData={selectedRow}
+            />
 
             <RawMaterialInventoryForm
                 open={formModalOpen}
