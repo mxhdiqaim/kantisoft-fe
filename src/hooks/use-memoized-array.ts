@@ -9,3 +9,13 @@ import {useMemo} from "react";
 export const useMemoizedArray = <T>(data: T[] | undefined): T[] => {
     return useMemo(() => data ?? [], [data]);
 }
+
+/**
+ * A custom hook to memoize an object, returning an empty object if the input is null or undefined.
+ * @template T The type of the object.
+ * @param {T | null | undefined} data The data object to memoize.
+ * @returns {T | {}} A memoized object.
+ */
+export const useMemoizedObject = <T extends object>(data: T | null | undefined): T | object => {
+    return useMemo(() => data ?? {}, [data]);
+};

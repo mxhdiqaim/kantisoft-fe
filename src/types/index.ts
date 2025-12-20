@@ -74,3 +74,5 @@ export interface ActivityLogResponse {
     limit: number;
     offset: number;
 }
+
+export type DrawerAnchor = "left" | "bottom" | "right" | "top";
