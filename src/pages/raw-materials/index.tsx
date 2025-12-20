@@ -5,32 +5,32 @@ import {useSearch} from "@/use-search.ts";
 import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 import DataGridTable from "@/components/ui/data-grid-table";
 import type {GridColDef} from "@mui/x-data-grid";
-import {type MouseEvent, useMemo, useState} from "react";
+import {type MouseEvent, useCallback, useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {formatCurrency} from "@/utils";
 import {relativeTime} from "@/utils/get-relative-time.ts";
 import RawMaterialForm from "@/components/raw-material/raw-material-form.tsx";
 import CustomButton from "@/components/ui/button.tsx";
-import {useNavigate} from "react-router-dom";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
 import type {RawMaterialType} from "@/types/raw-material-types.ts";
 import useNotifier from "@/hooks/useNotifier.ts";
+import CustomModal from "@/components/customs/custom-modal.tsx";
+import ViewRawMaterial from "@/pages/raw-materials/view-raw-material.tsx";
 
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import CustomModal from "@/components/customs/custom-modal.tsx";
 
 const RawMaterials = () => {
     const theme = useTheme();
     const notify = useNotifier();
-    const navigate = useNavigate();
     const [formModalOpen, setFormModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [selectedRow, setSelectedRow] = useState<RawMaterialType | null>(null);
+    const [drawerOpen, setDrawerOpen] = useState(false);
 
     const {data: rawMaterialData, isLoading: isFetchingRawMaterial} = useGetAllRawMaterialsQuery();
-    const [deleteRawMaterial, {isLoading: isDeleting}] = useDeleteRawMaterialMutation();
 
+    const [deleteRawMaterial, {isLoading: isDeleting}] = useDeleteRawMaterialMutation();
     const memoizedRawMaterialData = useMemoizedArray(rawMaterialData);
 
     const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
@@ -55,6 +55,14 @@ const RawMaterials = () => {
         setSelectedRow(null);
     };
 
+    const handleDrawerOpen = useCallback(() => {
+        setDrawerOpen(true);
+    }, []);
+
+    const handleDrawerClose = useCallback(() => {
+        setDrawerOpen(false);
+    }, []);
+
     const handleDeleteFactory = async () => {
         if (selectedRow) {
             try {
@@ -74,17 +82,12 @@ const RawMaterials = () => {
                 flex: 1,
                 field: "name",
                 headerName: "Name",
-                minWidth: 150,
+                minWidth: 180,
                 align: "left",
                 headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
-                        <Typography
-                            variant="body2"
-                            fontWeight="500"
-                            sx={{textTransform: "capitalize", textDecoration: "underline", cursor: "pointer"}}
-                            onClick={() => navigate(`/raw-materials/${params.row.id}/view`)}
-                        >
+                        <Typography variant="body2" fontWeight="500">
                             {params.value}
                         </Typography>
                     </TableStyledBox>
@@ -188,8 +191,9 @@ const RawMaterials = () => {
                         }
                     >
                         <TableStyledMenuItem
-                            onClick={() => navigate(`/raw-materials/${params.row.id}/view`)}
+                            // onClick={() => navigate(`/raw-materials/${params.row.id}/view`)}
                             sx={{borderRadius: theme.borderRadius.small, mx: 1}}
+                            onClick={handleDrawerOpen}
                         >
                             View Raw Material
                         </TableStyledMenuItem>
@@ -247,6 +251,15 @@ const RawMaterials = () => {
             </Grid>
 
             <RawMaterialForm open={formModalOpen} onClose={handleCloseFormModal} rawMaterial={selectedRow}/>
+
+            {selectedRow?.id && (
+                <ViewRawMaterial
+                    open={drawerOpen}
+                    onOpen={() => setDrawerOpen(true)}
+                    onClose={handleDrawerClose}
+                    rawMaterialId={selectedRow?.id as string}
+                />
+            )}
 
             <CustomModal
                 open={deleteModalOpen}
