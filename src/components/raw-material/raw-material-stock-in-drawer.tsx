@@ -1,4 +1,4 @@
-import {type FC, useEffect} from "react";
+import {type FC} from "react";
 import {Box, FormControl, Grid, InputAdornment, MenuItem, Stack} from "@mui/material";
 import DataDrawer from "@/components/ui/data-drawer.tsx";
 import {drawerPaperProps} from "@/components/styles";
@@ -32,12 +32,7 @@ const RawMaterialStockInDrawer: FC<Props> = ({open, onOpen, onClose, rawMaterial
 
     const {data: measurementUnit, isLoading: isMeasurementLoading} = useGetAllUnitOfMeasurementsQuery();
 
-    const [stockInRawMaterialInventory, {
-        isLoading,
-        isSuccess,
-        isError,
-        error
-    }] = useStockInRawMaterialInventoryMutation();
+    const [stockInRawMaterialInventory, {isLoading}] = useStockInRawMaterialInventoryMutation();
 
     const {
         control,
@@ -49,21 +44,17 @@ const RawMaterialStockInDrawer: FC<Props> = ({open, onOpen, onClose, rawMaterial
         resolver: yupResolver(stockInRawMaterialSchema),
     });
 
-    useEffect(() => {
-        if (isSuccess) {
+    const onSubmit = async (data: StockInRawMaterialType) => {
+        try {
+            await stockInRawMaterialInventory({...data, id: rawMaterialId});
             notify("Stock in Successfully!", "success");
             onClose();
             reset();
-        }
-        if (isError) {
+        } catch (error) {
             const defaultMessage = `Failed to stock in. Please try again.`;
             const apiError = getApiError(error, defaultMessage);
             notify(apiError.message, "error");
         }
-    }, [isSuccess, isError, error, notify, onClose, reset]);
-
-    const onSubmit = (data: StockInRawMaterialType) => {
-        stockInRawMaterialInventory({...data, id: rawMaterialId});
     };
 
     return (
@@ -159,7 +150,7 @@ const RawMaterialStockInDrawer: FC<Props> = ({open, onOpen, onClose, rawMaterial
                         </Grid>
                         <Grid size={{sm: 12, md: 6}}>
                             <Controller
-                                name="quantityPresentation"
+                                name="quantity"
                                 control={control}
                                 render={({field}) => (
                                     <FormControl fullWidth>
@@ -167,8 +158,8 @@ const RawMaterialStockInDrawer: FC<Props> = ({open, onOpen, onClose, rawMaterial
                                             {...field}
                                             label="Quantity"
                                             type="number"
-                                            error={Boolean(errors.quantityPresentation)}
-                                            helperText={errors.quantityPresentation?.message}
+                                            error={Boolean(errors.quantity)}
+                                            helperText={errors.quantity?.message}
                                         />
                                     </FormControl>
                                 )}
@@ -183,7 +174,6 @@ const RawMaterialStockInDrawer: FC<Props> = ({open, onOpen, onClose, rawMaterial
                                         <StyledTextField
                                             {...field}
                                             label="Reference"
-                                            disabled
                                             error={Boolean(errors.documentRefId)}
                                             helperText={errors.documentRefId?.message}
                                         />

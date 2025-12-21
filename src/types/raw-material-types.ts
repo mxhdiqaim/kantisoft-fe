@@ -159,8 +159,8 @@ export const RAW_MATERIAL_TRANSACTION_TYPE = Object.values(RawMaterialTransactio
 export const stockInRawMaterialSchema = yup.object({
     source: yup.string().oneOf(RAW_MATERIAL_TRANSACTION_SOURCE).required("Transaction source is required."),
     unitOfMeasurementId: yup.string().uuid().required("Unit of Measurement is required."),
-    quantityPresentation: yup.number().required("Quantity is required.").min(0.0001, "Quantity must be at least 0.0001."),
-    documentRefId: yup.string().uuid().optional(),
+    quantity: yup.number().required("Quantity is required.").min(0.0001, "Quantity must be at least 0.0001."),
+    documentRefId: yup.string().optional(),
     notes: yup.string().optional(),
 });
 
