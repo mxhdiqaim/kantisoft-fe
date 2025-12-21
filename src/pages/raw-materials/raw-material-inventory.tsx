@@ -223,7 +223,7 @@ const RawMaterialInventory = () => {
         <Box>
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
                 <Typography variant="h4" component="h1">
-                    Raw Material Inventory
+                    Raw Material Stock
                 </Typography>
                 <CustomButton
                     title={"Add Inventory"}

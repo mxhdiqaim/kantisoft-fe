@@ -113,7 +113,7 @@ const AppbarComponent: FC<Props> = ({toggleDrawer, drawerState}) => {
                             </Tooltip>
                         }
                     >
-                        <MenuItem onClick={() => navigate("/users/profile")} sx={{mx: 1, borderRadius: 3}}>
+                        <MenuItem onClick={() => navigate("/admin/users/profile")} sx={{mx: 1, borderRadius: 3}}>
                             <PersonOutline sx={{mr: 1}}/> Profile
                         </MenuItem>
                         <Divider/>

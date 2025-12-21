@@ -117,7 +117,7 @@ const InventoryManagement = () => {
             renderCell: (params) => (
                 <TableStyledBox
                     sx={{cursor: 'pointer', ":hover": {textDecoration: "underline"}}}
-                    onClick={() => navigate(`/inventory/${params.row.menuItemId}/transactions`)}
+                    onClick={() => navigate(`/stock/finished-goods/${params.row.menuItemId}/transactions`)}
                 >
                     <Typography variant="body2">{params.value.name}</Typography>
                 </TableStyledBox>
@@ -285,7 +285,7 @@ const InventoryManagement = () => {
         <>
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
                 <Typography variant="h4" component="h1">
-                    Inventory Management
+                    {t('menuItemStock')}
                 </Typography>
                 {canInteract && (
                     <CustomButton

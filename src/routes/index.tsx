@@ -32,18 +32,12 @@ import {type UserRole, UserRoleEnum} from "@/types/user-types";
 import {DashboardOutlined} from "@mui/icons-material";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
-import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
-import PlaylistAddCheckCircleOutlinedIcon from "@mui/icons-material/PlaylistAddCheckCircleOutlined";
 import RestaurantMenuOutlinedIcon from "@mui/icons-material/RestaurantMenuOutlined";
-import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
-import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
-
-import {IconButton} from "@mui/material";
 
 export interface AppRouteType {
     to: string;
-    element: ComponentType;
+    element?: ComponentType;
     title?: string;
     icon?: ReactNode;
     useLayout?: boolean;
@@ -73,141 +67,75 @@ export const appRoutes: AppRouteType[] = [
         to: "/dashboard",
         title: "dashboard",
         element: DashboardScreen,
-        icon: (
-            <IconButton size={"medium"}>
-                <DashboardOutlined/>
-            </IconButton>
-        ),
+        icon: <DashboardOutlined/>,
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
     },
 
     // ---------------------------------
-    // POS Management
+    // POS & SALES (Revenue)
     // ---------------------------------
     {
-        to: "/point-of-sale",
-        title: "orderTracking",
-        element: PointOfSaleScreen,
-        icon: (
-            <IconButton size={"medium"}>
-                <AddAlertOutlinedIcon/>
-            </IconButton>
-        ),
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
-    },
-
-    // ---------------------------------
-    // Sales Management
-    // ---------------------------------
-    {
-        to: "/sales-history",
-        title: "salesHistory",
-        element: SalesHistoryScreen,
-        icon: (
-            <IconButton size={"medium"}>
-                <ManageAccountsOutlinedIcon/>
-            </IconButton>
-        ),
+        to: "/pos-sale",
+        title: "POS & Sales",
+        icon: <AddAlertOutlinedIcon/>,
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
         children: [
             {
-                to: ":id/view",
-                title: "viewSalesHistory",
-                element: ViewSalesHistoryScreen,
-                hidden: true,
+                to: "pos",
+                title: "orderTracking",
+                element: PointOfSaleScreen,
+                roles: [UserRoleEnum.ADMIN, UserRoleEnum.MANAGER, UserRoleEnum.USER, UserRoleEnum.GUEST],
+            },
+            {
+                to: "sales",
+                title: "salesHistory",
+                element: SalesHistoryScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
+                children: [
+                    {
+                        to: ":id/view",
+                        title: "viewSalesHistory",
+                        element: ViewSalesHistoryScreen,
+                        hidden: true,
+                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
+                    },
+                ]
             },
         ]
     },
 
     // ---------------------------------
-    // Menu Item Management
+    // PRODUCT CATALOG (Definitions)
     // ---------------------------------
     {
-        to: "/menu-item",
-        title: "menuItem",
-        element: MenuItemScreen,
-        icon: (
-            <IconButton size={"medium"}>
-                <RestaurantMenuOutlinedIcon/>
-            </IconButton>
-        ),
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+        to: "/catalog",
+        title: "Catalog",
+        icon: <RestaurantMenuOutlinedIcon/>,
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
         children: [
             {
-                to: ":id/recipe", // Define BOM here
-                title: "Manage Recipe",
-                element: BillOfMaterialsScreen,
-                hidden: true,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
-            }
-        ]
-    },
-
-    // ---------------------------------
-    // Inventory Management
-    // ---------------------------------
-    {
-        to: "/inventory",
-        title: "Inventory",
-        element: InventoryManagementScreen,
-        icon: (
-            <IconButton size={"medium"}>
-                <InventoryOutlinedIcon/>
-            </IconButton>
-        ),
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
-        children: [
-            {
-                to: "management",
-                title: "Management",
-                element: InventoryManagementScreen,
+                to: "menu-items",
+                title: "menuItem",
+                element: MenuItemScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+                children: [
+                    {
+                        to: ":id/recipe", // Define BOM here
+                        title: "Manage Recipe",
+                        element: BillOfMaterialsScreen,
+                        hidden: true,
+                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                    }
+                ]
             },
             {
-                to: "transactions",
-                title: "Transactions",
-                element: InventoryTransactionsScreen,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
-            },
-            {
-                to: ":id/transactions",
-                title: "menuItemTransactions",
-                element: SingleInventoryTransactionScreen,
-                hidden: true,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
-            },
-        ]
-    },
-
-    // ---------------------------------
-    // Raw Material Management
-    // ---------------------------------
-    {
-        to: "/raw-materials", // STEP 1: Define ingredients (Flour, Milk, etc.)
-        title: "Raw Materials",
-        element: RawMaterialsScreen,
-        icon: (
-            <IconButton size={"medium"}>
-                <CategoryOutlinedIcon/>
-            </IconButton>
-        ),
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
-        children: [
-            {
-                to: "management",
-                title: "Management",
+                to: "raw-materials",
+                title: "Raw Materials",
                 element: RawMaterialsScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
             },
             {
-                to: "inventory", // STEP 2: Current stock levels per store
-                title: "Inventory",
-                element: RawMaterialInventoryScreen,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
-            },
-            {
-                to: "measurement",
+                to: "measurements",
                 title: "Measurements",
                 element: UnitOfMeasurementsScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
@@ -216,112 +144,136 @@ export const appRoutes: AppRouteType[] = [
     },
 
     // ---------------------------------
-    // Users management
+    // INVENTORY & STOCK (Tracking)
     // ---------------------------------
     {
-        to: "/users",
-        title: "usersManagement",
-        element: UsersScreen,
-        icon: (
-            <IconButton size={"medium"}>
-                <GroupOutlinedIcon/>
-            </IconButton>
-        ),
-        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+        to: "/stock",
+        title: "Stock Management",
+        icon: <InventoryOutlinedIcon/>,
+        roles: [UserRoleEnum.ADMIN, UserRoleEnum.MANAGER, UserRoleEnum.USER],
         children: [
             {
-                to: ":id/view",
-                title: "viewUser",
-                element: ViewUserScreen,
-                hidden: true,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                to: "finished-goods", // Was "Inventory Management"
+                title: "menuItemStock",
+                element: InventoryManagementScreen,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+                children: [
+                    {
+                        to: ":id/transactions",
+                        title: "menuItemTransactions",
+                        element: SingleInventoryTransactionScreen,
+                        hidden: true,
+                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+                    },
+                ]
             },
             {
-                to: "new",
-                title: "createUser",
-                element: AddUserScreen,
-                hidden: true,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                to: "materials", // Your new Bulk Stock controller
+                title: "Raw Material Stock",
+                element: RawMaterialInventoryScreen,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
             {
-                to: ":id/edit",
-                title: "editUser",
-                element: EditUserScreen,
-                hidden: true,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
-            },
-            {
-                to: "profile",
-                title: "Profile",
-                element: ProfileScreen,
-                hidden: true,
-                authGuard: true,
-                useLayout: true,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
-            },
-            {
-                to: "change-password",
-                title: "Change Password",
-                element: ChangePasswordScreen,
-                hidden: true,
-                authGuard: true,
-                useLayout: true,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
+                to: "logs",
+                title: "Stock Transactions",
+                element: InventoryTransactionsScreen,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
         ]
     },
 
     // ---------------------------------
-    // Store management
+    // SETTINGS & ADMIN
     // ---------------------------------
     {
-        to: "/stores",
-        title: "stores",
-        element: StoreScreen,
-        icon: (
-            <IconButton size={"medium"}>
-                <StorefrontOutlinedIcon/>
-            </IconButton>
-        ),
+        to: "/admin",
+        title: "Administration",
+        icon: <GroupOutlinedIcon/>,
         roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
         children: [
             {
-                to: "new",
-                title: "createStore",
-                element: StoreFormScreen,
-                hidden: true,
-                roles: [UserRoleEnum.MANAGER],
+                to: "users",
+                title: "User Management",
+                element: UsersScreen,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                children: [
+                    {
+                        to: ":id/view",
+                        title: "viewUser",
+                        element: ViewUserScreen,
+                        hidden: true,
+                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                    },
+                    {
+                        to: "new",
+                        title: "createUser",
+                        element: AddUserScreen,
+                        hidden: true,
+                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                    },
+                    {
+                        to: ":id/edit",
+                        title: "editUser",
+                        element: EditUserScreen,
+                        hidden: true,
+                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
+                    },
+                    {
+                        to: "profile",
+                        title: "Profile",
+                        element: ProfileScreen,
+                        hidden: true,
+                        authGuard: true,
+                        useLayout: true,
+                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
+                    },
+                    {
+                        to: "change-password",
+                        title: "Change Password",
+                        element: ChangePasswordScreen,
+                        hidden: true,
+                        authGuard: true,
+                        useLayout: true,
+                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
+                    },
+                ]
             },
             {
-                to: ":id/view",
-                title: "viewStore",
-                element: ViewStoreScreen,
-                hidden: true,
-                roles: [UserRoleEnum.MANAGER],
+                to: "stores",
+                title: "Store Management",
+                element: StoreScreen,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                children: [
+                    {
+                        to: "new",
+                        title: "createStore",
+                        element: StoreFormScreen,
+                        hidden: true,
+                        roles: [UserRoleEnum.MANAGER],
+                    },
+                    {
+                        to: ":id/view",
+                        title: "viewStore",
+                        element: ViewStoreScreen,
+                        hidden: true,
+                        roles: [UserRoleEnum.MANAGER],
+                    },
+                    {
+                        to: ":id/edit",
+                        title: "editStore",
+                        element: StoreFormScreen,
+                        hidden: true,
+                        roles: [UserRoleEnum.MANAGER],
+                    },
+                ]
             },
             {
-                to: ":id/edit",
-                title: "editStore",
-                element: StoreFormScreen,
-                hidden: true,
+                to: "activity",
+                title: "System Logs",
+                element: ActivityLogScreen,
                 roles: [UserRoleEnum.MANAGER],
             },
         ]
-    },
-
-    // ---------------------------------
-    // Activity Log
-    // ---------------------------------
-    {
-        to: "/activity-log",
-        title: "Activity Log",
-        element: ActivityLogScreen,
-        icon: (
-            <IconButton size={"medium"}>
-                <PlaylistAddCheckCircleOutlinedIcon/>
-            </IconButton>
-        ),
-        roles: [UserRoleEnum.MANAGER],
     },
 
     // ---------------------------------

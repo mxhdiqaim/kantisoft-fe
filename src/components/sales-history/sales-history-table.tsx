@@ -244,7 +244,7 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 renderCell: (params) => {
 
                     const handleView = () => {
-                        navigate(`/sales-history/${params.row.id}/view`);
+                        navigate(`/pos-sale/sales/${params.row.id}/view`);
                         handleMenuClose();
                     };
                     const handleEdit = () => {
