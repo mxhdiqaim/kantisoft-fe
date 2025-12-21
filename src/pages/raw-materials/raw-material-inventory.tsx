@@ -15,7 +15,7 @@ import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-men
 import {formatRelativeDateTime} from "@/utils/get-relative-time.ts";
 import {camelCaseToTitleCase} from "@/utils";
 import {getInventoryStatusChipColor} from "@/components/ui";
-import type {MultipleRawMaterialInventoryResponseType,} from "@/types/raw-material-types.ts";
+import type {MultipleRawMaterialInventoryResponseType} from "@/types/raw-material-types.ts";
 import InventoryDetailsDrawer from "@/components/raw-material/inventory-details-drawer.tsx";
 
 const RawMaterialInventory = () => {
@@ -65,12 +65,7 @@ const RawMaterialInventory = () => {
                 headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
-                        <Typography
-                            variant="body2"
-                            fontWeight="500"
-                            sx={{textTransform: "capitalize", textDecoration: "underline", cursor: "pointer"}}
-                            onClick={handleDrawerOpen}
-                        >
+                        <Typography variant="body2" fontWeight="500">
                             {params.value}
                         </Typography>
                     </TableStyledBox>
@@ -192,7 +187,7 @@ const RawMaterialInventory = () => {
                         }
                     >
                         <TableStyledMenuItem
-                            // onClick={() => navigate(`/raw-materials/${params.row.id}/view`)}
+                            onClick={handleDrawerOpen}
                             sx={{borderRadius: theme.borderRadius.small, mx: 1}}
                         >
                             View Inventory
@@ -250,12 +245,14 @@ const RawMaterialInventory = () => {
                 </Grid>
             </Grid>
 
-            <InventoryDetailsDrawer
-                open={drawerOpen}
-                onOpen={() => setDrawerOpen(true)}
-                onClose={handleDrawerClose}
-                inventoryData={selectedRow}
-            />
+            {selectedRow?.rawMaterialId && (
+                <InventoryDetailsDrawer
+                    open={drawerOpen}
+                    onOpen={() => setDrawerOpen(true)}
+                    onClose={handleDrawerClose}
+                    rawMaterialId={selectedRow?.rawMaterialId as string}
+                />
+            )}
 
             <RawMaterialInventoryForm
                 open={formModalOpen}

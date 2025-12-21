@@ -61,7 +61,7 @@ const ViewRawMaterialDrawer: FC<Props> = ({rawMaterialId, open, onOpen, onClose}
                 <Grid container spacing={3}>
                     <Grid size={12}>
                         <CustomCard>
-                            <Typography variant="h5" gutterBottom>
+                            <Typography variant="h6" gutterBottom>
                                 Basic Information
                             </Typography>
                             <Grid container spacing={2} sx={{mt: 1}}>
@@ -107,7 +107,7 @@ const ViewRawMaterialDrawer: FC<Props> = ({rawMaterialId, open, onOpen, onClose}
                                 </Grid>
                             </Grid>
                             <Divider sx={{my: 2}}/>
-                            <Typography variant="h5" gutterBottom>
+                            <Typography variant="h6" gutterBottom>
                                 Measurement Information
                             </Typography>
                             <Box
