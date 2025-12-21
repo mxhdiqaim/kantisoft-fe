@@ -13,7 +13,6 @@ import {relativeTime} from "@/utils/get-relative-time.ts";
 import {getTransactionChipColor, getTransactionTypeChipColor} from "@/components/ui";
 
 const InventoryTransactions = () => {
-
     const {control, watch} = useForm<{ timePeriod: TimePeriod }>({
         mode: "onChange",
         resolver: yupResolver(filterSchema),
@@ -27,7 +26,6 @@ const InventoryTransactions = () => {
     const {data, isLoading, isError, fulfilledTimeStamp} = useGetInventoryTransactionsQuery({timePeriod: period});
 
     const [lastFetched, setLastFetched] = useState<Date | null>(null);
-
 
     const columns: GridColDef[] = useMemo(() => [
         {
