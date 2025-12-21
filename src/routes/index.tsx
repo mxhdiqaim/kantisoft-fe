@@ -24,7 +24,6 @@ import {
     StoreScreen,
     UnitOfMeasurementsScreen,
     UsersScreen,
-    ViewRawMaterialScreen,
     ViewSalesHistoryScreen,
     ViewStoreScreen,
     ViewUserScreen,
@@ -199,13 +198,6 @@ export const appRoutes: AppRouteType[] = [
                 to: "management",
                 title: "Management",
                 element: RawMaterialsScreen,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
-            },
-            {
-                to: ":id/view",
-                title: "Material",
-                element: ViewRawMaterialScreen,
-                hidden: true,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
             },
             {

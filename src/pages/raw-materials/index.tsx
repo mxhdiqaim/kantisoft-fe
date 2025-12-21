@@ -15,7 +15,7 @@ import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-men
 import type {RawMaterialType} from "@/types/raw-material-types.ts";
 import useNotifier from "@/hooks/useNotifier.ts";
 import CustomModal from "@/components/customs/custom-modal.tsx";
-import ViewRawMaterial from "@/pages/raw-materials/view-raw-material.tsx";
+import ViewRawMaterialDrawer from "@/components/raw-material/view-raw-material-drawer.tsx";
 
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -87,7 +87,10 @@ const RawMaterials = () => {
                 headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
-                        <Typography variant="body2" fontWeight="500">
+                        <Typography
+                            variant="body2"
+                            fontWeight="500"
+                        >
                             {params.value}
                         </Typography>
                     </TableStyledBox>
@@ -110,7 +113,7 @@ const RawMaterials = () => {
                 flex: 1,
                 field: "unitOfMeasurement",
                 headerName: "Measurement Unit",
-                minWidth: 200,
+                minWidth: 180,
                 cellClassName: "capitalize-cell",
                 align: "left",
                 headerAlign: "left",
@@ -128,8 +131,8 @@ const RawMaterials = () => {
             {
                 flex: 1,
                 field: "latestUnitPricePresentation",
-                headerName: "Unit Price",
-                minWidth: 180,
+                headerName: "Price per unit",
+                minWidth: 150,
                 cellClassName: "capitalize-cell",
                 align: "left",
                 headerAlign: "left",
@@ -191,7 +194,6 @@ const RawMaterials = () => {
                         }
                     >
                         <TableStyledMenuItem
-                            // onClick={() => navigate(`/raw-materials/${params.row.id}/view`)}
                             sx={{borderRadius: theme.borderRadius.small, mx: 1}}
                             onClick={handleDrawerOpen}
                         >
@@ -253,7 +255,7 @@ const RawMaterials = () => {
             <RawMaterialForm open={formModalOpen} onClose={handleCloseFormModal} rawMaterial={selectedRow}/>
 
             {selectedRow?.id && (
-                <ViewRawMaterial
+                <ViewRawMaterialDrawer
                     open={drawerOpen}
                     onOpen={() => setDrawerOpen(true)}
                     onClose={handleDrawerClose}

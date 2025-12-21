@@ -21,7 +21,7 @@ interface Props {
     rawMaterialId: string;
 }
 
-const ViewRawMaterial: FC<Props> = ({rawMaterialId, open, onOpen, onClose}) => {
+const ViewRawMaterialDrawer: FC<Props> = ({rawMaterialId, open, onOpen, onClose}) => {
     const notify = useNotifier();
 
     const [formModalOpen, setFormModalOpen] = useState(false);
@@ -62,7 +62,7 @@ const ViewRawMaterial: FC<Props> = ({rawMaterialId, open, onOpen, onClose}) => {
                     <Grid size={12}>
                         <CustomCard>
                             <Typography variant="h5" gutterBottom>
-                                Material Information
+                                Basic Information
                             </Typography>
                             <Grid container spacing={2} sx={{mt: 1}}>
                                 <Grid size={{xs: 12, sm: 6}}>
@@ -157,4 +157,4 @@ const ViewRawMaterial: FC<Props> = ({rawMaterialId, open, onOpen, onClose}) => {
     );
 };
 
-export default ViewRawMaterial;
+export default ViewRawMaterialDrawer;
