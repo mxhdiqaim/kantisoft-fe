@@ -12,11 +12,12 @@ import type {GridColDef} from "@mui/x-data-grid";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
-import {relativeTime} from "@/utils/get-relative-time.ts";
+import {formatRelativeDateTime} from "@/utils/get-relative-time.ts";
 import {camelCaseToTitleCase} from "@/utils";
 import {getInventoryStatusChipColor} from "@/components/ui";
-import type {MultipleRawMaterialInventoryResponseType,} from "@/types/raw-material-types.ts";
+import type {MultipleRawMaterialInventoryResponseType} from "@/types/raw-material-types.ts";
 import InventoryDetailsDrawer from "@/components/raw-material/inventory-details-drawer.tsx";
+import RawMaterialStockInDrawer from "@/components/raw-material/raw-material-stock-in-drawer.tsx";
 
 const RawMaterialInventory = () => {
     const theme = useTheme();
@@ -25,7 +26,8 @@ const RawMaterialInventory = () => {
     const memoizedInventoryData = useMemoizedArray(data);
 
     const [formModalOpen, setFormModalOpen] = useState(false);
-    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [openInventoryDetailDrawer, setOpenInventoryDetailDrawer] = useState(false);
+    const [openStockInDrawer, setOpenStockInDrawer] = useState(false);
     const [selectedRow, setSelectedRow] = useState<MultipleRawMaterialInventoryResponseType | null>(null);
 
     const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
@@ -46,12 +48,20 @@ const RawMaterialInventory = () => {
         setFormModalOpen(true);
     };
 
-    const handleDrawerOpen = useCallback(() => {
-        setDrawerOpen(true);
+    const handleInventoryDrawerOpen = useCallback(() => {
+        setOpenInventoryDetailDrawer(true);
     }, []);
 
-    const handleDrawerClose = useCallback(() => {
-        setDrawerOpen(false);
+    const handleInventoryDrawerClose = useCallback(() => {
+        setOpenInventoryDetailDrawer(false);
+    }, []);
+
+    const handleStockInDrawerOpen = useCallback(() => {
+        setOpenStockInDrawer(true);
+    }, []);
+
+    const handleStockInDrawerClose = useCallback(() => {
+        setOpenStockInDrawer(false);
     }, []);
 
     const columns: GridColDef[] = useMemo(
@@ -65,12 +75,7 @@ const RawMaterialInventory = () => {
                 headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
-                        <Typography
-                            variant="body2"
-                            fontWeight="500"
-                            sx={{textTransform: "capitalize", textDecoration: "underline", cursor: "pointer"}}
-                            onClick={handleDrawerOpen}
-                        >
+                        <Typography variant="body2" fontWeight="500">
                             {params.value}
                         </Typography>
                     </TableStyledBox>
@@ -80,7 +85,7 @@ const RawMaterialInventory = () => {
                 flex: 1,
                 field: "quantity",
                 headerName: "Quantity",
-                minWidth: 120,
+                minWidth: 100,
                 align: "left",
                 headerAlign: "left",
                 renderCell: (params) => (
@@ -93,7 +98,7 @@ const RawMaterialInventory = () => {
                 flex: 1,
                 field: "unitOfMeasurement",
                 headerName: "Measurement Unit",
-                minWidth: 200,
+                minWidth: 180,
                 cellClassName: "capitalize-cell",
                 align: "left",
                 headerAlign: "left",
@@ -165,15 +170,15 @@ const RawMaterialInventory = () => {
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2">
-                            {relativeTime(new Date(params.value))}
+                            {formatRelativeDateTime(params.value)}
                         </Typography>
                     </TableStyledBox>
                 ),
             },
             {
                 field: "actions",
-                headerName: "Actions",
-                width: 100,
+                headerName: "",
+                width: 60,
                 align: "center",
                 headerAlign: "center",
                 sortable: false,
@@ -192,7 +197,7 @@ const RawMaterialInventory = () => {
                         }
                     >
                         <TableStyledMenuItem
-                            // onClick={() => navigate(`/raw-materials/${params.row.id}/view`)}
+                            onClick={handleInventoryDrawerOpen}
                             sx={{borderRadius: theme.borderRadius.small, mx: 1}}
                         >
                             View Inventory
@@ -202,6 +207,12 @@ const RawMaterialInventory = () => {
                             sx={{borderRadius: theme.borderRadius.small, mx: 1}}
                         >
                             Edit Raw Material
+                        </TableStyledMenuItem>
+                        <TableStyledMenuItem
+                            onClick={handleStockInDrawerOpen}
+                            sx={{borderRadius: theme.borderRadius.small, mx: 1}}
+                        >
+                            Stock In
                         </TableStyledMenuItem>
 
                         <TableStyledMenuItem
@@ -228,7 +239,7 @@ const RawMaterialInventory = () => {
         <Box>
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
                 <Typography variant="h4" component="h1">
-                    Raw Material Inventory
+                    Raw Material Stock
                 </Typography>
                 <CustomButton
                     title={"Add Inventory"}
@@ -250,12 +261,23 @@ const RawMaterialInventory = () => {
                 </Grid>
             </Grid>
 
-            <InventoryDetailsDrawer
-                open={drawerOpen}
-                onOpen={() => setDrawerOpen(true)}
-                onClose={handleDrawerClose}
-                inventoryData={selectedRow}
-            />
+            {selectedRow?.rawMaterialId && (
+                <InventoryDetailsDrawer
+                    open={openInventoryDetailDrawer}
+                    onOpen={() => setOpenInventoryDetailDrawer(true)}
+                    onClose={handleInventoryDrawerClose}
+                    rawMaterialId={selectedRow?.rawMaterialId as string}
+                />
+            )}
+
+            {selectedRow?.rawMaterialId && (
+                <RawMaterialStockInDrawer
+                    open={openStockInDrawer}
+                    onOpen={() => setOpenStockInDrawer(true)}
+                    onClose={handleStockInDrawerClose}
+                    rawMaterialId={selectedRow?.rawMaterialId as string}
+                />
+            )}
 
             <RawMaterialInventoryForm
                 open={formModalOpen}

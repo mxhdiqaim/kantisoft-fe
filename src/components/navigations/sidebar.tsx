@@ -4,10 +4,6 @@ import {apiSlice, useGetAllStoresQuery, useLogoutMutation} from "@/store/slice";
 import {selectCurrentUser} from "@/store/slice/auth-slice";
 import {selectActiveStore, setActiveStore} from "@/store/slice/store-slice";
 import {LogoutOutlined, StorefrontOutlined} from "@mui/icons-material";
-
-import Icon from "@/components/ui/icon.tsx";
-import CancelSvgIcon from "@/assets/icons/cancel.svg";
-import CollapseSvgIcon from "@/assets/icons/collapse.svg";
 import useScreenSize from "@/hooks/use-screen-size";
 
 import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
@@ -36,6 +32,10 @@ import type {Props as AppBarProps} from "./appbar";
 import {UserRoleEnum} from "@/types/user-types.ts";
 import type {StoreType} from "@/types/store-types.ts";
 import CustomButton from "@/components/ui/button.tsx";
+
+import Icon from "@/components/ui/icon.tsx";
+import CancelSvgIcon from "@/assets/icons/cancel.svg";
+import CollapseSvgIcon from "@/assets/icons/collapse.svg";
 
 interface Props extends AppBarProps {
     sx?: SxProps<Theme>;

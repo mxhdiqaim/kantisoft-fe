@@ -1,3 +1,5 @@
+import {differenceInDays, differenceInSeconds, format, formatDistanceToNow} from 'date-fns';
+
 export const relativeTime = (previous: Date, current: Date = new Date()): string => {
     const msPerMinute = 60 * 1000;
     const msPerHour = msPerMinute * 60;
@@ -46,4 +48,54 @@ export const relativeTime = (previous: Date, current: Date = new Date()): string
 
     // over a year
     return previous.toDateString().slice(3);
+};
+
+/**
+ * Formats a date to a human-readable relative string or an absolute date.
+ * (just now, 15 min ago, 2 hours ago, 2 days ago, 2 weeks ago or MMM d, yyyy)
+ */
+export const formatRelativeDateTime = (date: Date | string | number): string => {
+    const dateObj = new Date(date);
+    const now = new Date();
+
+    // Handle "just now" (less than 30 seconds)
+    const secondsDiff = differenceInSeconds(now, dateObj);
+    if (secondsDiff < 30) {
+        return 'just now';
+    }
+
+    // Handle Absolute Date (> 30 days / 1 month)
+    const daysDiff = differenceInDays(now, dateObj);
+    if (daysDiff >= 30) {
+        return format(dateObj, 'MMM d, yyyy'); // e.g., Dec 19, 2025
+    }
+
+    // Handle Relative Time (minutes, hours, days, weeks)
+    // We use formatDistanceToNow for 30s to 30 days
+    return formatDistanceToNow(dateObj, {addSuffix: true})
+        .replace('about ', '')
+        .replace('less than a minute ago', 'just now')
+        .replace(' minutes', ' mins')
+        .replace(' minute', ' min')
+        .replace(' hours', ' hrs')
+        .replace(' hour', ' hr');
+};
+
+/**
+ * Custom date formatter for specific display variants.
+ * @param date - Date object, string, or number
+ * @param variant - 'short' (21 Dec, 2025) or 'long' (21 December 2025)
+ */
+export const formatDateCustom = (
+    date: Date | string | number,
+    variant: 'short' | 'long' = 'short'
+): string => {
+    const dateObj = new Date(date);
+
+    // d = Day (21)
+    // MMM = Short Month (Dec) | MMMM = Long Month (December)
+    // yyyy = Year (2025)
+    const pattern = variant === 'short' ? 'd MMM, yyyy' : 'd MMMM, yyyy';
+
+    return format(dateObj, pattern);
 };

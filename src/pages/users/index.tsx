@@ -267,11 +267,11 @@ const UsersPage = () => {
                 headerAlign: "center",
                 renderCell: (params) => {
                     const handleView = () => {
-                        navigate(`/users/${params.row.id}/view`);
+                        navigate(`/admin/users/${params.row.id}/view`);
                         handleMenuClose();
                     };
                     const handleEdit = () => {
-                        navigate(`/users/${params.row.id}/edit`);
+                        navigate(`/admin/users/${params.row.id}/edit`);
                         handleMenuClose();
                     };
 
@@ -363,7 +363,7 @@ const UsersPage = () => {
                         title={"New User"}
                         variant="contained"
                         startIcon={<AddOutlined/>}
-                        onClick={() => navigate("/users/new")}
+                        onClick={() => navigate("/admin/users/new")}
                     />
                 )}
             </Box>

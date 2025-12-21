@@ -173,11 +173,11 @@ const StoresPage = () => {
                     const isDeleteDisabled = isMainStore && hasBranches;
 
                     const handleView = () => {
-                        navigate(`/stores/${params.row.id}/view`);
+                        navigate(`/admin/stores/${params.row.id}/view`);
                         handleMenuClose();
                     };
                     const handleEdit = () => {
-                        navigate(`/stores/${params.row.id}/edit`);
+                        navigate(`/admin/stores/${params.row.id}/edit`);
                         handleMenuClose();
                     };
 
@@ -234,7 +234,7 @@ const StoresPage = () => {
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3}}>
                 <Typography variant="h4">{t("store")} Management</Typography>
                 <CustomButton title={`New ${t("store")}`} variant="contained" startIcon={<AddOutlined/>}
-                              onClick={() => navigate("/stores/new")}/>
+                              onClick={() => navigate("/admin/stores/new")}/>
             </Box>
             <TableSearchActions
                 searchControl={searchControl}

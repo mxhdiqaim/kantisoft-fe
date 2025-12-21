@@ -12,9 +12,9 @@ const HomeScreen = () => {
 
     useEffect(() => {
         if (currentUser) {
-            // Specifically handle the 'guest' role to prevent redirection to a data-heavy dashboard.
+            // Specifically, handle the 'guest' role to prevent redirection to a data-heavy dashboard.
             if (currentUser.role === UserRoleEnum.GUEST) {
-                navigate("/point-of-sale", {replace: true});
+                navigate("/pos-sale/pos", {replace: true});
                 return;
             }
 
@@ -33,7 +33,7 @@ const HomeScreen = () => {
             } else {
                 // As a fallback, if no specific page is found for the user's role,
                 // send them to the login page.
-                navigate("/profile", {replace: true});
+                navigate("/admin/profile", {replace: true});
             }
         } else {
             // If there's no authenticated user, they must log in.

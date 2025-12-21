@@ -4,7 +4,6 @@ import {getApiError} from "@/helpers/get-api-error.ts";
 import ApiErrorDisplay from "@/components/feedback/api-error-display.tsx";
 import {Box, Divider, Grid, Stack, Typography} from "@mui/material";
 import {EditOutlined} from "@mui/icons-material";
-import {format, formatRelative} from "date-fns";
 import ViewRawMaterialSkeleton from "@/components/spinners/view-raw-material-skeleton.tsx";
 import CustomButton from "@/components/ui/button.tsx";
 import CustomCard from "@/components/customs/custom-card.tsx";
@@ -13,6 +12,7 @@ import RawMaterialForm from "@/components/raw-material/raw-material-form.tsx";
 import {type FC, useState} from "react";
 import {drawerPaperProps} from "@/components/styles";
 import DataDrawer from "@/components/ui/data-drawer.tsx";
+import {formatDateCustom, formatRelativeDateTime} from "@/utils/get-relative-time.ts";
 
 interface Props {
     open: boolean;
@@ -21,7 +21,7 @@ interface Props {
     rawMaterialId: string;
 }
 
-const ViewRawMaterial: FC<Props> = ({rawMaterialId, open, onOpen, onClose}) => {
+const ViewRawMaterialDrawer: FC<Props> = ({rawMaterialId, open, onOpen, onClose}) => {
     const notify = useNotifier();
 
     const [formModalOpen, setFormModalOpen] = useState(false);
@@ -61,8 +61,8 @@ const ViewRawMaterial: FC<Props> = ({rawMaterialId, open, onOpen, onClose}) => {
                 <Grid container spacing={3}>
                     <Grid size={12}>
                         <CustomCard>
-                            <Typography variant="h5" gutterBottom>
-                                Material Information
+                            <Typography variant="h6" gutterBottom>
+                                Basic Information
                             </Typography>
                             <Grid container spacing={2} sx={{mt: 1}}>
                                 <Grid size={{xs: 12, sm: 6}}>
@@ -94,7 +94,7 @@ const ViewRawMaterial: FC<Props> = ({rawMaterialId, open, onOpen, onClose}) => {
                                         Modified on
                                     </Typography>
                                     <Typography variant="body1" fontWeight={500}>
-                                        {formatRelative(new Date(rawMaterial.lastModified), new Date())}
+                                        {formatRelativeDateTime(rawMaterial.lastModified)}
                                     </Typography>
                                 </Grid>
                                 <Grid size={{xs: 12, sm: 6}}>
@@ -102,12 +102,12 @@ const ViewRawMaterial: FC<Props> = ({rawMaterialId, open, onOpen, onClose}) => {
                                         Date Added
                                     </Typography>
                                     <Typography variant="body1" fontWeight={500}>
-                                        {format(new Date(rawMaterial.createdAt), "dd, MMMM yyyy")}
+                                        {formatDateCustom(rawMaterial.createdAt)}
                                     </Typography>
                                 </Grid>
                             </Grid>
                             <Divider sx={{my: 2}}/>
-                            <Typography variant="h5" gutterBottom>
+                            <Typography variant="h6" gutterBottom>
                                 Measurement Information
                             </Typography>
                             <Box
@@ -157,4 +157,4 @@ const ViewRawMaterial: FC<Props> = ({rawMaterialId, open, onOpen, onClose}) => {
     );
 };
 
-export default ViewRawMaterial;
+export default ViewRawMaterialDrawer;

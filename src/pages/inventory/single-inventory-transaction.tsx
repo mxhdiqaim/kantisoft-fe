@@ -9,6 +9,7 @@ import {relativeTime} from "@/utils/get-relative-time.ts";
 import CustomButton from "@/components/ui/button.tsx";
 import {ArrowBackIosNewOutlined} from "@mui/icons-material";
 import {getTransactionChipColor} from "@/components/ui";
+import {AppBreadcrumbs} from "@/helpers";
 
 const SingleInventoryTransaction = () => {
     const {id: menuItemId} = useParams<{ id: string }>();
@@ -141,6 +142,7 @@ const SingleInventoryTransaction = () => {
 
     return (
         <>
+            <AppBreadcrumbs/>
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
                 <CustomButton
                     title={"Go Back"}

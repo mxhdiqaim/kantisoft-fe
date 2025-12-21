@@ -1,4 +1,4 @@
-import {type MouseEvent, type ReactNode, useState} from "react";
+import {Children, cloneElement, isValidElement, type MouseEvent, type ReactNode, useState} from "react";
 import {Box, Button, type ButtonProps, Menu, type SxProps, type Theme, useTheme} from "@mui/material";
 import {Link} from "react-router-dom";
 
@@ -123,7 +123,25 @@ const CustomButton = ({
                     },
                 }}
             >
-                {children}
+                {Children.map(children, (child) => {
+                    if (isValidElement(child)) {
+                        return cloneElement(child, {
+                            // eslint-disable-next-line
+                            // @ts-ignore
+                            onClick: (e: MouseEvent<HTMLElement>) => {
+                                // eslint-disable-next-line
+                                // @ts-ignore
+                                if (child.props.onClick) {
+                                    // eslint-disable-next-line
+                                    // @ts-ignore
+                                    child.props.onClick(e);
+                                }
+                                handleClose();
+                            },
+                        });
+                    }
+                    return child;
+                })}
             </Menu>
         </>
     );

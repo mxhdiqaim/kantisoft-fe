@@ -42,6 +42,7 @@ import type {
     RawMaterialType,
     SingleRawMaterialInventoryType,
     SingleRawMaterialType,
+    StockInRawMaterialType,
     UpdateRawMaterialInventoryResponseType,
     UpdateRawMaterialInventoryType,
     UpdateRawMaterialResponseType,
@@ -150,7 +151,8 @@ export const apiSlice = createApi({
         "RawMaterial",
         "UnitOfMeasurements",
         "RawMaterialInventory",
-        "RawMaterialInventories"
+        "RawMaterialInventories",
+        "RawMaterialInventoryStock"
     ],
     endpoints: (builder) => ({
         // -------------------------
@@ -620,6 +622,22 @@ export const apiSlice = createApi({
             ],
         }),
 
+        getRawMaterialInventoryStock: builder.query<any, string>({
+            query: (id) => `/raw-materials/inventory/${id}`,
+            providesTags: (_result, _error, id) => [{type: "RawMaterialInventoryStock", id}],
+        }),
+
+        stockInRawMaterialInventory: builder.mutation<any, StockInRawMaterialType & Pick<RawMaterialType, "id">>({
+            query: ({id, ...body}) => ({
+                url: `/raw-materials/inventory/${id}/stock-in`,
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: (_result, _error, {id}) => [
+                {type: "RawMaterialInventory", id},
+                {type: "RawMaterialInventories", id: "LIST"},
+            ],
+        }),
     }),
 });
 
@@ -691,4 +709,6 @@ export const {
     useGetAllRawMaterialInventoryQuery,
     useCreateRawMaterialInventoryMutation,
     useUpdateRawMaterialInventoryMutation,
+    useGetRawMaterialInventoryStockQuery,
+    useStockInRawMaterialInventoryMutation,
 } = apiSlice;

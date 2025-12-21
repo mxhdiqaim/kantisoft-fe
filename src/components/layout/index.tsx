@@ -34,7 +34,6 @@ const Layout: FC<{ children: ReactNode }> = ({children}) => {
             )}
 
             {/* Main content area */}
-
             <Box sx={{flexGrow: 1}}>
                 <OfflineBanner/>
                 <AppbarComponent {...{toggleDrawer, drawerState}} />
@@ -46,7 +45,6 @@ const Layout: FC<{ children: ReactNode }> = ({children}) => {
                         flexGrow: 1,
                         p: 2,
                         maxWidth: {xs: "100vw", md: `calc(100vw - ${theme.layout.sidebarWidth}px) !important`},
-                        // background: "red",
                     }}
                 >
                     {children}
