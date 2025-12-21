@@ -12,7 +12,7 @@ import type {GridColDef} from "@mui/x-data-grid";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
-import {relativeTime} from "@/utils/get-relative-time.ts";
+import {formatRelativeDateTime} from "@/utils/get-relative-time.ts";
 import {camelCaseToTitleCase} from "@/utils";
 import {getInventoryStatusChipColor} from "@/components/ui";
 import type {MultipleRawMaterialInventoryResponseType,} from "@/types/raw-material-types.ts";
@@ -80,7 +80,7 @@ const RawMaterialInventory = () => {
                 flex: 1,
                 field: "quantity",
                 headerName: "Quantity",
-                minWidth: 120,
+                minWidth: 100,
                 align: "left",
                 headerAlign: "left",
                 renderCell: (params) => (
@@ -93,7 +93,7 @@ const RawMaterialInventory = () => {
                 flex: 1,
                 field: "unitOfMeasurement",
                 headerName: "Measurement Unit",
-                minWidth: 200,
+                minWidth: 180,
                 cellClassName: "capitalize-cell",
                 align: "left",
                 headerAlign: "left",
@@ -165,15 +165,15 @@ const RawMaterialInventory = () => {
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2">
-                            {relativeTime(new Date(params.value))}
+                            {formatRelativeDateTime(params.value)}
                         </Typography>
                     </TableStyledBox>
                 ),
             },
             {
                 field: "actions",
-                headerName: "Actions",
-                width: 100,
+                headerName: "",
+                width: 60,
                 align: "center",
                 headerAlign: "center",
                 sortable: false,

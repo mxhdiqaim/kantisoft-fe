@@ -8,7 +8,7 @@ import type {GridColDef} from "@mui/x-data-grid";
 import {type MouseEvent, useCallback, useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {formatCurrency} from "@/utils";
-import {relativeTime} from "@/utils/get-relative-time.ts";
+import {formatRelativeDateTime} from "@/utils/get-relative-time.ts";
 import RawMaterialForm from "@/components/raw-material/raw-material-form.tsx";
 import CustomButton from "@/components/ui/button.tsx";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
@@ -152,7 +152,7 @@ const RawMaterials = () => {
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2">
-                            {relativeTime(new Date(params.value))}
+                            {formatRelativeDateTime(params.value)}
                         </Typography>
                     </TableStyledBox>
                 ),
@@ -167,15 +167,15 @@ const RawMaterials = () => {
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2">
-                            {relativeTime(new Date(params.value))}
+                            {formatRelativeDateTime(params.value)}
                         </Typography>
                     </TableStyledBox>
                 ),
             },
             {
                 field: "actions",
-                headerName: "Actions",
-                width: 100,
+                headerName: "",
+                width: 60,
                 align: "center",
                 headerAlign: "center",
                 sortable: false,
