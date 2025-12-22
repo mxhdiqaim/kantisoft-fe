@@ -40,5 +40,6 @@ export {default as NotFoundScreen} from "./feedbacks/not-found";
 // Raw Material Inventory Management Sub-screens
 export {default as RawMaterialsScreen} from "./raw-materials"; // Master list of ingredients
 export {default as RawMaterialInventoryScreen} from "./raw-materials/raw-material-inventory.tsx"; // Actual stock levels/min stock
+export {default as RawMaterialInventoryTransactionScreen} from "./raw-materials/raw-material-inventory-transaction.tsx"; // Stock in/out transactions
 export {default as BillOfMaterialsScreen} from "./menu-item/bom"; // Recipe definition
 export {default as UnitOfMeasurementsScreen} from "./raw-materials/unit-of-measurements.tsx"; // Units of measurement
