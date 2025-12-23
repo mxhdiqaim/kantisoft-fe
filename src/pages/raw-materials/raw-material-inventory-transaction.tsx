@@ -1,35 +1,60 @@
 import {Box, Chip, Grid, Skeleton, Tooltip, Typography, useTheme} from "@mui/material";
 import {useGetRawMaterialInventoryTransactionsQuery} from "@/store/slice";
-import DataGridTable from "@/components/ui/data-grid-table";
 import type {GridColDef} from "@mui/x-data-grid";
-import {type MouseEvent, useMemo, useState} from "react";
+import {type MouseEvent, useEffect, useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
-import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
-import {camelCaseToTitleCase} from "@/utils";
+import {camelCaseToTitleCase, getTitle} from "@/utils";
 import {getTransactionTypeChipColor} from "@/components/ui";
-import {formatDateCustom} from "@/utils/get-relative-time.ts";
-import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
-import {useSearch} from "@/use-search.ts";
+import {formatDateCustom, relativeTime} from "@/utils/get-relative-time.ts";
 import CustomButton from "@/components/ui/button.tsx";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
+import DataGridTable from "@/components/ui/data-grid-table";
+import {useForm} from "react-hook-form";
+import {filterSchema, type TimePeriod} from "@/types";
+import {yupResolver} from "@hookform/resolvers/yup";
+import OverviewHeader from "@/components/ui/custom-header.tsx";
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
+import {useSearch} from "@/use-search.ts";
+import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
+import type {
+    RawMaterialInventoryTransaction as SingleRawMaterialInventoryTransaction
+} from "@/types/raw-material-types.ts";
 
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const RawMaterialInventoryTransaction = () => {
     const theme = useTheme();
 
-    const {data, isLoading, isError} = useGetRawMaterialInventoryTransactionsQuery({});
+    const {control, watch} = useForm<{ timePeriod: TimePeriod }>({
+        mode: "onChange",
+        resolver: yupResolver(filterSchema),
+        defaultValues: {
+            timePeriod: "today",
+        },
+    });
 
-    const memoizedData = useMemoizedArray(data)
+    const period = watch("timePeriod");
+
+    const {
+        data,
+        isLoading,
+        isError,
+        fulfilledTimeStamp
+    } = useGetRawMaterialInventoryTransactionsQuery({timePeriod: period});
+
+    const [lastFetched, setLastFetched] = useState<Date | null>(null);
+    const [selectedRow, setSelectedRow] = useState<SingleRawMaterialInventoryTransaction | null>(null);
+
+    console.log("selectedRow:", selectedRow);
+
+    const memoizedData = useMemoizedArray(data?.transactions || []);
 
     const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
         initialData: memoizedData,
-        searchKeys: ["reference", "source", "type", "rawMaterial.name", "notes"],
+        searchKeys: ["reference", "source", "type", "notes"],
     });
 
-    const [selectedRow, setSelectedRow] = useState<any | null>(null);
-
-    const handleMenuClick = (_event: MouseEvent<HTMLElement>, row: any) => {
+    const handleMenuClick = (_event: MouseEvent<HTMLElement>, row: SingleRawMaterialInventoryTransaction) => {
         setSelectedRow(row);
     };
 
@@ -166,8 +191,13 @@ const RawMaterialInventoryTransaction = () => {
                 </CustomButton>
             ),
         },
-    ], []);
+    ], [theme]);
 
+    useEffect(() => {
+        if (fulfilledTimeStamp) {
+            setLastFetched(new Date(fulfilledTimeStamp));
+        }
+    }, [fulfilledTimeStamp]);
 
     if (isLoading) {
         return (
@@ -179,18 +209,33 @@ const RawMaterialInventoryTransaction = () => {
         );
     }
 
-    if (isError) {
+    if (isError || !data) {
         console.log("error:", isError);
         return <Box>Something went wrong</Box>
     }
 
     return (
         <Box>
-            {/*<OverviewHeader*/}
-            {/*    title={"Raw Material Transaction"}*/}
-            {/*    timePeriod={timePeriod as TimePeriod}*/}
-            {/*    control={control} getTimeTitle={getTitle}*/}
-            {/*/>*/}
+            <OverviewHeader
+                title={"Transaction"}
+                timePeriod={data.timePeriod as TimePeriod}
+                control={control} getTimeTitle={getTitle}
+            />
+            <Box sx={{display: "flex", justifyContent: "flex-end"}}>
+                <Typography
+                    variant="h6"
+                    component="span"
+                    color="text.secondary"
+                    align="right"
+                    mb={1}
+                    sx={{
+                        fontWeight: 400,
+                        textAlign: "right",
+                    }}
+                >
+                    {lastFetched ? `Last updated ${relativeTime(lastFetched)}` : "Fetching data..."}
+                </Typography>
+            </Box>
 
             <TableSearchActions
                 searchControl={searchControl}

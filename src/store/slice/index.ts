@@ -39,6 +39,7 @@ import type {
     CreateRawMaterialInventoryType,
     CreateRawMaterialType,
     MultipleRawMaterialInventoryResponseType,
+    RawMaterialInventoryTransactionsResponse,
     RawMaterialType,
     SingleRawMaterialInventoryType,
     SingleRawMaterialType,
@@ -641,18 +642,17 @@ export const apiSlice = createApi({
             ],
         }),
 
-        getRawMaterialInventoryTransactions: builder.query<any[], { rawMaterialId?: string }>({
-            query: ({rawMaterialId}) => ({
+        getRawMaterialInventoryTransactions: builder.query<RawMaterialInventoryTransactionsResponse, {
+            rawMaterialId?: string,
+            timePeriod?: string;
+            startDate?: string;
+            endDate?: string
+        }>({
+            query: (params) => ({
                 url: "/raw-materials/transactions",
-                params: rawMaterialId ? {rawMaterialId} : {},
+                params,
             }),
-            providesTags: (result) =>
-                result
-                    ? [...result.map(({id}) => ({
-                        type: "RawMaterialTransactions" as const,
-                        id
-                    })), {type: "RawMaterialTransactions", id: "LIST"}]
-                    : [{type: "RawMaterialTransactions", id: "LIST"}],
+            providesTags: ["RawMaterialTransactions"],
         }),
 
     }),

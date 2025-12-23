@@ -11,6 +11,9 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {filterSchema, type TimePeriod} from "@/types";
 import {relativeTime} from "@/utils/get-relative-time.ts";
 import {getTransactionChipColor, getTransactionTypeChipColor} from "@/components/ui";
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
+import {useSearch} from "@/use-search.ts";
+import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 
 const InventoryTransactions = () => {
     const {control, watch} = useForm<{ timePeriod: TimePeriod }>({
@@ -24,6 +27,13 @@ const InventoryTransactions = () => {
     const period = watch("timePeriod");
 
     const {data, isLoading, isError, fulfilledTimeStamp} = useGetInventoryTransactionsQuery({timePeriod: period});
+
+    const memoizedData = useMemoizedArray(data?.transactions || []);
+
+    const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
+        initialData: memoizedData,
+        searchKeys: ["type", "label"],
+    });
 
     const [lastFetched, setLastFetched] = useState<Date | null>(null);
 
@@ -101,13 +111,11 @@ const InventoryTransactions = () => {
         return <Box>Something went wrong</Box>
     }
 
-    const {transactions: transactionsData, timePeriod} = data;
-
     return (
         <Box>
             <OverviewHeader
                 title={"Transaction"}
-                timePeriod={timePeriod as TimePeriod}
+                timePeriod={data.timePeriod as TimePeriod}
                 control={control} getTimeTitle={getTitle}
             />
             <Box sx={{display: "flex", justifyContent: "flex-end"}}>
@@ -126,14 +134,16 @@ const InventoryTransactions = () => {
                 </Typography>
             </Box>
 
+            <TableSearchActions
+                searchControl={searchControl}
+                searchSubmit={searchSubmit}
+                handleSearch={handleSearch}
+            />
+
             <Grid container spacing={2}>
                 <Grid size={12}>
-                    <DataGridTable
-                        data={transactionsData ?? []}
-                        columns={columns}
-                        loading={isLoading}
-                        getRowId={() => Math.random().toString(36).substr(2, 9)}
-                    />
+                    <DataGridTable data={filteredData} columns={columns} loading={isLoading}
+                                   getRowId={() => Math.random().toString(36).substr(2, 9)}/>
                 </Grid>
             </Grid>
         </Box>
