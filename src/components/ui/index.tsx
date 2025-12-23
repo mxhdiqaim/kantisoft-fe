@@ -93,8 +93,8 @@ export const StyledTextField = styled(TextField, {
     shouldForwardProp: (prop) => prop !== "disabled",
 })<{ disabled?: boolean }>(({disabled}) => ({
     "& .MuiOutlinedInput-root": {
-        // height: 40,
-        // "& fieldset": {height: 45},
+        height: 40,
+        "& fieldset": {height: 45},
         background: disabled && "#CFD1D3",
     },
 }));

@@ -1,5 +1,5 @@
 import type {ReactNode} from "react";
-import {MenuItem, type MenuItemProps, styled, type SxProps, type Theme} from "@mui/material";
+import {MenuItem, type MenuItemProps, styled, type SxProps, type Theme, useTheme} from "@mui/material";
 
 const StyledMenuItem = styled(MenuItem)(({theme}) => ({
     mx: 1,
@@ -11,8 +11,20 @@ interface Props extends MenuItemProps {
     sx?: SxProps<Theme>;
 }
 
-const TableStyledMenuItem = ({children, ...props}: Props) => {
-    return <StyledMenuItem {...props}>{children}</StyledMenuItem>;
+const TableStyledMenuItem = ({children, sx, ...props}: Props) => {
+    const theme = useTheme();
+
+    return (
+        <StyledMenuItem
+            sx={{
+                mx: 1,
+                borderRadius: theme.borderRadius.small, ...sx
+            }}
+            {...props}
+        >
+            {children}
+        </StyledMenuItem>
+    );
 };
 
 export default TableStyledMenuItem;

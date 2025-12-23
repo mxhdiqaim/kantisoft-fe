@@ -1,5 +1,5 @@
 import {type BaseSyntheticEvent} from "react";
-import {Box, Grid, MenuItem, type SxProps, type Theme} from "@mui/material";
+import {Box, Grid, type SxProps, type Theme} from "@mui/material";
 import SearchField from "@/components/ui/search-field.tsx";
 import type {Control} from "react-hook-form";
 import CustomCard from "@/components/customs/custom-card.tsx";
@@ -8,6 +8,7 @@ import {FileDownloadOutlined} from "@mui/icons-material";
 import {UserRoleEnum} from "@/types/user-types.ts";
 import {useAppSelector} from "@/store";
 import {selectCurrentUser} from "@/store/slice/auth-slice.ts";
+import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
 
 interface Props {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,11 +17,6 @@ interface Props {
     handleSearch: (data: any) => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     searchControl: Control<any>;
-    statusFilterOptions?: string[];
-    selectedStatus?: string;
-    onStatusChange?: (newStatus: string) => void;
-    showFilterButton?: boolean;
-    showColumnsButton?: boolean;
     onExportCsv?: () => void;
     onExportXlsx?: () => void;
     sx?: SxProps<Theme>;
@@ -92,8 +88,8 @@ const TableSearchActions = ({
                                 sx={{height: 40, width: 100}}
                                 variant={"contained"}
                             >
-                                <MenuItem onClick={handleCsvClick}>Export as CSV</MenuItem>
-                                <MenuItem onClick={handleXlsxClick}>Export as XLSX</MenuItem>
+                                <TableStyledMenuItem onClick={handleCsvClick}>Export as CSV</TableStyledMenuItem>
+                                <TableStyledMenuItem onClick={handleXlsxClick}>Export as XLSX</TableStyledMenuItem>
                             </CustomButton>
                         </Box>
                     </Grid>

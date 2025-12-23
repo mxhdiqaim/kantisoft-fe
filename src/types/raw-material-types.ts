@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import {extendBaseSchema} from "@/types";
+import {extendBaseSchema, timePeriodSchema} from "@/types";
 import {unitOfMeasurementSchema} from "@/types/unit-of-measurement-types.ts";
 import type {InventoryTransactionResponseType} from "@/types/inventory-types.ts";
 
@@ -194,3 +194,10 @@ export type RawMaterialInventoryTransaction = {
 export type RawMaterialInventoryTransactionsResponse = Omit<InventoryTransactionResponseType, "transactions"> & {
     transactions: RawMaterialInventoryTransaction[]
 }
+
+export const fetchRawMaterialAndFilterByPeriod = yup.object({
+    timePeriod: timePeriodSchema,
+    rawMaterialId: yup.string().uuid().required(),
+});
+
+export type FetchRawMaterialAndFilterByPeriodType = yup.InferType<typeof fetchRawMaterialAndFilterByPeriod>;

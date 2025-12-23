@@ -1,6 +1,9 @@
 import {type Control, Controller} from "react-hook-form";
-import {Box, FormControl, InputLabel, MenuItem, Select, Typography} from "@mui/material";
+import {Box, FormControl, InputAdornment, MenuItem, Typography} from "@mui/material";
 import type {TimePeriod} from "@/types";
+import Icon from "@/components/ui/icon.tsx";
+import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
+import {StyledTextField} from "@/components/ui/index.tsx";
 
 type Props = {
     title: string;
@@ -35,14 +38,33 @@ const OverviewHeader = ({title, timePeriod, getTimeTitle, control}: Props) => (
                     name="timePeriod"
                     control={control}
                     render={({field}) => (
-                        <FormControl sx={{minWidth: 120}} size="small">
-                            <InputLabel id="period-select-label">Period</InputLabel>
-                            <Select {...field} labelId="period-select-label" label="Period">
+                        <FormControl>
+                            <StyledTextField
+                                {...field}
+                                select
+                                label="Period"
+                                placeholder="Select Period"
+                                SelectProps={{
+                                    IconComponent: () => null,
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Icon
+                                                src={ArrowDownIconSvg}
+                                                alt={"Dropdown Arrow"}
+                                                sx={{width: 15, height: 15}}
+                                            />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            >
+                                <MenuItem value={""} disabled>
+                                    Select Period
+                                </MenuItem>
                                 <MenuItem value={"today"}>Today</MenuItem>
                                 <MenuItem value={"week"}>This Week</MenuItem>
                                 <MenuItem value={"month"}>This Month</MenuItem>
                                 <MenuItem value={"all-time"}>All Time</MenuItem>
-                            </Select>
+                            </StyledTextField>
                         </FormControl>
                     )}
                 />

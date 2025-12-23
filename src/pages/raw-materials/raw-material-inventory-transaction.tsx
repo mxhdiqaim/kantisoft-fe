@@ -1,46 +1,74 @@
-import {Box, Chip, Grid, Skeleton, Tooltip, Typography, useTheme} from "@mui/material";
-import {useGetRawMaterialInventoryTransactionsQuery} from "@/store/slice";
+import {
+    Box,
+    Chip,
+    FormControl,
+    Grid,
+    InputAdornment,
+    MenuItem,
+    Skeleton,
+    Tooltip,
+    Typography,
+    useTheme
+} from "@mui/material";
+import {useGetAllRawMaterialsQuery, useGetRawMaterialInventoryTransactionsQuery} from "@/store/slice";
 import type {GridColDef} from "@mui/x-data-grid";
 import {type MouseEvent, useEffect, useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {camelCaseToTitleCase, getTitle} from "@/utils";
-import {getTransactionTypeChipColor} from "@/components/ui";
+import {getTransactionTypeChipColor, StyledTextField} from "@/components/ui";
 import {formatDateCustom, relativeTime} from "@/utils/get-relative-time.ts";
 import CustomButton from "@/components/ui/button.tsx";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
 import DataGridTable from "@/components/ui/data-grid-table";
-import {useForm} from "react-hook-form";
-import {filterSchema, type TimePeriod} from "@/types";
+import {Controller, useForm} from "react-hook-form";
+import {type TimePeriod} from "@/types";
 import {yupResolver} from "@hookform/resolvers/yup";
 import OverviewHeader from "@/components/ui/custom-header.tsx";
 import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 import {useSearch} from "@/use-search.ts";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
-import type {
-    RawMaterialInventoryTransaction as SingleRawMaterialInventoryTransaction
+import {
+    fetchRawMaterialAndFilterByPeriod,
+    type RawMaterialInventoryTransaction as SingleRawMaterialInventoryTransaction
 } from "@/types/raw-material-types.ts";
 
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Icon from "@/components/ui/icon.tsx";
+import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
+import CustomCard from "@/components/customs/custom-card.tsx";
 
 const RawMaterialInventoryTransaction = () => {
     const theme = useTheme();
 
-    const {control, watch} = useForm<{ timePeriod: TimePeriod }>({
+    const {
+        control,
+        watch,
+        formState: {errors},
+    } = useForm({
         mode: "onChange",
-        resolver: yupResolver(filterSchema),
         defaultValues: {
             timePeriod: "today",
+            rawMaterialId: "",
         },
+
+        resolver: yupResolver(fetchRawMaterialAndFilterByPeriod),
     });
 
     const period = watch("timePeriod");
+    const rawMaterialId = watch("rawMaterialId");
 
     const {
         data,
         isLoading,
         isError,
         fulfilledTimeStamp
-    } = useGetRawMaterialInventoryTransactionsQuery({timePeriod: period});
+    } = useGetRawMaterialInventoryTransactionsQuery({timePeriod: period, rawMaterialId});
+
+    const {data: rawMaterialData, isLoading: isFetchingRawMaterial} = useGetAllRawMaterialsQuery(undefined, {
+        skip: !open,
+    });
+
+    const memoizedRawMaterial = useMemoizedArray(rawMaterialData);
 
     const [lastFetched, setLastFetched] = useState<Date | null>(null);
     const [selectedRow, setSelectedRow] = useState<SingleRawMaterialInventoryTransaction | null>(null);
@@ -184,7 +212,6 @@ const RawMaterialInventoryTransaction = () => {
                 >
                     <TableStyledMenuItem
                         // onClick={handleOpenAdjustStockModal}
-                        sx={{borderRadius: theme.borderRadius.small, mx: 1}}
                     >
                         Adjust Stock
                     </TableStyledMenuItem>
@@ -236,12 +263,59 @@ const RawMaterialInventoryTransaction = () => {
                     {lastFetched ? `Last updated ${relativeTime(lastFetched)}` : "Fetching data..."}
                 </Typography>
             </Box>
+            <Grid container spacing={2}>
+                <Grid size={{xs: 12, md: 8}}>
+                    <TableSearchActions
+                        searchControl={searchControl}
+                        searchSubmit={searchSubmit}
+                        handleSearch={handleSearch}
+                    />
+                </Grid>
+                <Grid size={{xs: 12, md: 4}}>
+                    <CustomCard>
+                        <Controller
+                            name="rawMaterialId"
+                            control={control}
+                            render={({field}) => (
+                                <FormControl fullWidth>
+                                    <StyledTextField
+                                        {...field}
+                                        select
+                                        label="Raw Material"
+                                        placeholder="Select Raw Material"
+                                        disabled={isFetchingRawMaterial}
+                                        SelectProps={{
+                                            IconComponent: () => null,
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <Icon
+                                                        src={ArrowDownIconSvg}
+                                                        alt={"Dropdown Arrow"}
+                                                        sx={{width: 15, height: 15}}
+                                                    />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                        error={Boolean(errors.rawMaterialId)}
+                                        helperText={errors.rawMaterialId?.message}
+                                    >
+                                        <MenuItem value={""} disabled>
+                                            Select Raw Material
+                                        </MenuItem>
+                                        {memoizedRawMaterial?.map((rawMaterial) => (
+                                            <MenuItem key={rawMaterial.id} value={rawMaterial.id}
+                                                      sx={{textTransform: "capitalize"}}>
+                                                {rawMaterial.name}
+                                            </MenuItem>
+                                        ))}
+                                    </StyledTextField>
+                                </FormControl>
+                            )}
+                        />
+                    </CustomCard>
+                </Grid>
+            </Grid>
 
-            <TableSearchActions
-                searchControl={searchControl}
-                searchSubmit={searchSubmit}
-                handleSearch={handleSearch}
-            />
 
             <Grid container spacing={2}>
                 <Grid size={12}>
