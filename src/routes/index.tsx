@@ -16,6 +16,7 @@ import {
     PointOfSaleScreen,
     ProfileScreen,
     RawMaterialInventoryScreen,
+    RawMaterialInventoryTransactionScreen,
     RawMaterialsScreen,
     RegisterScreen,
     SalesHistoryScreen,
@@ -34,6 +35,7 @@ import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import RestaurantMenuOutlinedIcon from "@mui/icons-material/RestaurantMenuOutlined";
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
+import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 
 export interface AppRouteType {
     to: string;
@@ -85,21 +87,6 @@ export const appRoutes: AppRouteType[] = [
                 title: "orderTracking",
                 element: PointOfSaleScreen,
                 roles: [UserRoleEnum.ADMIN, UserRoleEnum.MANAGER, UserRoleEnum.USER, UserRoleEnum.GUEST],
-            },
-            {
-                to: "sales",
-                title: "salesHistory",
-                element: SalesHistoryScreen,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
-                children: [
-                    {
-                        to: ":id/view",
-                        title: "viewSalesHistory",
-                        element: ViewSalesHistoryScreen,
-                        hidden: true,
-                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
-                    },
-                ]
             },
         ]
     },
@@ -173,11 +160,49 @@ export const appRoutes: AppRouteType[] = [
                 element: RawMaterialInventoryScreen,
                 roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
             },
+        ]
+    },
+
+    // ---------------------------------
+    // REPORTS & RECORDS
+    // ---------------------------------
+    {
+        to: "/records",
+        title: "Reports & Records",
+        icon: <HistoryEduIcon/>,
+        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+        children: [
             {
-                to: "logs",
-                title: "Stock Transactions",
+                to: "sales",
+                title: "Sales History",
+                element: SalesHistoryScreen,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                children: [
+                    {
+                        to: ":id/view",
+                        element: ViewSalesHistoryScreen,
+                        hidden: true,
+                        roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+                    }
+                ]
+            },
+            {
+                to: "inventory-logs",
+                title: "Menu Item Logs",
                 element: InventoryTransactionsScreen,
-                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN, UserRoleEnum.USER],
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+            },
+            {
+                to: "material-logs",
+                title: "Raw Material Logs",
+                element: RawMaterialInventoryTransactionScreen,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
+            },
+            {
+                to: "activity",
+                title: "System Activity",
+                element: ActivityLogScreen,
+                roles: [UserRoleEnum.MANAGER, UserRoleEnum.ADMIN],
             },
         ]
     },
@@ -266,12 +291,6 @@ export const appRoutes: AppRouteType[] = [
                         roles: [UserRoleEnum.MANAGER],
                     },
                 ]
-            },
-            {
-                to: "activity",
-                title: "System Logs",
-                element: ActivityLogScreen,
-                roles: [UserRoleEnum.MANAGER],
             },
         ]
     },

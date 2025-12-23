@@ -56,6 +56,8 @@ export const getUserRoleChipColor = (role: UserRoleType) => {
 
 export const getTransactionTypeChipColor = (type: typeof TransactionTypeEnum[keyof typeof TransactionTypeEnum]) => {
     const colors: Record<typeof TransactionTypeEnum[keyof typeof TransactionTypeEnum], "success" | "warning" | "error" | "info" | "default"> = {
+        comingIn: "success",
+        goingOut: "error",
         sale: "success",
         return: "warning",
         waste: "error",

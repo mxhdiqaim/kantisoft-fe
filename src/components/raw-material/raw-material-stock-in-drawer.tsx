@@ -16,6 +16,7 @@ import {
 } from "@/types/raw-material-types.ts";
 import CustomCard from "@/components/customs/custom-card.tsx";
 import {camelCaseToTitleCase} from "@/utils";
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 
 import Icon from "@/components/ui/icon.tsx";
 import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
@@ -31,6 +32,8 @@ const RawMaterialStockInDrawer: FC<Props> = ({open, onOpen, onClose, rawMaterial
     const notify = useNotifier();
 
     const {data: measurementUnit, isLoading: isMeasurementLoading} = useGetAllUnitOfMeasurementsQuery();
+
+    const memoizedMeasurement = useMemoizedArray(measurementUnit);
 
     const [stockInRawMaterialInventory, {isLoading}] = useStockInRawMaterialInventoryMutation();
 
@@ -137,7 +140,7 @@ const RawMaterialStockInDrawer: FC<Props> = ({open, onOpen, onClose, rawMaterial
                                             <MenuItem value={""} disabled>
                                                 Select Measurement Unit
                                             </MenuItem>
-                                            {measurementUnit.map((measurement) => (
+                                            {memoizedMeasurement.map((measurement) => (
                                                 <MenuItem key={measurement.id} value={measurement.id}
                                                           sx={{textTransform: "capitalize"}}>
                                                     {measurement.name}

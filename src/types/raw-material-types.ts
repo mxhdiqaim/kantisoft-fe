@@ -1,6 +1,7 @@
 import * as yup from "yup";
 import {extendBaseSchema} from "@/types";
 import {unitOfMeasurementSchema} from "@/types/unit-of-measurement-types.ts";
+import type {InventoryTransactionResponseType} from "@/types/inventory-types.ts";
 
 // Create a new schema with only the desired fields from unitOfMeasurementSchema
 const partialUnitOfMeasurementSchema = yup.object({
@@ -165,3 +166,31 @@ export const stockInRawMaterialSchema = yup.object({
 });
 
 export type StockInRawMaterialType = yup.InferType<typeof stockInRawMaterialSchema>;
+
+export type RawMaterialInventoryTransaction = {
+    id: string;
+    type: typeof RAW_MATERIAL_TRANSACTION_TYPE[keyof typeof RAW_MATERIAL_TRANSACTION_TYPE];
+    source: typeof RAW_MATERIAL_TRANSACTION_SOURCE[keyof typeof RAW_MATERIAL_TRANSACTION_SOURCE];
+    quantity: number;
+    reference: string;
+    notes: string;
+    transactionDate: string;
+    createdAt: string;
+    lastModified: string;
+
+    users: {
+        id: string;
+        firstName: string;
+        lastName: string;
+    };
+    rawMaterial: {
+        id: string;
+        name: string;
+        unitOfMeasurementId: string;
+        latestUnitPrice: number;
+    };
+}
+
+export type RawMaterialInventoryTransactionsResponse = Omit<InventoryTransactionResponseType, "transactions"> & {
+    transactions: RawMaterialInventoryTransaction[]
+}

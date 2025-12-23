@@ -35,7 +35,7 @@ const DataGridTable = <T extends GridValidRowModel>({columns, data, loading, ...
             }}
             sx={{
                 border: `1px solid ${theme.palette.customColors.border}`,
-                borderRadius: theme.borderRadius.small,
+                borderRadius: theme.borderRadius.small - 2,
                 backgroundColor: theme.palette.background.default,
                 "& .MuiDataGrid-columnHeaders": {
                     backgroundColor: theme.palette.primary.main,

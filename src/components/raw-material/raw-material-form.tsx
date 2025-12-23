@@ -14,8 +14,9 @@ import {getApiError} from "@/helpers/get-api-error.ts";
 import CustomButton from "@/components/ui/button.tsx";
 import {createRawMaterialSchema, type CreateRawMaterialType, type RawMaterialType} from "@/types/raw-material-types.ts";
 import {StyledTextField} from "@/components/ui";
-import Icon from "@/components/ui/icon.tsx";
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 
+import Icon from "@/components/ui/icon.tsx";
 import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
 
 interface Props {
@@ -29,6 +30,8 @@ const RawMaterialForm: FC<Props> = ({open, onClose, rawMaterial}) => {
     const isEditMode = !!rawMaterial;
 
     const {data: measurementUnit, isLoading: isMeasurementLoading} = useGetAllUnitOfMeasurementsQuery();
+    const memoizedMeasurement = useMemoizedArray(measurementUnit);
+
     const [createRawMaterial, {isLoading: isCreating, isSuccess: isCreateSuccess}] = useCreateRawMaterialMutation();
     const [updateRawMaterial, {isLoading: isUpdating, isSuccess: isUpdateSuccess}] = useUpdateRawMaterialMutation();
 
@@ -139,7 +142,7 @@ const RawMaterialForm: FC<Props> = ({open, onClose, rawMaterial}) => {
                                         <MenuItem value={""} disabled>
                                             Select Measurement Unit
                                         </MenuItem>
-                                        {measurementUnit.map((measurement) => (
+                                        {memoizedMeasurement.map((measurement) => (
                                             <MenuItem key={measurement.id} value={measurement.id}
                                                       sx={{textTransform: "capitalize"}}>
                                                 {measurement.name}
