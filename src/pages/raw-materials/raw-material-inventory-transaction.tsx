@@ -1,24 +1,11 @@
-import {
-    Box,
-    Chip,
-    FormControl,
-    Grid,
-    InputAdornment,
-    MenuItem,
-    Skeleton,
-    Tooltip,
-    Typography,
-    useTheme
-} from "@mui/material";
+import {Box, Chip, FormControl, Grid, InputAdornment, MenuItem, Skeleton, Typography, useTheme} from "@mui/material";
 import {useGetAllRawMaterialsQuery, useGetRawMaterialInventoryTransactionsQuery} from "@/store/slice";
 import type {GridColDef} from "@mui/x-data-grid";
-import {type MouseEvent, useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {camelCaseToTitleCase, getTitle} from "@/utils";
 import {getTransactionTypeChipColor, StyledTextField} from "@/components/ui";
-import {formatDateCustom, relativeTime} from "@/utils/get-relative-time.ts";
-import CustomButton from "@/components/ui/button.tsx";
-import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
+import {formatDateTimeCustom, relativeTime} from "@/utils/get-relative-time.ts";
 import DataGridTable from "@/components/ui/data-grid-table";
 import {Controller, useForm} from "react-hook-form";
 import {type TimePeriod} from "@/types";
@@ -27,12 +14,7 @@ import OverviewHeader from "@/components/ui/custom-header.tsx";
 import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 import {useSearch} from "@/use-search.ts";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
-import {
-    fetchRawMaterialAndFilterByPeriod,
-    type RawMaterialInventoryTransaction as SingleRawMaterialInventoryTransaction
-} from "@/types/raw-material-types.ts";
-
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import {fetchRawMaterialAndFilterByPeriod} from "@/types/raw-material-types.ts";
 import Icon from "@/components/ui/icon.tsx";
 import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
 import CustomCard from "@/components/customs/custom-card.tsx";
@@ -71,9 +53,9 @@ const RawMaterialInventoryTransaction = () => {
     const memoizedRawMaterial = useMemoizedArray(rawMaterialData);
 
     const [lastFetched, setLastFetched] = useState<Date | null>(null);
-    const [selectedRow, setSelectedRow] = useState<SingleRawMaterialInventoryTransaction | null>(null);
+    // const [selectedRow, setSelectedRow] = useState<SingleRawMaterialInventoryTransaction | null>(null);
 
-    console.log("selectedRow:", selectedRow);
+    // console.log("selectedRow:", selectedRow);
 
     const memoizedData = useMemoizedArray(data?.transactions || []);
 
@@ -82,16 +64,16 @@ const RawMaterialInventoryTransaction = () => {
         searchKeys: ["reference", "source", "type", "notes"],
     });
 
-    const handleMenuClick = (_event: MouseEvent<HTMLElement>, row: SingleRawMaterialInventoryTransaction) => {
-        setSelectedRow(row);
-    };
+    // const handleMenuClick = (_event: MouseEvent<HTMLElement>, row: SingleRawMaterialInventoryTransaction) => {
+    //     setSelectedRow(row);
+    // };
 
     const columns: GridColDef[] = useMemo(() => [
         {
             flex: 1,
             field: "reference",
             headerName: "Reference",
-            minWidth: 250,
+            minWidth: 180,
             align: "left",
             headerAlign: "left",
             renderCell: (params) => (
@@ -165,59 +147,59 @@ const RawMaterialInventoryTransaction = () => {
         },
         {
             flex: 1,
-            field: "rawMaterial",
+            field: "rawMaterialName",
             headerName: "Raw Material",
-            minWidth: 120,
+            minWidth: 180,
             align: "left",
             headerAlign: "left",
             renderCell: (params) => (
                 <TableStyledBox>
-                    <Typography variant="body2">{params.value.name}</Typography>
+                    <Typography variant="body2">{params.value}</Typography>
                 </TableStyledBox>
             ),
         },
         {
             flex: 1,
-            field: "createdAt",
-            headerName: "Created",
-            minWidth: 120,
+            field: "transactionDate",
+            headerName: "Transaction Time",
+            minWidth: 200,
             align: "left",
             headerAlign: "left",
             renderCell: (params) => (
                 <TableStyledBox>
-                    <Typography variant="body2">{formatDateCustom(params.value)}</Typography>
+                    <Typography variant="body2">{formatDateTimeCustom(params.value)}</Typography>
                 </TableStyledBox>
             ),
         },
-        {
-            field: "actions",
-            headerName: "",
-            width: 60,
-            align: "center",
-            headerAlign: "center",
-            sortable: false,
-            renderCell: (params) => (
-                <CustomButton
-                    variant={"text"}
-                    sx={{
-                        borderRadius: "10px",
-                        color: theme.palette.text.primary,
-                    }}
-                    onClick={(e) => handleMenuClick(e, params.row)}
-                    startIcon={
-                        <Tooltip title="More Actions" placement={"top"}>
-                            <MoreVertIcon/>
-                        </Tooltip>
-                    }
-                >
-                    <TableStyledMenuItem
-                        // onClick={handleOpenAdjustStockModal}
-                    >
-                        Adjust Stock
-                    </TableStyledMenuItem>
-                </CustomButton>
-            ),
-        },
+        // {
+        //     field: "actions",
+        //     headerName: "",
+        //     width: 60,
+        //     align: "center",
+        //     headerAlign: "center",
+        //     sortable: false,
+        //     renderCell: (params) => (
+        //         <CustomButton
+        //             variant={"text"}
+        //             sx={{
+        //                 borderRadius: "10px",
+        //                 color: theme.palette.text.primary,
+        //             }}
+        //             onClick={(e) => handleMenuClick(e, params.row)}
+        //             startIcon={
+        //                 <Tooltip title="More Actions" placement={"top"}>
+        //                     <MoreVertIcon/>
+        //                 </Tooltip>
+        //             }
+        //         >
+        //             <TableStyledMenuItem
+        //                 // onClick={handleOpenAdjustStockModal}
+        //             >
+        //                 Adjust Stock
+        //             </TableStyledMenuItem>
+        //         </CustomButton>
+        //     ),
+        // },
     ], [theme]);
 
     useEffect(() => {
@@ -244,9 +226,11 @@ const RawMaterialInventoryTransaction = () => {
     return (
         <Box>
             <OverviewHeader
-                title={"Transaction"}
+                title={"Raw Material Transactions"}
                 timePeriod={data.timePeriod as TimePeriod}
-                control={control} getTimeTitle={getTitle}
+                control={control}
+                getTimeTitle={getTitle}
+                timeTitle={"Transactions"}
             />
             <Box sx={{display: "flex", justifyContent: "flex-end"}}>
                 <Typography

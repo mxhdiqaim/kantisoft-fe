@@ -114,9 +114,11 @@ const InventoryTransactions = () => {
     return (
         <Box>
             <OverviewHeader
-                title={"Transaction"}
+                title={"Inventory Transactions"}
                 timePeriod={data.timePeriod as TimePeriod}
-                control={control} getTimeTitle={getTitle}
+                control={control}
+                getTimeTitle={getTitle}
+                timeTitle={"Transactions"}
             />
             <Box sx={{display: "flex", justifyContent: "flex-end"}}>
                 <Typography
