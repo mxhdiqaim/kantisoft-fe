@@ -234,6 +234,7 @@ export const apiSlice = createApi({
                 url: "/activities",
                 params: {limit, offset},
             }),
+            transformResponse: (response: ActivityLogResponse) => response.data,
             providesTags: [{type: "ActivityLog", id: "LIST"}],
         }),
 
