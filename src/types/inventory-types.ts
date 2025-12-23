@@ -16,6 +16,8 @@ export const TransactionTypeEnum = {
     ADJUSTMENT_IN: "adjustmentIn",
     ADJUSTMENT_OUT: "adjustmentOut",
     PURCHASE_RECEIVE: "purchaseReceive",
+    COMING_IN: "comingIn",
+    GOING_OUT: "goingOut",
 } as const;
 
 export const INVENTORY_STATUS = Object.values(InventoryStatusEnum);
