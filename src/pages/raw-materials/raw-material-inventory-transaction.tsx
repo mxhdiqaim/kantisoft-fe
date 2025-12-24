@@ -253,6 +253,7 @@ const RawMaterialInventoryTransaction = () => {
                         searchControl={searchControl}
                         searchSubmit={searchSubmit}
                         handleSearch={handleSearch}
+                        placeholder={"Search by reference, type, source or notes"}
                     />
                 </Grid>
                 <Grid size={{xs: 12, md: 4}}>

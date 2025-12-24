@@ -180,6 +180,7 @@ const ActivityLogPage = () => {
                 searchControl={searchControl}
                 searchSubmit={searchSubmit}
                 handleSearch={handleSearch}
+                placeholder={"Search Activity Logs..."}
             />
             <Grid container spacing={2}>
                 <Grid size={12}>

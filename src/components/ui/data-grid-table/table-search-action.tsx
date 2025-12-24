@@ -20,6 +20,7 @@ interface Props {
     onExportCsv?: () => void;
     onExportXlsx?: () => void;
     sx?: SxProps<Theme>;
+    placeholder?: string;
 }
 
 const TableSearchActions = ({
@@ -29,6 +30,7 @@ const TableSearchActions = ({
                                 onExportCsv,
                                 onExportXlsx,
                                 sx,
+                                placeholder = "Search...",
                             }: Props) => {
 
     const currentUser = useAppSelector(selectCurrentUser);
@@ -67,7 +69,7 @@ const TableSearchActions = ({
                         >
                             <SearchField
                                 name={"search"}
-                                placeholder={"Search..."}
+                                placeholder={placeholder}
                                 control={searchControl}
                                 sx={{
                                     "& .MuiOutlinedInput-root": {

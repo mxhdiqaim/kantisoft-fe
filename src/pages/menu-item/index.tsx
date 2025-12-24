@@ -367,6 +367,7 @@ const MenuItems = () => {
                 handleSearch={handleSearch}
                 onExportCsv={handleExportCsv}
                 onExportXlsx={handleExportXlsx}
+                placeholder={`Search ${t("menuItem")} by name or item code`}
             />
 
             <Grid container spacing={2} sx={{mt: 2}}>

@@ -23,7 +23,7 @@ const UnitOfMeasurements = () => {
                 flex: 1,
                 field: "name",
                 headerName: "Name",
-                minWidth: 220,
+                minWidth: 180,
                 align: "left",
                 headerAlign: "left",
                 renderCell: (params) => (
@@ -31,19 +31,6 @@ const UnitOfMeasurements = () => {
                         <Typography variant="body2" fontWeight="500" textTransform={"capitalize"}>
                             {params.value}
                         </Typography>
-                    </TableStyledBox>
-                ),
-            },
-            {
-                flex: 1,
-                field: "symbol",
-                headerName: "Symbol",
-                minWidth: 80,
-                align: "left",
-                headerAlign: "left",
-                renderCell: (params) => (
-                    <TableStyledBox>
-                        <Typography variant="body2">{params.value}</Typography>
                     </TableStyledBox>
                 ),
             },
@@ -58,6 +45,19 @@ const UnitOfMeasurements = () => {
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2" textTransform={"capitalize"}>{params.value}</Typography>
+                    </TableStyledBox>
+                ),
+            },
+            {
+                flex: 1,
+                field: "symbol",
+                headerName: "Symbol",
+                minWidth: 80,
+                align: "left",
+                headerAlign: "left",
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography variant="body2">{params.value}</Typography>
                     </TableStyledBox>
                 ),
             },
@@ -92,8 +92,8 @@ const UnitOfMeasurements = () => {
             {
                 flex: 1,
                 field: "calculationLogic",
-                headerName: "Conversion Logic",
-                minWidth: 250,
+                headerName: "Conversion Note",
+                minWidth: 280,
                 align: "left",
                 headerAlign: "left",
                 renderCell: (params) => (
@@ -114,6 +114,7 @@ const UnitOfMeasurements = () => {
                 searchControl={searchControl}
                 searchSubmit={searchSubmit}
                 handleSearch={handleSearch}
+                placeholder="Search Measurements..."
             />
             <Grid container spacing={2}>
                 <Grid size={12}>

@@ -373,6 +373,7 @@ const UsersPage = () => {
                 handleSearch={handleSearch}
                 onExportCsv={handleExportCsv}
                 onExportXlsx={handleExportXlsx}
+                placeholder={"Search users by name, email, or store..."}
             />
             <Grid container spacing={2}>
                 <Grid size={12}>

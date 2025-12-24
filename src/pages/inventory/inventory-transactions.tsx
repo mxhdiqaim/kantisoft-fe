@@ -140,6 +140,7 @@ const InventoryTransactions = () => {
                 searchControl={searchControl}
                 searchSubmit={searchSubmit}
                 handleSearch={handleSearch}
+                placeholder={"Search by type or label"}
             />
 
             <Grid container spacing={2}>

@@ -8,7 +8,7 @@ import type {GridColDef} from "@mui/x-data-grid";
 import {type MouseEvent, useCallback, useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {formatCurrency} from "@/utils";
-import {formatRelativeDateTime} from "@/utils/get-relative-time.ts";
+import {formatDateCustom, formatRelativeDateTime} from "@/utils/get-relative-time.ts";
 import RawMaterialForm from "@/components/raw-material/raw-material-form.tsx";
 import CustomButton from "@/components/ui/button.tsx";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
@@ -44,11 +44,19 @@ const RawMaterials = () => {
 
     const handleCloseFormModal = () => {
         setFormModalOpen(false);
+        // Always reset selectedRow when modal closes to ensure clean state for next action
+        setSelectedRow(null);
     };
 
     const handleOpenFormModal = () => {
         setFormModalOpen(true);
     };
+
+    const handleOpenCreateModal = () => {
+        // Ensure the selectedRow is null for creation
+        setSelectedRow(null);
+        setFormModalOpen(true);
+    }
 
     const handleCloseDeleteModal = () => {
         setDeleteModalOpen(false);
@@ -61,6 +69,7 @@ const RawMaterials = () => {
 
     const handleDrawerClose = useCallback(() => {
         setDrawerOpen(false);
+        setSelectedRow(null);
     }, []);
 
     const handleDeleteFactory = async () => {
@@ -152,7 +161,7 @@ const RawMaterials = () => {
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2">
-                            {formatRelativeDateTime(params.value)}
+                            {formatDateCustom(params.value)}
                         </Typography>
                     </TableStyledBox>
                 ),
@@ -223,7 +232,7 @@ const RawMaterials = () => {
                 ),
             },
         ],
-        [],
+        [isDeleting, handleDrawerOpen, theme],
     );
 
     return (
@@ -236,7 +245,7 @@ const RawMaterials = () => {
                     title={"Create Raw Material"}
                     variant="contained"
                     startIcon={<AddIcon/>}
-                    onClick={handleOpenFormModal}
+                    onClick={handleOpenCreateModal}
                 />
             </Box>
 
@@ -244,6 +253,7 @@ const RawMaterials = () => {
                 searchControl={searchControl}
                 searchSubmit={searchSubmit}
                 handleSearch={handleSearch}
+                placeholder={"Search Raw Materials..."}
             />
 
             <Grid container spacing={2}>

@@ -300,6 +300,7 @@ const InventoryManagement = () => {
                 searchControl={searchControl}
                 searchSubmit={searchSubmit}
                 handleSearch={handleSearch}
+                placeholder={`Search ${t('menuItemStock')}...`}
             />
 
             <Grid container spacing={2}>
