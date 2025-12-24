@@ -19,6 +19,7 @@ import ViewRawMaterialDrawer from "@/components/raw-material/view-raw-material-d
 
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import MenuItemsPageSkeleton from "@/components/menu-items/loading";
 
 const RawMaterials = () => {
     const theme = useTheme();
@@ -234,6 +235,8 @@ const RawMaterials = () => {
         ],
         [isDeleting, handleDrawerOpen, theme],
     );
+
+    if (isFetchingRawMaterial) return <MenuItemsPageSkeleton/>;
 
     return (
         <Box>

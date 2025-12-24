@@ -7,6 +7,7 @@ import {useSearch} from "@/use-search.ts";
 import DataGridTable from "@/components/ui/data-grid-table";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import type {GridColDef} from "@mui/x-data-grid";
+import MenuItemsPageSkeleton from "@/components/menu-items/loading";
 
 const UnitOfMeasurements = () => {
     const {data, isLoading} = useGetAllUnitOfMeasurementsQuery();
@@ -107,6 +108,8 @@ const UnitOfMeasurements = () => {
         ],
         [],
     );
+
+    if (isLoading) return <MenuItemsPageSkeleton/>;
 
     return (
         <Box>
