@@ -40,32 +40,18 @@ export const filterSchema = yup.object({
 
 export type TimePeriod = (typeof ORDER_PERIODS)[number];
 
-export interface ActivityLogType {
-    id: string;
-    userId: string;
-    storeId: string;
-    action: string;
-    entityId?: string;
-    entityType?: string;
-    details: string;
-    isRead: boolean;
-    createdAt: string;
-}
-
-export interface ActivityLogUser {
-    firstName: string;
-    lastName: string;
-    role: string;
-}
-
-export interface ActivityLogStore {
-    name: string;
-}
-
 export interface ActivityLogEntry {
-    activityLog: ActivityLogType;
-    user?: ActivityLogUser;
-    store?: ActivityLogStore;
+    id: string;
+    action: string;
+    entity?: string;
+    entityId?: string;
+    details: string;
+    status?: string;
+    createdAt: string;
+    storeName: string;
+    userName: string;
+    userRole: string;
+    entityType?: string;
 }
 
 export interface ActivityLogResponse {

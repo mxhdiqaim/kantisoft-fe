@@ -15,9 +15,15 @@ import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 import {useSearch} from "@/use-search.ts";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 import {fetchRawMaterialAndFilterByPeriod} from "@/types/raw-material-types.ts";
+import CustomCard from "@/components/customs/custom-card.tsx";
+
 import Icon from "@/components/ui/icon.tsx";
 import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
-import CustomCard from "@/components/customs/custom-card.tsx";
+
+type FormValues = {
+    timePeriod: TimePeriod;
+    rawMaterialId: string;
+};
 
 const RawMaterialInventoryTransaction = () => {
     const theme = useTheme();
@@ -26,7 +32,7 @@ const RawMaterialInventoryTransaction = () => {
         control,
         watch,
         formState: {errors},
-    } = useForm({
+    } = useForm<FormValues>({
         mode: "onChange",
         defaultValues: {
             timePeriod: "today",
@@ -230,6 +236,7 @@ const RawMaterialInventoryTransaction = () => {
                 timePeriod={data.timePeriod as TimePeriod}
                 control={control}
                 getTimeTitle={getTitle}
+                name={"timePeriod"}
                 timeTitle={"Transactions"}
             />
             <Box sx={{display: "flex", justifyContent: "flex-end"}}>

@@ -1,4 +1,4 @@
-import type {ActivityLogResponse} from "@/types";
+import type {ActivityLogEntry, ActivityLogResponse} from "@/types";
 import type {
     InventorySummaryType,
     SalesTrendType,
@@ -229,7 +229,7 @@ export const apiSlice = createApi({
             }),
         }),
 
-        getActivities: builder.query<ActivityLogResponse, { limit?: number; offset?: number }>({
+        getActivities: builder.query<ActivityLogEntry[], { limit?: number; offset?: number }>({
             query: ({limit = 20, offset = 0} = {}) => ({
                 url: "/activities",
                 params: {limit, offset},
