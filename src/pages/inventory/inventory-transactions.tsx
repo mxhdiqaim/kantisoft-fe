@@ -118,6 +118,7 @@ const InventoryTransactions = () => {
                 timePeriod={data.timePeriod as TimePeriod}
                 control={control}
                 getTimeTitle={getTitle}
+                name={"timePeriod"}
                 timeTitle={"Transactions"}
             />
             <Box sx={{display: "flex", justifyContent: "flex-end"}}>

@@ -1,10 +1,10 @@
 import {FormControl, type SxProps, type TextFieldProps, type Theme} from "@mui/material";
-import {type Control, Controller, type FieldValues} from "react-hook-form";
+import {type Control, Controller, type FieldValues, type Path} from "react-hook-form";
 import {StyledTextField} from "@/components/ui/index.tsx";
 
 interface Props<T extends FieldValues> extends Omit<TextFieldProps, "name" | "defaultValue"> {
     control: Control<T>;
-    name: string;
+    name: Path<T>;
     placeholder?: string;
     sx?: SxProps<Theme>;
 }

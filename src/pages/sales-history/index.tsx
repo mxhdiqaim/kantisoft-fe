@@ -58,6 +58,7 @@ const SalesHistory = () => {
                 timePeriod={period}
                 control={control}
                 getTimeTitle={getTitle}
+                name={"timePeriod"}
                 timeTitle={"Sales History"}
             />
             <Box sx={{display: "flex", justifyContent: "flex-end"}}>

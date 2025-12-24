@@ -1,19 +1,27 @@
-import {type Control, Controller} from "react-hook-form";
+import {type Control, Controller, type FieldValues, type Path} from "react-hook-form";
 import {Box, FormControl, InputAdornment, MenuItem, Typography} from "@mui/material";
 import type {TimePeriod} from "@/types";
 import Icon from "@/components/ui/icon.tsx";
 import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
 import {StyledTextField} from "@/components/ui/index.tsx";
 
-type Props<T> = {
+type Props<T extends FieldValues> = {
     title: string;
     timePeriod: TimePeriod;
     getTimeTitle: (timePeriod: TimePeriod) => string;
     control: Control<T>;
+    name: Path<T>;
     timeTitle?: string;
 };
 
-const OverviewHeader = ({title, timePeriod, getTimeTitle, control, timeTitle}: Props<T>) => (
+const OverviewHeader = <T extends FieldValues>({
+                                                   title,
+                                                   timePeriod,
+                                                   getTimeTitle,
+                                                   control,
+                                                   name,
+                                                   timeTitle
+                                               }: Props<T>) => (
     <Box
         sx={{
             display: "flex",
@@ -35,7 +43,7 @@ const OverviewHeader = ({title, timePeriod, getTimeTitle, control, timeTitle}: P
                     {getTimeTitle(timePeriod)}&apos;s {timeTitle}
                 </Typography>
                 <Controller
-                    name="timePeriod"
+                    name={name}
                     control={control}
                     render={({field}) => (
                         <FormControl>

@@ -6,7 +6,6 @@ import {UserRoleEnum} from "@/types/user-types";
 import {useMemo, useState} from "react";
 import TableStyledBox from "@/components/ui/data-grid-table/table-styled-box.tsx";
 import {type GridColDef} from "@mui/x-data-grid";
-import {useTranslation} from "react-i18next";
 import ActivityLogSkeleton from "@/components/activity-log/loading";
 import ApiErrorDisplay from "@/components/feedback/api-error-display";
 import {getApiError} from "@/helpers/get-api-error";
@@ -17,6 +16,7 @@ import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
 import {useSearch} from "@/use-search.ts";
 import {formatDateTimeCustom} from "@/utils/get-relative-time.ts";
+import {useTranslation} from "react-i18next";
 
 const ActivityLogPage = () => {
     const {t} = useTranslation();
@@ -36,7 +36,7 @@ const ActivityLogPage = () => {
 
     const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
         initialData: memoizedData,
-        searchKeys: ["user.firstName", "user.lastName", "activityLog.details", "activityLog.entityType", "activityLog.action", "store.name"],
+        searchKeys: ["details", "userName", "userRole", "storeName", "action"],
     });
 
     const columns: GridColDef[] = useMemo(
@@ -47,16 +47,11 @@ const ActivityLogPage = () => {
                 flex: 1,
                 minWidth: 200,
                 headerAlign: "left",
-                renderCell: (params) => {
-                    const date = new Date(params.row.activityLog.createdAt);
-                    return (
-                        <TableStyledBox>
-                            <Typography variant="body2">
-                                {formatDateTimeCustom(date)}
-                            </Typography>
-                        </TableStyledBox>
-                    );
-                },
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Typography variant="body2">{formatDateTimeCustom(params.value)}</Typography>
+                    </TableStyledBox>
+                ),
             },
             {
                 field: "details",
@@ -66,13 +61,13 @@ const ActivityLogPage = () => {
                 headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
-                        <Typography variant="body2">{params.row.activityLog.details}</Typography>
+                        <Typography variant="body2">{params.row.details}</Typography>
                     </TableStyledBox>
                 ),
             },
 
             {
-                field: "user",
+                field: "userName",
                 headerName: "User",
                 flex: 1,
                 minWidth: 180,
@@ -80,43 +75,37 @@ const ActivityLogPage = () => {
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Typography variant="body2">
-                            {params.row.user
-                                ? `${params.row.user.firstName} ${params.row.user.lastName}`
-                                : "System/Unknown"}
+                            {params.row.userName}
                         </Typography>
                     </TableStyledBox>
                 ),
             },
             {
-                field: "role",
+                field: "userRole",
                 headerName: "Role",
                 flex: 1,
                 minWidth: 120,
                 align: "center",
                 headerAlign: "left",
-                renderCell: (params) => {
-                    const role = params.row.user.role;
-
-                    return (
-                        <TableStyledBox>
-                            <Chip
-                                label={role ?? "N/A"}
-                                size="medium"
-                                sx={{textTransform: "capitalize", textAlign: "left"}}
-                            />
-                        </TableStyledBox>
-                    )
-                }
+                renderCell: (params) => (
+                    <TableStyledBox>
+                        <Chip
+                            label={params.row.userRole}
+                            size="medium"
+                            sx={{textTransform: "capitalize", textAlign: "left"}}
+                        />
+                    </TableStyledBox>
+                )
             },
             {
-                field: "store",
+                field: "storeName",
                 headerName: "Store",
                 flex: 1,
                 minWidth: 150,
                 headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
-                        <Typography variant="body2">{params.row.store?.name || "Global"}</Typography>
+                        <Typography variant="body2">{params.row.storeName}</Typography>
                     </TableStyledBox>
                 ),
             },
@@ -128,7 +117,7 @@ const ActivityLogPage = () => {
                 headerAlign: "left",
                 renderCell: (params) => (
                     <TableStyledBox>
-                        <Typography variant="body2">{t(params.row.activityLog.entityType || "N/A")}</Typography>
+                        <Typography variant="body2">{t(params.row.entityType || "N/A")}</Typography>
                     </TableStyledBox>
                 ),
             },
@@ -141,8 +130,8 @@ const ActivityLogPage = () => {
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Chip
-                            label={params.row.activityLog.action.replace(/_/g, " ")}
-                            color={getActionColor(params.row.activityLog.action)}
+                            label={params.row.action.replace(/_/g, " ")}
+                            color={getActionColor(params.row.action)}
                             size="medium"
                             sx={{fontWeight: 600, textTransform: "capitalize"}}
                         />
@@ -184,13 +173,7 @@ const ActivityLogPage = () => {
             />
             <Grid container spacing={2}>
                 <Grid size={12}>
-                    <DataGridTable
-                        data={filteredData}
-                        columns={columns}
-                        loading={isLoading}
-                        getRowId={(row) => row.activityLog.id}
-                    />
-
+                    <DataGridTable data={filteredData} columns={columns} loading={isLoading}/>
                 </Grid>
             </Grid>
         </Box>
