@@ -29,16 +29,27 @@ const RawMaterialForm: FC<Props> = ({open, onClose, rawMaterial}) => {
     const notify = useNotifier();
     const isEditMode = !!rawMaterial;
 
-    const {data: measurementUnit, isLoading: isMeasurementLoading} = useGetAllUnitOfMeasurementsQuery();
+    const {data: measurementUnit, isLoading: isMeasurementLoading} = useGetAllUnitOfMeasurementsQuery(undefined, {
+        skip: !open,
+    });
+
     const memoizedMeasurement = useMemoizedArray(measurementUnit);
 
-    const [createRawMaterial, {isLoading: isCreating, isSuccess: isCreateSuccess}] = useCreateRawMaterialMutation();
-    const [updateRawMaterial, {isLoading: isUpdating, isSuccess: isUpdateSuccess}] = useUpdateRawMaterialMutation();
+    const [createRawMaterial, {
+        isLoading: isCreating,
+        isSuccess: isCreateSuccess,
+        reset: resetCreateMutation
+    }] = useCreateRawMaterialMutation();
+    const [updateRawMaterial, {
+        isLoading: isUpdating,
+        isSuccess: isUpdateSuccess,
+        reset: resetUpdateMutation
+    }] = useUpdateRawMaterialMutation();
 
     const {
         control,
         handleSubmit,
-        reset,
+        reset: resetForm,
         formState: {errors},
     } = useForm({
         defaultValues: {
@@ -50,25 +61,35 @@ const RawMaterialForm: FC<Props> = ({open, onClose, rawMaterial}) => {
         resolver: yupResolver(createRawMaterialSchema),
     });
 
+    const handleClose = () => {
+        onClose();
+        resetCreateMutation();
+        resetUpdateMutation();
+    };
+
     useEffect(() => {
-        if (isEditMode && rawMaterial) {
-            reset({
+        if (isCreateSuccess || isUpdateSuccess) {
+            handleClose();
+        }
+    }, [isCreateSuccess, isUpdateSuccess]);
+
+    useEffect(() => {
+        if (rawMaterial && open) {
+            resetForm({
                 name: rawMaterial.name,
                 description: rawMaterial.description,
                 unitOfMeasurementId: rawMaterial.unitOfMeasurementId,
                 latestUnitPricePresentation: rawMaterial.latestUnitPricePresentation,
             });
-        } else {
-            reset();
+        } else if (!open) {
+            resetForm({
+                name: "",
+                description: "",
+                unitOfMeasurementId: "",
+                latestUnitPricePresentation: 0,
+            });
         }
-    }, [isEditMode, rawMaterial, reset]);
-
-    useEffect(() => {
-        if (isCreateSuccess || isUpdateSuccess) {
-            reset();
-            onClose();
-        }
-    }, [isCreateSuccess, isUpdateSuccess, onClose, reset]);
+    }, [rawMaterial, open, resetForm]);
 
     const onSubmit = async (data: CreateRawMaterialType) => {
 

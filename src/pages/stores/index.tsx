@@ -240,6 +240,7 @@ const StoresPage = () => {
                 searchControl={searchControl}
                 searchSubmit={searchSubmit}
                 handleSearch={handleSearch}
+                placeholder={"Search by name, type or location"}
                 // onExportCsv={handleExportCsv}
                 // onExportXlsx={handleExportXlsx}
             />

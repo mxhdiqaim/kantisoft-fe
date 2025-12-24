@@ -234,6 +234,7 @@ export const apiSlice = createApi({
                 url: "/activities",
                 params: {limit, offset},
             }),
+            transformResponse: (response: ActivityLogResponse) => response.data,
             providesTags: [{type: "ActivityLog", id: "LIST"}],
         }),
 
@@ -549,6 +550,11 @@ export const apiSlice = createApi({
                     : [{type: "RawMaterials", id: "LIST"}],
         }),
 
+        getSingleRawMaterial: builder.query<RawMaterialType, string>({
+            query: (id) => `/raw-materials/${id}`,
+            providesTags: (_result, _error, id) => [{type: "RawMaterial", id}],
+        }),
+
         createRawMaterial: builder.mutation<SingleRawMaterialType, CreateRawMaterialType>({
             query: (body) => ({
                 url: "/raw-materials/create",
@@ -556,11 +562,6 @@ export const apiSlice = createApi({
                 body,
             }),
             invalidatesTags: [{type: "RawMaterials", id: "LIST"}],
-        }),
-
-        getSingleRawMaterial: builder.query<RawMaterialType, string>({
-            query: (id) => `/raw-materials/${id}`,
-            providesTags: (_result, _error, id) => [{type: "RawMaterial", id}],
         }),
 
         updateRawMaterial: builder.mutation<UpdateRawMaterialResponseType, Partial<UpdateRawMaterialType> & Pick<RawMaterialType, "id">>({
@@ -600,6 +601,11 @@ export const apiSlice = createApi({
                     : [{type: "RawMaterialInventories", id: "LIST"}],
         }),
 
+        getRawMaterialInventoryStock: builder.query<any, string>({
+            query: (id) => `/raw-materials/inventory/${id}`,
+            providesTags: (_result, _error, id) => [{type: "RawMaterialInventoryStock", id}],
+        }),
+
         createRawMaterialInventory: builder.mutation<SingleRawMaterialInventoryType, CreateRawMaterialInventoryType>({
             query: (body) => ({
                 url: `/raw-materials/inventory/create`,
@@ -622,11 +628,6 @@ export const apiSlice = createApi({
                 {type: "RawMaterialInventory", id},
                 {type: "RawMaterialInventories", id: "LIST"},
             ],
-        }),
-
-        getRawMaterialInventoryStock: builder.query<any, string>({
-            query: (id) => `/raw-materials/inventory/${id}`,
-            providesTags: (_result, _error, id) => [{type: "RawMaterialInventoryStock", id}],
         }),
 
         stockInRawMaterialInventory: builder.mutation<any, StockInRawMaterialType & Pick<RawMaterialType, "id">>({

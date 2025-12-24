@@ -13,6 +13,10 @@ import {getApiError} from "@/helpers/get-api-error";
 import useNotifier from "@/hooks/useNotifier";
 import DataGridTable from "@/components/ui/data-grid-table";
 import {getActionColor} from "@/utils";
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
+import TableSearchActions from "@/components/ui/data-grid-table/table-search-action.tsx";
+import {useSearch} from "@/use-search.ts";
+import {formatDateTimeCustom} from "@/utils/get-relative-time.ts";
 
 const ActivityLogPage = () => {
     const {t} = useTranslation();
@@ -28,13 +32,12 @@ const ActivityLogPage = () => {
         offset: page * rowsPerPage,
     });
 
-    if (!currentUser || ![UserRoleEnum.MANAGER, UserRoleEnum.ADMIN].includes(currentUser.role)) {
-        return (
-            <Box sx={{p: 4}}>
-                <Typography color="error">You do not have permission to view activity logs.</Typography>
-            </Box>
-        );
-    }
+    const memoizedData = useMemoizedArray(data);
+
+    const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
+        initialData: memoizedData,
+        searchKeys: ["user.firstName", "user.lastName", "activityLog.details", "activityLog.entityType", "activityLog.action", "store.name"],
+    });
 
     const columns: GridColDef[] = useMemo(
         () => [
@@ -49,7 +52,7 @@ const ActivityLogPage = () => {
                     return (
                         <TableStyledBox>
                             <Typography variant="body2">
-                                {isNaN(date.getTime()) ? "Invalid Date" : date.toLocaleString()}
+                                {formatDateTimeCustom(date)}
                             </Typography>
                         </TableStyledBox>
                     );
@@ -134,7 +137,7 @@ const ActivityLogPage = () => {
                 headerName: "Action",
                 flex: 1,
                 headerAlign: "left",
-                minWidth: 240,
+                minWidth: 300,
                 renderCell: (params) => (
                     <TableStyledBox>
                         <Chip
@@ -147,16 +150,16 @@ const ActivityLogPage = () => {
                 ),
             },
         ],
-
         [],
     );
 
-    // Flatten data for DataGrid
-    const rows =
-        data?.data?.map((entry) => ({
-            id: entry.activityLog.id,
-            ...entry,
-        })) ?? [];
+    if (!currentUser || ![UserRoleEnum.MANAGER, UserRoleEnum.ADMIN].includes(currentUser.role)) {
+        return (
+            <Box sx={{p: 4}}>
+                <Typography color="error">You do not have permission to view activity logs.</Typography>
+            </Box>
+        );
+    }
 
     if (isLoading) {
         return <ActivityLogSkeleton rows={10} columns={columns.length}/>;
@@ -169,16 +172,23 @@ const ActivityLogPage = () => {
     }
 
     return (
-        <Box sx={{p: 2}}>
+        <Box>
             <Typography variant="h4" gutterBottom>
                 Activity Log
             </Typography>
+            <TableSearchActions
+                searchControl={searchControl}
+                searchSubmit={searchSubmit}
+                handleSearch={handleSearch}
+                placeholder={"Search Activity Logs..."}
+            />
             <Grid container spacing={2}>
                 <Grid size={12}>
                     <DataGridTable
-                        data={rows}
+                        data={filteredData}
                         columns={columns}
                         loading={isLoading}
+                        getRowId={(row) => row.activityLog.id}
                     />
 
                 </Grid>

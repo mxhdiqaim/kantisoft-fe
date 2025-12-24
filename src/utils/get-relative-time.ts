@@ -99,3 +99,22 @@ export const formatDateCustom = (
 
     return format(dateObj, pattern);
 };
+
+export const formatDateTimeCustom = (
+    date: Date | string | number,
+    variant: 'short' | 'long' | 'withTime' = 'withTime'
+): string => {
+    const dateObj = new Date(date);
+
+    // Define patterns
+    // d MMM, yyyy h:mma -> 23 Dec, 2025 9:30PM
+    const patterns = {
+        short: 'd MMM, yyyy',
+        long: 'd MMMM, yyyy',
+        withTime: 'd MMM, yyyy h:mm a'
+    };
+
+    // We use .replace(' ', '') on the 'a' part if you want "PM" instead of "PM "
+    // but usually, the standard format is fine.
+    return format(dateObj, patterns[variant]);
+};

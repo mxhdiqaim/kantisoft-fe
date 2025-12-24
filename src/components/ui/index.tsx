@@ -93,9 +93,19 @@ export const StyledTextField = styled(TextField, {
     shouldForwardProp: (prop) => prop !== "disabled",
 })<{ disabled?: boolean }>(({disabled}) => ({
     "& .MuiOutlinedInput-root": {
-        // height: 40,
-        // "& fieldset": {height: 45},
-        background: disabled && "#CFD1D3",
+        height: 40,
+        "& fieldset": {height: 45},
+        background: disabled ? "#CFD1D3" : "transparent",
+    },
+    "& .MuiInputLabel-root": {
+        // Adjusts the label to be vertically centered
+        transform: "translate(14px, 9px) scale(1)",
+        // Optionally reduce line-height if needed
+        lineHeight: "1.4375em",
+    },
+    "& .MuiInputLabel-shrink": {
+        // Fine-tune the shrunk label's position
+        transform: "translate(14px, -9px) scale(0.75)",
     },
 }));
 

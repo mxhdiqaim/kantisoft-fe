@@ -53,7 +53,13 @@ const SalesHistory = () => {
 
     return (
         <Box sx={{mx: "auto"}}>
-            <OverviewHeader title={"Sales"} timePeriod={period} control={control} getTimeTitle={getTitle}/>
+            <OverviewHeader
+                title={"Sales"}
+                timePeriod={period}
+                control={control}
+                getTimeTitle={getTitle}
+                timeTitle={"Sales History"}
+            />
             <Box sx={{display: "flex", justifyContent: "flex-end"}}>
                 <Typography
                     variant="h6"

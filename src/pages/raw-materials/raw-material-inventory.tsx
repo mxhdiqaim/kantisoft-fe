@@ -253,6 +253,7 @@ const RawMaterialInventory = () => {
                 searchControl={searchControl}
                 searchSubmit={searchSubmit}
                 handleSearch={handleSearch}
+                placeholder={"Search Raw Material Inventory..."}
             />
 
             <Grid container spacing={2}>

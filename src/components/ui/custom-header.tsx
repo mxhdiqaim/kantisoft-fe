@@ -1,16 +1,19 @@
 import {type Control, Controller} from "react-hook-form";
-import {Box, FormControl, InputLabel, MenuItem, Select, Typography} from "@mui/material";
+import {Box, FormControl, InputAdornment, MenuItem, Typography} from "@mui/material";
 import type {TimePeriod} from "@/types";
+import Icon from "@/components/ui/icon.tsx";
+import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
+import {StyledTextField} from "@/components/ui/index.tsx";
 
-type Props = {
+type Props<T> = {
     title: string;
     timePeriod: TimePeriod;
     getTimeTitle: (timePeriod: TimePeriod) => string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    control: Control<any>;
+    control: Control<T>;
+    timeTitle?: string;
 };
 
-const OverviewHeader = ({title, timePeriod, getTimeTitle, control}: Props) => (
+const OverviewHeader = ({title, timePeriod, getTimeTitle, control, timeTitle}: Props<T>) => (
     <Box
         sx={{
             display: "flex",
@@ -19,7 +22,7 @@ const OverviewHeader = ({title, timePeriod, getTimeTitle, control}: Props) => (
             mb: 1,
         }}
     >
-        <Typography variant="h4">{`${title} Overview`}</Typography>
+        <Typography variant="h4">{title}</Typography>
         <Box
             sx={{
                 display: "flex",
@@ -29,20 +32,39 @@ const OverviewHeader = ({title, timePeriod, getTimeTitle, control}: Props) => (
         >
             <Box sx={{display: "flex", alignItems: "center", gap: 2}}>
                 <Typography variant="h4" component="h1">
-                    {getTimeTitle(timePeriod)}&apos;s {title}
+                    {getTimeTitle(timePeriod)}&apos;s {timeTitle}
                 </Typography>
                 <Controller
                     name="timePeriod"
                     control={control}
                     render={({field}) => (
-                        <FormControl sx={{minWidth: 120}} size="small">
-                            <InputLabel id="period-select-label">Period</InputLabel>
-                            <Select {...field} labelId="period-select-label" label="Period">
+                        <FormControl>
+                            <StyledTextField
+                                {...field}
+                                select
+                                label="Period"
+                                placeholder="Select Period"
+                                SelectProps={{
+                                    IconComponent: () => null,
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Icon
+                                                src={ArrowDownIconSvg}
+                                                alt={"Dropdown Arrow"}
+                                                sx={{width: 15, height: 15}}
+                                            />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            >
+                                <MenuItem value={""} disabled>
+                                    Select Period
+                                </MenuItem>
                                 <MenuItem value={"today"}>Today</MenuItem>
                                 <MenuItem value={"week"}>This Week</MenuItem>
                                 <MenuItem value={"month"}>This Month</MenuItem>
                                 <MenuItem value={"all-time"}>All Time</MenuItem>
-                            </Select>
+                            </StyledTextField>
                         </FormControl>
                     )}
                 />

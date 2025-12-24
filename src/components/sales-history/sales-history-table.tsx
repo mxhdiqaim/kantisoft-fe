@@ -22,6 +22,7 @@ import {useSearch} from "@/use-search.ts";
 import {exportToCsv, exportToXlsx, getExportFormattedData} from "@/utils/export-data-utils";
 import CustomButton from "@/components/ui/button.tsx";
 import TableStyledMenuItem from "@/components/ui/data-grid-table/table-style-menuitem.tsx";
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 
 export interface Props {
     orders: OrderType[];
@@ -38,7 +39,7 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
-    const memoizedOrders = useMemo(() => orders ?? [], [orders]);
+    const memoizedOrders = useMemoizedArray(orders);
 
     const {searchControl, searchSubmit, handleSearch, filteredData} = useSearch({
         initialData: memoizedOrders,
@@ -330,6 +331,7 @@ const SalesHistoryTable = ({orders, loading: isLoadingOrders, period}: Props) =>
                 handleSearch={handleSearch}
                 onExportCsv={handleExportCsv}
                 onExportXlsx={handleExportXlsx}
+                placeholder={"Search by Order Reference or ID"}
             />
             <Grid container spacing={2} sx={{mt: 2}}>
                 <Grid size={12}>

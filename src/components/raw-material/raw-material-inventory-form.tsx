@@ -20,6 +20,7 @@ import CustomButton from "@/components/ui/button.tsx";
 import useNotifier from "@/hooks/useNotifier.ts";
 import {getApiError} from "@/helpers/get-api-error.ts";
 import ArrowDownIconSvg from "@/assets/icons/arrow-down.svg";
+import {useMemoizedArray} from "@/hooks/use-memoized-array.ts";
 
 interface Props {
     open: boolean;
@@ -34,6 +35,9 @@ const RawMaterialInventoryForm: FC<Props> = ({open, onClose, rawMaterialInventor
     const {data: rawMaterialData, isLoading: isFetchingRawMaterial} = useGetAllRawMaterialsQuery(undefined, {
         skip: !open,
     });
+
+    const memoizedRawMaterial = useMemoizedArray(rawMaterialData);
+
     const [createRawMaterialInventory, {
         isLoading: isCreating,
         isSuccess: isCreateSuccess,
@@ -149,7 +153,7 @@ const RawMaterialInventoryForm: FC<Props> = ({open, onClose, rawMaterialInventor
                                             <MenuItem value={""} disabled>
                                                 Select Raw Material
                                             </MenuItem>
-                                            {rawMaterialData?.map((rawMaterial) => (
+                                            {memoizedRawMaterial?.map((rawMaterial) => (
                                                 <MenuItem key={rawMaterial.id} value={rawMaterial.id}
                                                           sx={{textTransform: "capitalize"}}>
                                                     {rawMaterial.name}
