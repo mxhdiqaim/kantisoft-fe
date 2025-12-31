@@ -1,18 +1,20 @@
-FROM node:20-alpine
+# Use the official Bun image
+FROM oven/bun:1-alpine
 
-# Working directory
+# Set the working directory
 WORKDIR /app
 
-# Enable Corepack
-RUN corepack enable
+# Copy package.json and the bun lockfile
+COPY package.json bun.lock ./
 
-# Copy package.json and lock file
-COPY package.json pnpm-lock.yaml ./
+# Install dependencies using Bun
+RUN bun install --frozen-lockfile
 
-# Install dependencies, don't use --frozen-lockfile here
-RUN pnpm install
+# Copy the rest of the application files
+COPY . .
 
 # Expose the Vite dev server port
 EXPOSE 3000
 
-CMD ["pnpm", "dev"]
+# Command to run the development server
+CMD ["bun", "run", "dev"]
