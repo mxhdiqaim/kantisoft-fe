@@ -1,15 +1,40 @@
-
-node_modules
-dist
-
-.env.local
-.env
-.env.*
-
-Dockerfile
-docker-compose.yml
-
+# Git and version control
 .git
 .gitignore
 
+# Node.js dependencies
+# These are installed within the container
+node_modules
+npm-debug.log*
+
+# Build artifacts
+dist
+build
+
+# IDE and editor configurations
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# macOS specific files
+.DS_Store
+
+# Environment variables
+# Keep secrets and local configs out of the image
+.env
+.env.*
+!.env.example
+
+# Docker-related files
+# These are not needed inside the image itself
+Dockerfile
+Dockerfile.*
+docker-compose.yml
+docker-compose.*.yml
+
+# Documentation
 README.md

@@ -1,25 +1,23 @@
-FROM node:20-alpine AS Build
+FROM oven/bun:1-alpine AS Build
 
+# Build argument for the API URL
 ARG VITE_APP_API_URL
 
 WORKDIR /app
 
-# Enable corepack to use pnpm
-RUN corepack enable
+## Enable corepack to use pnpm
+#RUN corepack enable
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json bun.lock ./
 
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN bun install --frozen-lockfile
 
 COPY . .
 
 # Pass the build argument as an environment variable during the build process
-RUN VITE_APP_API_URL=${VITE_APP_API_URL} pnpm build
-
-## Build the application for production.
-#RUN pnpm build
+RUN VITE_APP_API_URL=${VITE_APP_API_URL} bun run build
 
 # Serve the application with a lightweight Nginx server
 FROM nginx:alpine AS serve
